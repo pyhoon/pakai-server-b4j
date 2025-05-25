@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-'Version 4.00 beta 3
+'Version 4.00 beta 4
 Sub Process_Globals
 	
 End Sub
@@ -117,7 +117,7 @@ Private Sub ReturnAlertScript3 (ContentType As String, VerboseMode As Boolean, A
 	End If
 End Sub
 
-Private Sub ReturnSuccessScript (ContentType As String, Verbose As Boolean, ExpectAccessToken As Boolean) As String
+Private Sub ReturnSuccessScriptForHelp (ContentType As String, Verbose As Boolean, ExpectAccessToken As Boolean) As String
 	If ContentType = WebApiUtils.CONTENT_TYPE_XML Then
 		If Verbose Then
 			Return $"success: function (response, textStatus, xhr) {
@@ -130,8 +130,8 @@ Private Sub ReturnSuccessScript (ContentType As String, Verbose As Boolean, Expe
 						$("#alert" + id).fadeOut("fast", function () {
 							$("#response" + id).val(xhr.responseText)
 							$("#alert" + id).html(code + " " + message)
-							$("#alert" + id).removeClass("alert-danger")
-							$("#alert" + id).addClass("alert-success")
+							$("#alert" + id).removeClass("bg-danger")
+							$("#alert" + id).addClass("bg-success")
 							$("#alert" + id).fadeIn()
 						})${IIf(ExpectAccessToken, $"
 						// Access Token specific
@@ -148,8 +148,8 @@ Private Sub ReturnSuccessScript (ContentType As String, Verbose As Boolean, Expe
 						$("#alert" + id).fadeOut("fast", function () {
 							$("#response" + id).val(xhr.responseText)
 							$("#alert" + id).html(code + " " + error)
-							$("#alert" + id).removeClass("alert-success")
-							$("#alert" + id).addClass("alert-danger")
+							$("#alert" + id).removeClass("bg-success")
+							$("#alert" + id).addClass("bg-danger")
 							$("#alert" + id).fadeIn()
 						})
 					}
@@ -159,8 +159,8 @@ Private Sub ReturnSuccessScript (ContentType As String, Verbose As Boolean, Expe
 					$("#alert" + id).fadeOut("fast", function () {
 						$("#response" + id).val(xhr.responseText)
 						$("#alert" + id).html(xhr.status + " " + textStatus)
-						$("#alert" + id).removeClass("alert-danger")
-						$("#alert" + id).addClass("alert-success")
+						$("#alert" + id).removeClass("bg-danger")
+						$("#alert" + id).addClass("bg-success")
 						$("#alert" + id).fadeIn()
 					})${IIf(ExpectAccessToken, $"
 					// Access Token specific
@@ -183,8 +183,8 @@ Private Sub ReturnSuccessScript (ContentType As String, Verbose As Boolean, Expe
 						$("#alert" + id).fadeOut("fast", function () {
 							$("#response" + id).val(content)
 							$("#alert" + id).html(response.a + " " + response.m)
-							$("#alert" + id).removeClass("alert-danger")
-							$("#alert" + id).addClass("alert-success")
+							$("#alert" + id).removeClass("bg-danger")
+							$("#alert" + id).addClass("bg-success")
 							$("#alert" + id).fadeIn()
 						})${IIf(ExpectAccessToken, $"
 						// Json Web Token specific
@@ -200,8 +200,8 @@ Private Sub ReturnSuccessScript (ContentType As String, Verbose As Boolean, Expe
 						$("#alert" + id).fadeOut("fast", function () {
 							$("#response" + id).val(content)
 							$("#alert" + id).html(response.a + " " + response.e)
-							$("#alert" + id).removeClass("alert-success")
-							$("#alert" + id).addClass("alert-danger")
+							$("#alert" + id).removeClass("bg-success")
+							$("#alert" + id).addClass("bg-danger")
 							$("#alert" + id).fadeIn()
 						})
 					}
@@ -212,8 +212,8 @@ Private Sub ReturnSuccessScript (ContentType As String, Verbose As Boolean, Expe
 					$("#alert" + id).fadeOut("fast", function () {
 						$("#response" + id).val(content)
 						$("#alert" + id).html(xhr.status + " " + textStatus)
-						$("#alert" + id).removeClass("alert-danger")
-						$("#alert" + id).addClass("alert-success")
+						$("#alert" + id).removeClass("bg-danger")
+						$("#alert" + id).addClass("bg-success")
 						$("#alert" + id).fadeIn()
 					})${IIf(ExpectAccessToken, $"
 					// Json Web Token specific
@@ -242,13 +242,13 @@ Private Sub ReturnSuccessTableScript (ContentType As String, Verbose As Boolean)
           var code = $(this).find("product_code").text()
           var name = $(this).find("product_name").text()
           var price = $(this).find("product_price").text()
-          var col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + id + "</td>"
-          var col_category = "<td class=\"align-middle\">" + category_name + "</td>"
+          var col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + id + "</td>"          
           var col_code = "<td class=\"align-middle\">" + code + "</td>"
           var col_name = "<td class=\"align-middle\">" + name + "</td>"
+          var col_category = "<td class=\"align-middle\">" + category_name + "</td>"
           var col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + price + "</td>"
           var col_edit = "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" data-price=\"" + price + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-          tbl_body += "<tr>" + col_id + col_category + col_code + col_name + col_price + col_edit + "</tr>"
+          tbl_body += "<tr>" + col_id + col_code + col_name + col_category + col_price + col_edit + "</tr>"
         })
         tbl_body += "</tbody>"
       }
@@ -264,46 +264,46 @@ Private Sub ReturnSuccessTableScript (ContentType As String, Verbose As Boolean)
         var tbl_head = ""
         var tbl_body = ""
         if (response.r.length) {
-          tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Category</th><th>Name</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
+          tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Name</th><th>Category</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
           tbl_body += "<tbody>"
           $.each(response.r, function () {
             var col_id = ""
             var col_code = ""
-            var col_category = ""
             var col_name = ""
+            var col_category = ""
             var col_price = ""
             var col_edit = ""
             var id
+            var catid
             var code
             var name
-            var price
-            var catid
+            var price            
             $.each(this, function (key, value) {
               if (key == "id") {
                 col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
                 id = value
               }
+              else if (key == "category_id") {
+                catid = value
+              }
               else if (key == "product_code") {
                 col_code = "<td class=\"align-middle\">" + value + "</td>"
                 code = value
-              }
-              else if (key == "category_name") {
-                col_category = "<td class=\"align-middle\">" + value + "</td>"
               }
               else if (key == "product_name") {
                 col_name = "<td class=\"align-middle\">" + value + "</td>"
                 name = value
               }
+              else if (key == "category_name") {
+                col_category = "<td class=\"align-middle\">" + value + "</td>"
+              }
               else if (key == "product_price") {
                 col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
                 price = value
               }
-              else if (key == "category_id") {
-                catid = value
-              }
             })
             col_edit = "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\"  data-price=\"" + price + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-            tbl_body += "<tr>" + col_id + col_code + col_category + col_name + col_price + col_edit + "</tr>"
+            tbl_body += "<tr>" + col_id + col_code + col_name + col_category + col_price + col_edit + "</tr>"
           })
           tbl_body += "</tbody>"
         }
@@ -322,46 +322,46 @@ Private Sub ReturnSuccessTableScript (ContentType As String, Verbose As Boolean)
       var tbl_head = ""
       var tbl_body = ""
       if (response.length) {
-        tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Category</th><th>Name</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
+        tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Name</th><th>Category</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
         tbl_body += "<tbody>"
         $.each(response, function () {
           var col_id = ""
           var col_code = ""
-          var col_category = ""
           var col_name = ""
+          var col_category = ""
           var col_price = ""
           var col_edit = ""
           var id
+          var catid
           var code
           var name
           var price
-          var catid
           $.each(this, function (key, value) {
             if (key == "id") {
               col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
               id = value
             }
+            else if (key == "category_id") {
+              catid = value
+            }
             else if (key == "product_code") {
               col_code = "<td class=\"align-middle\">" + value + "</td>"
               code = value
-            }
-            else if (key == "category_name") {
-              col_category = "<td class=\"align-middle\">" + value + "</td>"
             }
             else if (key == "product_name") {
               col_name = "<td class=\"align-middle\">" + value + "</td>"
               name = value
             }
+            else if (key == "category_name") {
+              col_category = "<td class=\"align-middle\">" + value + "</td>"
+            }
             else if (key == "product_price") {
               col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
               price = value
             }
-            else if (key == "category_id") {
-              catid = value
-            }
           })
           col_edit = "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" data-price=\"" + price + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-          tbl_body += "<tr>" + col_id + col_code + col_category + col_name + col_price + col_edit + "</tr>"
+          tbl_body += "<tr>" + col_id + col_code + col_name + col_category + col_price + col_edit + "</tr>"
         })
         tbl_body += "</tbody>"
       }
@@ -392,14 +392,14 @@ function setOptions(id) {
 				type: "get",
 				dataType: "${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")}",
 				headers: headers,
-				${ReturnSuccessScript(ContentType, Verbose, False)}
+				${ReturnSuccessScriptForHelp(ContentType, Verbose, False)}
 				error: function (xhr, textStatus, errorThrown) {
 					var content = xhr.responseText
 					$("#alert" + id).fadeOut("fast", function () {
 						$("#response" + id).val(content)
 						$("#alert" + id).html(xhr.status + " " + errorThrown)
-						$("#alert" + id).removeClass("alert-success")
-						$("#alert" + id).addClass("alert-danger")
+						$("#alert" + id).removeClass("bg-success")
+						$("#alert" + id).addClass("bg-danger")
 						$("#alert" + id).fadeIn()
 					})
 				}
@@ -411,7 +411,7 @@ function setOptions(id) {
 				data: $("#body" + id).val(),
 				dataType: "${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")}",
 				headers: headers,
-				${ReturnSuccessScript(ContentType, Verbose, True)}
+				${ReturnSuccessScriptForHelp(ContentType, Verbose, True)}
 				error: function (xhr, textStatus, errorThrown) {
 					var content = xhr.responseText			
 					$("#alert" + id).fadeOut("fast", function () {
@@ -430,7 +430,7 @@ function setOptions(id) {
 				data: $("#body" + id).val(),
 				dataType: "${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")}",
 				headers: headers,
-				${ReturnSuccessScript(ContentType, Verbose, False)}
+				${ReturnSuccessScriptForHelp(ContentType, Verbose, False)}
 				error: function (xhr, textStatus, errorThrown) {
 					var content = xhr.responseText
 					$("#alert" + id).fadeOut("fast", function () {
@@ -448,7 +448,7 @@ function setOptions(id) {
 				type: "delete",
 				dataType: "${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")}",
 				headers: headers,
-				${ReturnSuccessScript(ContentType, Verbose, False)}
+				${ReturnSuccessScriptForHelp(ContentType, Verbose, False)}
 				error: function (xhr, textStatus, errorThrown) {
 					var content = xhr.responseText
 					$("#alert" + id).fadeOut("fast", function () {
@@ -513,12 +513,12 @@ Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, Con
       var result = $(response).find("result")
 	  tbl_body += "<tbody>"
 	  if (result.length) {
-	    tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Name</th><th style=\"width: 90px\">Actions</th></thead>"
+	    tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th style=\"text-align: left\">Name</th><th style=\"text-align: center; width: 90px\">Actions</th></thead>"
 	    $(result).each(function () {
 	      var id = $(this).find("id").text()
 	      var name = $(this).find("category_name").text()
 	      var col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + id + "</td>"
-	      var col_name = "<td class=\"align-middle\">" + name + "</td>"
+	      var col_name = "<td class=\"align-middle\" style=\"text-align: left\">" + name + "</td>"
 	      var tbl_row = col_id + col_name + "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-name=\"" + name + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
 	      tbl_body += "<tr>" + tbl_row + "</tr>"
 	    })
@@ -644,7 +644,7 @@ Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, Con
   var tbl_body = ""
   $.getJSON("/${Main.conf.ApiName}/categories", function (response) {
     if (${IIf(Verbose, "response.r", "response")}.length) {
-      tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Name</th><th style=\"width: 90px\">Actions</th></thead>"
+      tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th style=\"text-align: left\">Name</th><th style=\"text-align: center; width: 90px\">Actions</th></thead>"
       tbl_body += "<tbody>"
       $.each(${IIf(Verbose, "response.r", "response")}, function () {
         var tbl_row = ""
@@ -658,7 +658,7 @@ Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, Con
             id = value
           }
           else if (key == "category_name") {
-            col_name = "<td class=\"align-middle\">" + value + "</td>"
+            col_name = "<td class=\"align-middle\" style=\"text-align: left\">" + value + "</td>"
             name = value
           }
         })
@@ -827,7 +827,7 @@ Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, Conte
     success: function (response) {
       var result = $(response).find("result")
       if (result.length) {
-        tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Category</th><th>Code</th><th>Name</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
+        tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Name</th><th>Category</th><th style=\"text-align: right\">Price</th><th style=\"text-align: center; width: 90px\">Actions</th></thead>"
         tbl_body += "<tbody>"
         $(result).each(function () {
           var id = $(this).find("id").text()
@@ -837,12 +837,12 @@ Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, Conte
           var name = $(this).find("product_name").text()
           var price = $(this).find("product_price").text()
           var col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + id + "</td>"
-          var col_category = "<td class=\"align-middle\">" + category_name + "</td>"
           var col_code = "<td class=\"align-middle\">" + code + "</td>"
           var col_name = "<td class=\"align-middle\">" + name + "</td>"
-          var col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + price + "</td>"
+          var col_category = "<td class=\"align-middle\">" + category_name + "</td>"          
+		  var col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + price + "</td>"
           var col_edit = "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" data-price=\"" + price + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-          tbl_body += "<tr>" + col_id + col_category + col_code + col_name + col_price + col_edit + "</tr>"
+          tbl_body += "<tr>" + col_id + col_code + col_name + col_category + col_price + col_edit + "</tr>"
         })
         tbl_body += "</tbody>"
       }
@@ -872,14 +872,14 @@ Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, Conte
 })"$
 		Dim script4 As String = $"$(document).on("click", ".edit", function (e) {
   var id = $(this).attr("data-id")
-  var category = $(this).attr("data-category")
   var code = $(this).attr("data-code")
   var name = $(this).attr("data-name")
+  var category = $(this).attr("data-category")
   var price = $(this).attr("data-price").replace(",", "")
   $("#id1").val(id)
-  $("#category2").val(category)
   $("#code1").val(code)
   $("#name1").val(name)
+  $("#category2").val(category)
   $("#price1").val(price)
 })"$
 		Dim script5 As String = $"$(document).on("click", ".delete", function (e) {
@@ -1027,13 +1027,13 @@ function escapeXml(unsafe) {
     var tbl_head = ""
     var tbl_body = ""
     if (${IIf(Verbose, "response.r", "response")}.length) {
-      tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Category</th><th>Code</th><th>Name</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
+      tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Name</th><th>Category</th><th style=\"text-align: right\">Price</th><th style=\"text-align: center; width: 90px\">Actions</th></thead>"
       tbl_body += "<tbody>"
       $.each(${IIf(Verbose, "response.r", "response")}, function () {
         var col_id = ""
-        var col_category = ""
         var col_code = ""
         var col_name = ""
+        var col_category = ""
         var col_price = ""
         var col_edit = ""
         var id
@@ -1046,9 +1046,6 @@ function escapeXml(unsafe) {
             col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
             id = value
           }
-          else if (key == "category_name") {
-            col_category = "<td class=\"align-middle\">" + value + "</td>"
-          }
           else if (key == "product_code") {
             col_code = "<td class=\"align-middle\">" + value + "</td>"
             code = value
@@ -1057,6 +1054,9 @@ function escapeXml(unsafe) {
             col_name = "<td class=\"align-middle\">" + value + "</td>"
             name = value
           }
+          else if (key == "category_name") {
+            col_category = "<td class=\"align-middle\">" + value + "</td>"
+          }		  
           else if (key == "product_price") {
             col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
             price = value
@@ -1066,7 +1066,7 @@ function escapeXml(unsafe) {
           }
         })
         col_edit = "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" data-price=\"" + price + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-        tbl_body += "<tr>" + col_id + col_category + col_code + col_name + col_price + col_edit + "</tr>"
+        tbl_body += "<tr>" + col_id + col_code + col_name + col_category + col_price + col_edit + "</tr>"
       })
       tbl_body += "</tbody>"
     }
@@ -1098,9 +1098,9 @@ function escapeXml(unsafe) {
   var name = $(this).attr("data-name")
   var price = $(this).attr("data-price").replace(",", "")
   $("#id1").val(id)
-  $("#category2").val(category)
   $("#code1").val(code)
   $("#name1").val(name)
+  $("#category2").val(category)
   $("#price1").val(price)
 })"$
 		Dim script5 As String = $"$(document).on("click", ".delete", function (e) {

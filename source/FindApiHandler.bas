@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 3
+'Version 4.00 beta 4
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -112,7 +112,7 @@ Public Sub GetProductsByCategoryId (id As Int)
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
 	DB.Close
 	ReturnApiResponse
 End Sub

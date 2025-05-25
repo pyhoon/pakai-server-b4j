@@ -39,7 +39,8 @@ button:focus {
 
 .collapsible:after {
     content: '\002B';
-    color: dimgray;
+    /* color: dimgray; */
+    color: white;
     font-weight: bold;
     float: right;
     margin-left: 5px;
@@ -56,7 +57,7 @@ button:focus {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
-    background-color: #f1f1f1;
+    background-color: #636363;
 }
 
 .bottom {
@@ -133,35 +134,43 @@ button:focus {
 }
 
 .badge-green {
-    background-color: #16a34a;
-}
-
-.badge-purple {
-    background-color: #9333ea;
-}
-
-.badge-blue {
-    background-color: #2563eb;
-}
-
-.badge-red {
-    background-color: #dc2626;
-}
-
-.collapsible-background-green {
+    /* background-color: #16a34a; */
     background-color: #bbf7d0;
 }
 
-.collapsible-background-purple {
+.badge-purple {
+    /* background-color: #9333ea; */
     background-color: #e9d5ff;
 }
 
-.collapsible-background-blue {
+.badge-blue {
+    /* background-color: #2563eb; */
     background-color: #bfdbfe;
 }
 
-.collapsible-background-red {
+.badge-red {
+    /* background-color: #dc2626; */
     background-color: #fecaca;
+}
+
+.collapsible-background-green {
+    /* background-color: #bbf7d0; */
+    background-color: #16a34a;
+}
+
+.collapsible-background-purple {
+    /* background-color: #e9d5ff; */
+    background-color: #9333ea;
+}
+
+.collapsible-background-blue {
+    /* background-color: #bfdbfe; */
+    background-color: #2563eb;
+}
+
+.collapsible-background-red {
+    /* background-color: #fecaca; */
+    background-color: #dc2626;
 }
 
 .error {

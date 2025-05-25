@@ -1,6 +1,6 @@
-# Product: 		Web API Server
+# Product: 		Pakai framework (formerly known as Web API Server)
 # Version: 		4.00
-# Description: 	Server application project template
+# Description: 	B4J project template for building JSON and XML formats API backend
 # Developer:	Poon Yip Hoon (Aeric)
 # License:		MIT License
 # GitHub:		https://github.com/pyhoon/web-api-server-b4j
@@ -16,9 +16,9 @@
 # Backslash character at the end of line means that the command continues in the next line.
 
 # Define App Constants
-HOME_TITLE=WEB API SERVER
-APP_TITLE=Web API Server
-APP_TRADEMARK=B4X
+HOME_TITLE=PAKAI FRAMEWORK
+APP_TITLE=Pakai
+APP_TRADEMARK=PAKAI
 APP_COPYRIGHT=Copyright Computerise System Solutions 2025
 
 # Server Path
@@ -52,12 +52,12 @@ SSL_KEYSTORE_PASSWORD=xxxxxxxxx
 
 ## SQLite configuration:
 DbType=SQLite
-DbFile=webapi.db
+DbFile=pakai.db
 DbDir=
 
 ## MySQL configuration:
 #DbType=MySQL
-#DbName=webapi
+#DbName=pakai
 #DbHost=localhost
 #DbPort=
 #DriverClass=com.mysql.cj.jdbc.Driver

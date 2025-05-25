@@ -1,16 +1,16 @@
-# Web API Server
+# Pakai - Web API Server framework
 
 Version: 4.00
 
-Create Web API Server using B4X project template
+Create Web API Backend using B4J project template
 
 ### Preview
-![Web API Server](../v4.00beta/web-api-server-b4j.png))
+![Pakai](../v4.00beta/web-api-server-b4j.png)
 
 ---
 
 ## Template:
-- Web API Server (4.00).b4xtemplate
+- Pakai (4.00).b4xtemplate
 
 ## Depends on:
 - [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
@@ -21,7 +21,7 @@ Create Web API Server using B4X project template
 ## Features:
 - Use Server Handlers
 - Improved API documentation
-- Built-in web front-end (bootstrap 4)
+- Built-in web front-end (Bootstrap 4)
 - Supports JSON and XML formats
 
 ### Code Example

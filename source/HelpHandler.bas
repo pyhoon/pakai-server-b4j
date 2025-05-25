@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Help Handler class
-'Version 4.00 beta 3
+'Version 4.00 beta 4
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
@@ -36,7 +36,7 @@ Private Sub ShowHelpPage
 	#End If
 	BuildMethods ' Build page programatically
 	Dim Contents As String = GenerateHtml
-	Dim strMain As String = WebApiUtils.ReadTextFile("main.html")
+	Dim strMain As String = WebApiUtils.ReadTextFile("help.html")
 	strMain = WebApiUtils.BuildDocView(strMain, Contents)
 	strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
 	strMain = WebApiUtils.BuildHtml(strMain, Main.ctx)
@@ -410,15 +410,15 @@ End Sub
 Private Sub GenerateVerbSection (section As VerbSection) As String
 	Select section.FileUpload
 		Case "Image", "PDF"
-			Dim strBodyInput As String = $"File: <label for="file1${section.ElementId}">Choose a file:</label><input type="file" id="file1${section.ElementId}" class="pb-3" name="file1">"$
+			Dim strBodyInput As String = $"<p><strong>File:</strong> <label for="file1${section.ElementId}">Choose a file:</label><input type="file" id="file1${section.ElementId}" class="pb-3" name="file1"></p>"$
 		Case Else
-			Dim strBodySample As String = $"Format: <p class="form-control" style="height: fit-content; background-color: #F0F9FF; font-size: small">${section.Body}</p>"$
-			Dim strBodyInput As String = $"Body: <textarea id="body${section.ElementId}" rows="6" class="form-control data-body" style="background-color: #FFFFFF; font-size: small"></textarea></p>"$
+			Dim strBodySample As String = $"<p><strong>Format:</strong> <span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">${section.Body}</span></p>"$
+			Dim strBodyInput As String = $"<p><strong>Body:</strong> <textarea id="body${section.ElementId}" rows="6" class="form-control data-body" style="background-color: #363636; color: white; font-size: small"></textarea></p>"$
 	End Select
 	Return $"
-        <button style="color: #363636" class="collapsible collapsible-background-${section.Color}"><span style="width: 60px" class="badge badge-${section.Color} text-white py-1 mr-1">${section.Verb}</span>
+        <button style="color: #363636" class="collapsible collapsible-background-${section.Color}"><span style="width: 60px" class="badge badge-${section.Color} text-dark py-1 mr-1">${section.Verb}</span>
 		${IIf(section.Authenticate.EqualsIgnoreCase("Basic") Or section.Authenticate.EqualsIgnoreCase("Token"), _
-			$"<span style="width: 50px" class="badge rounded-pill pill-yellow pill-yellow-text px-2 py-1">${WebApiUtils.ProperCase(section.Authenticate)}</span>"$, "")} ${section.Description}
+			$"<span style="width: 50px" class="badge rounded-pill pill-yellow pill-yellow-text px-2 py-1">${WebApiUtils.ProperCase(section.Authenticate)}</span>"$, "")}<span class="text-dark ml-1">${section.Description}</span>
 		</button>
         <div class="details">
             <!--<div class="row">
@@ -431,23 +431,23 @@ Private Sub GenerateVerbSection (section As VerbSection) As String
             <div class="row">
                 <div class="col-md-3 p-3">
                     <p><strong>Parameters</strong><br/>
-                    <label class="col control-label border rounded" style="padding-top: 5px; padding-bottom: 5px; background-color: #F0F9FF; font-size: small; white-space: pre-wrap;">${section.Params}</label></p>
+                    <label class="col control-label border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; white-space: pre-wrap;">${section.Params}</label></p>
                     ${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strBodySample, "")}
-                    <p><strong>Status Code</strong><br/>
-                    ${section.Expected}</p>
+                    <div class="mt-3"><strong>Status Code</strong><br/>
+                    ${section.Expected}</div>
                 </div>
 	            <div class="col-md-3 p-3">
 					<form id="form1" method="${section.Verb}">
 					<p><strong>Path</strong><br/>
-	                <input${IIf(section.InputDisabled, " disabled", "")} id="path${section.ElementId}" class="form-control data-path" style="background-color: ${section.DisabledBackground}; font-size: small" value="${section.Link & IIf(section.Raw, "?format=json", "")}"></p>
+	                <input${IIf(section.InputDisabled, " disabled", "")} id="path${section.ElementId}" class="form-control data-path text-light" style="background-color: ${section.DisabledBackground}; font-size: small" value="${section.Link & IIf(section.Raw, "?format=json", "")}"></p>
 					${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strBodyInput, $""$)}
 					<button id="btn${section.ElementId}" class="${IIf(section.FileUpload.EqualsIgnoreCase("Image") Or section.FileUpload.EqualsIgnoreCase("PDF"), $"file"$, $"${section.Verb.ToLowerCase}"$)}${IIf(section.Authenticate.ToUpperCase = "BASIC" Or section.Authenticate.ToUpperCase = "TOKEN", " " & section.Authenticate.ToLowerCase, "")} button submit-button-${section.Color} text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px"><strong>Submit</strong></button>
 	            	</form>
 				</div>
                 <div class="col-md-6 p-3">
                     <p><strong>Response</strong><br/>
-                    <textarea rows="10" id="response${section.ElementId}" class="form-control" style="background-color: #696969; color: white; font-size: small"></textarea></p>
-                    <div id="alert${section.ElementId}" class="alert alert-default" role="alert" style="display: block"></div>
+                    <textarea rows="10" id="response${section.ElementId}" class="form-control" style="background-color: #363636; color: white; font-size: small"></textarea></p>
+                    <div id="alert${section.ElementId}" class="alert text-light" role="alert" style="display: block"></div>
                 </div>
             </div>
         </div>"$
@@ -487,9 +487,11 @@ Private Sub GenerateDocItem (Props As Map) As String
 	section.Expected = IIf(Props.ContainsKey("Expected"), Props.Get("Expected"), GetExpectedResponse(section.Verb))
 	If section.Params.EqualsIgnoreCase("Not required") Then
 		section.InputDisabled = True
-		section.DisabledBackground = "#F0F9FF"
+		'section.DisabledBackground = "#F0F9FF"
+		section.DisabledBackground = "#696969"
 	Else
-		section.DisabledBackground = "#FFFFFF"
+		'section.DisabledBackground = "#FFFFFF"
+		section.DisabledBackground = "#363636"
 	End If
 	Return GenerateVerbSection(section)
 End Sub
