@@ -178,11 +178,11 @@ Private Sub ReturnSuccessScriptForHelp (ContentType As String, Verbose As Boolea
 	Else
 		If Verbose Then
 			Return $"success: function (response) {
-					if (response.s == "ok" || response.s == "success") {
+					if (response.status == "ok" || response.status == "success") {
 						var content = JSON.stringify(response, undefined, 2)
 						$("#alert" + id).fadeOut("fast", function () {
 							$("#response" + id).val(content)
-							$("#alert" + id).html(response.a + " " + response.m)
+							$("#alert" + id).html(response.code + " " + response.message)
 							$("#alert" + id).removeClass("bg-danger")
 							$("#alert" + id).addClass("bg-success")
 							$("#alert" + id).fadeIn()
@@ -199,7 +199,7 @@ Private Sub ReturnSuccessScriptForHelp (ContentType As String, Verbose As Boolea
 						var content = JSON.stringify(response, undefined, 2)
 						$("#alert" + id).fadeOut("fast", function () {
 							$("#response" + id).val(content)
-							$("#alert" + id).html(response.a + " " + response.e)
+							$("#alert" + id).html(response.code + " " + response.error)
 							$("#alert" + id).removeClass("bg-success")
 							$("#alert" + id).addClass("bg-danger")
 							$("#alert" + id).fadeIn()

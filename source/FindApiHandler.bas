@@ -140,7 +140,7 @@ Public Sub SearchByKeywords
 	
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products p"
-	DB.Select = Array("p.*", "c.category_name")
+	DB.Select = Array("p.id AS id", "p.product_code AS code", "p.product_name AS name", "c.category_name", "p.product_price AS price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	If SearchForText <> "" Then
 		DB.Where = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
@@ -149,7 +149,10 @@ Public Sub SearchByKeywords
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
+	HRM.ResponseKeys = Array("m", "a", "r", "s", "e")
+	HRM.KeysAlias = Array("message", "code", "data", "status", "error")
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
