@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 4
+'Version 4.00 beta 5
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -20,6 +20,9 @@ End Sub
 Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.OrderedKeys = True
+	HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
+	HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -93,12 +96,14 @@ End Sub
 Public Sub GetAllProducts
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products p"
-	DB.Select = Array("p.*", "c.category_name")
+	DB.Select = Array("category_id catid", "category_name category", "p.id id", "product_code code", "product_name name", "product_price price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
+	HRM.ResponseKeys = Array("a", "s", "m", "e", "r")
+	HRM.ResponseKeysAlias = Array("code", "status", "message", "error", "data")	' if ok, then show message first
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -111,6 +116,8 @@ Public Sub GetProductsByCategoryId (id As Int)
 	DB.WhereParam("c.id = ?", id)
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
+	HRM.ResponseKeys = Array("a", "s", "m", "e", "r")
+	HRM.ResponseKeysAlias = Array("code", "status", "message", "error", "data")	' if ok, then show message first
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
 	DB.Close
@@ -140,7 +147,7 @@ Public Sub SearchByKeywords
 	
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products p"
-	DB.Select = Array("p.id AS id", "p.product_code AS code", "p.product_name AS name", "c.category_name", "p.product_price AS price")
+	DB.Select = Array("p.id id", "product_code code", "product_name AS name", "category_id catid", "category_name category", "product_price price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	If SearchForText <> "" Then
 		DB.Where = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
@@ -150,9 +157,9 @@ Public Sub SearchByKeywords
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
+	'HRM.OrderedKeys = True
 	HRM.ResponseKeys = Array("m", "a", "r", "s", "e")
-	HRM.KeysAlias = Array("message", "code", "data", "status", "error")
-	HRM.OrderedKeys = True
+	HRM.ResponseKeysAlias = Array("message", "code", "data", "status", "error")
 	DB.Close
 	ReturnApiResponse
 End Sub

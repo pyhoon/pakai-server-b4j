@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 4
+'Version 4.00 beta 5
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -19,6 +19,9 @@ End Sub
 Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.OrderedKeys = True
+	HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
+	HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -94,7 +97,11 @@ Private Sub GetCategories
 	DB.Table = "tbl_categories"
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	If HRM.OrderedKeys Then
+		HRM.ResponseData = DB.Results2
+	Else
+		HRM.ResponseData = DB.Results
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub
