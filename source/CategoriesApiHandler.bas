@@ -19,10 +19,12 @@ End Sub
 Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML
+	HRM.XmlElement = "item"
 	HRM.OrderedKeys = True
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
-		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
+		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "item")
 	End If
 End Sub
 
@@ -128,14 +130,23 @@ Private Sub GetCategoryById (id As Int)
 End Sub
 
 Private Sub CreateNewCategory
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
-		HRM.ResponseError = "Invalid json object"
+	'Dim data As Map = WebApiUtils.RequestData(Request)
+	'If Not(data.IsInitialized) Then
+	'	HRM.ResponseCode = 400
+	'	HRM.ResponseError = "Invalid json object"
+	'	ReturnApiResponse
+	'	Return
+	'End If
+	Try
+		Dim str As String = WebApiUtils.RequestDataText(Request)
+		Dim data As Map = str.As(JSON).ToMap
+	Catch
+		HRM.ResponseCode = 422
+		'HRM.ResponseError = LastException.Message
+		HRM.ResponseError = $"Invalid ${IIf(HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")} object"$
 		ReturnApiResponse
 		Return
-	End If
-	
+	End Try
 	' Check whether required keys are provided
 	If data.ContainsKey("category_name") = False Then
 		HRM.ResponseCode = 400
@@ -177,14 +188,23 @@ Private Sub CreateNewCategory
 End Sub
 
 Private Sub UpdateCategoryById (id As Int)
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
+	'Dim data As Map = WebApiUtils.RequestData(Request)
+	'If Not(data.IsInitialized) Then
+	'	HRM.ResponseCode = 400
+	'	HRM.ResponseError = "Invalid json object"
+	'	ReturnApiResponse
+	'	Return
+	'End If
+	Try
+		Dim str As String = WebApiUtils.RequestDataText(Request)
+		Dim data As Map = str.As(JSON).ToMap
+	Catch
+		HRM.ResponseCode = 422
+		'HRM.ResponseError = LastException.Message
 		HRM.ResponseError = "Invalid json object"
 		ReturnApiResponse
 		Return
-	End If
-	
+	End Try
 	' Check whether required keys are provided
 	If data.ContainsKey("category_name") = False Then
 		HRM.ResponseCode = 400
@@ -214,7 +234,7 @@ Private Sub UpdateCategoryById (id As Int)
 		ReturnApiResponse
 		DB.Close
 		Return
-	End If					
+	End If
 
 	DB.Reset
 	DB.Columns = Array("category_name", _

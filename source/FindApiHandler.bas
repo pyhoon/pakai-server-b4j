@@ -20,6 +20,7 @@ End Sub
 Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML
 	HRM.OrderedKeys = True
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
@@ -135,16 +136,25 @@ Public Sub GetProductsByCategoryId (id As Int)
 End Sub
 
 Public Sub SearchByKeywords
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
+	'Dim data As Map = WebApiUtils.RequestData(Request)
+	'If Not(data.IsInitialized) Then
+	'	HRM.ResponseCode = 400
+	'	HRM.ResponseError = $"Invalid ${IIf(HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")} object"$
+	'	ReturnApiResponse
+	'	Return
+	'End If
+	Try
+		Dim str As String = WebApiUtils.RequestDataText(Request)
+		Dim data As Map = str.As(JSON).ToMap
+	Catch
+		HRM.ResponseCode = 422
+		'HRM.ResponseError = LastException.Message
 		HRM.ResponseError = $"Invalid ${IIf(HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")} object"$
 		ReturnApiResponse
 		Return
-	End If
-	
+	End Try
 	'If HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML Then
-	'	data = data.Get("root")		
+	'	data = data.Get("root")
 	'End If
 	' Check whether required keys are provided
 	If data.ContainsKey("keyword") = False Then

@@ -14,9 +14,9 @@ FileGroup5=Default Group
 Group=App
 Library1=jcore
 Library2=json
-Library3=miniormutils
-Library4=xml2map
-Library5=jstringutils
+Library3=jstringutils
+Library4=miniormutils
+Library5=xml2map
 Module1=CategoriesApiHandler
 Module10=|absolute|C:\B4X\Development\WebApiUtils-B4J\WebApiUtils
 Module2=CategoriesWebHandler
@@ -33,7 +33,7 @@ NumberOfModules=10
 Version=10.2
 @EndOfDesignText@
 #Region Project Attributes
-' Product: 				Web API Server
+' Product: 				Pakai
 ' Version: 				4.00 beta 6
 ' Description: 			Server application project template
 ' Developer:			Poon Yip Hoon (Aeric) (https://www.b4x.com/android/forum/members/aeric.74499/)
@@ -67,7 +67,7 @@ Sub Process_Globals
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
 	Private Const VERSION_NAME	As String = "4.00 beta 6"
-	Type ServerConfigurations (EnableCORS As Boolean, EnableHelp As Boolean, EnableSSL As Boolean, Port As Int, SSLPort As Int, RootUrl As String, RootPath As String, ServerUrl As String, ApiName As String, ApiVersioning As Boolean, VerboseMode As Boolean, SslKeystoreDir As String, SslKeystoreFile As String, SslKeystorePassword As String, StaticFilesBrowsable As Boolean, StaticFilesFolder As String, Version As String, SmtpUserName As String, SmtpPassword As String, SmtpServer As String, SmtpUseSsl As String, SmtpPort As Int)
+	Type ServerConfigurations (EnableCORS As Boolean, EnableHelp As Boolean, EnableSSL As Boolean, Port As Int, SSLPort As Int, RootUrl As String, RootPath As String, ServerUrl As String, ApiName As String, ApiVersioning As Boolean, VerboseMode As Boolean, ContentType As String, SslKeystoreDir As String, SslKeystoreFile As String, SslKeystorePassword As String, StaticFilesBrowsable As Boolean, StaticFilesFolder As String, Version As String, SmtpUserName As String, SmtpPassword As String, SmtpServer As String, SmtpUseSsl As String, SmtpPort As Int)
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -82,7 +82,7 @@ Sub AppStart (Args() As String)
 	srvr.AddHandler($"/${conf.ApiName}/products/*"$, "ProductsApiHandler", False) 		' API handler
 	srvr.AddHandler($"/${conf.ApiName}/find/*"$, "FindApiHandler", False) 				' API handler
 	srvr.Start
-	Log($"Web API Server (version = ${conf.Version}) is running on port ${srvr.Port}${IIf(srvr.SslPort > 0, $" (redirected to port ${srvr.SslPort})"$, "")}"$)
+	Log($"Pakai server (version = ${conf.Version}) is running on port ${srvr.Port}${IIf(srvr.SslPort > 0, $" (redirected to port ${srvr.SslPort})"$, "")}"$)
 	Log($"Open the following URL from your web browser"$)
 	Log(conf.ServerUrl)
 	InitDatabase
@@ -99,6 +99,7 @@ Private Sub Configurable
 	#End If
 	conf.EnableCORS = True
 '	conf.VerboseMode = True
+	conf.ContentType = WebApiUtils.CONTENT_TYPE_XML
 	conf.StaticFilesBrowsable = False
 End Sub
 
@@ -264,6 +265,7 @@ Private Sub InitServer
 	ctx.Put("VERSION", VERSION_NAME)
 	conf.Initialize
 	conf.Version = VERSION_NAME
+	conf.ContentType = WebApiUtils.CONTENT_TYPE_JSON ' Default format
 	conf.StaticFilesFolder = File.Combine(File.DirApp, "www")
 	conf.Port = ctx.GetDefault("ServerPort", 8080)
 	conf.SSLPort = ctx.GetDefault("SSLPort", 0)
@@ -279,7 +281,7 @@ Private Sub InitServer
 	ConfigurePort
 	ConfigureCORS
 	ConfigureStaticFiles
-	CreateJSFiles(WebApiUtils.CONTENT_TYPE_JSON)
+	CreateJSFiles
 End Sub
 
 ' Create Database Connection
@@ -346,7 +348,7 @@ Private Sub InitDatabase
 End Sub
 
 ' Generate JS files from code to save some file size
-Private Sub CreateJSFiles (ContentType As String)
+Private Sub CreateJSFiles
 	Dim skip As Boolean
 	Dim Parent As String = File.Combine(conf.StaticFilesFolder, "assets")
 	Dim DirName As String = File.Combine(Parent, "scripts")
@@ -358,9 +360,9 @@ Private Sub CreateJSFiles (ContentType As String)
 	#End If
 	End If
 	If skip = False Then
-		Utility.GenerateJSFileForCategory(DirName, "category.js", ContentType, conf.VerboseMode)
-		Utility.GenerateJSFileForSearch(DirName, "search.js", ContentType, conf.VerboseMode)
-		Utility.GenerateJSFileForHelp(DirName, "help.js", ContentType, conf.VerboseMode)
+		Utility.GenerateJSFileForCategory(DirName, "category.js", conf.ContentType, conf.VerboseMode)
+		Utility.GenerateJSFileForSearch(DirName, "search.js", conf.ContentType, conf.VerboseMode)
+		Utility.GenerateJSFileForHelp(DirName, "help.js", conf.ContentType, conf.VerboseMode)
 	End If
 End Sub
 

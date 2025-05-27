@@ -19,6 +19,7 @@ End Sub
 Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML
 	HRM.OrderedKeys = True
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
@@ -128,13 +129,23 @@ Private Sub GetProductById (id As Int)
 End Sub
 
 Private Sub PostProduct
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
-		HRM.ResponseError = "Invalid json object"
+	'Dim data As Map = WebApiUtils.RequestData(Request)
+	'If NotInitialized(data) Then
+	'	HRM.ResponseCode = 400
+	'	HRM.ResponseError = "Invalid json object"
+	'	ReturnApiResponse
+	'	Return
+	'End If
+	Try
+		Dim str As String = WebApiUtils.RequestDataText(Request)
+		Dim data As Map = str.As(JSON).ToMap
+	Catch
+		HRM.ResponseCode = 422
+		'HRM.ResponseError = LastException.Message
+		HRM.ResponseError = $"Invalid ${IIf(HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")} object"$
 		ReturnApiResponse
 		Return
-	End If
+	End Try
 	
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
@@ -188,14 +199,23 @@ Private Sub PostProduct
 End Sub
 
 Private Sub PutProductById (id As Int)
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
+	'Dim data As Map = WebApiUtils.RequestData(Request)
+	'If Not(data.IsInitialized) Then
+	'	HRM.ResponseCode = 400
+	'	HRM.ResponseError = "Invalid json object"
+	'	ReturnApiResponse
+	'	Return
+	'End If
+	Try
+		Dim str As String = WebApiUtils.RequestDataText(Request)
+		Dim data As Map = str.As(JSON).ToMap
+	Catch
+		HRM.ResponseCode = 422
+		'HRM.ResponseError = LastException.Message
 		HRM.ResponseError = "Invalid json object"
 		ReturnApiResponse
 		Return
-	End If
-
+	End Try
 	' Check conflict product code
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products"
