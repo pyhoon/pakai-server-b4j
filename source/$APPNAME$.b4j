@@ -13,8 +13,10 @@ FileGroup4=Default Group
 FileGroup5=Default Group
 Group=App
 Library1=jcore
-Library2=miniormutils
-Library3=webapiutils
+Library2=json
+Library3=miniormutils
+Library4=xml2map
+Library5=jstringutils
 Module1=CategoriesApiHandler
 Module10=|absolute|C:\B4X\Development\WebApiUtils-B4J\WebApiUtils
 Module2=CategoriesWebHandler
@@ -26,13 +28,13 @@ Module7=IndexWebHandler
 Module8=ProductsApiHandler
 Module9=Utility
 NumberOfFiles=5
-NumberOfLibraries=3
+NumberOfLibraries=5
 NumberOfModules=10
 Version=10.2
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: 				Web API Server
-' Version: 				4.00 beta 5
+' Version: 				4.00 beta 6
 ' Description: 			Server application project template
 ' Developer:			Poon Yip Hoon (Aeric) (https://www.b4x.com/android/forum/members/aeric.74499/)
 ' License:				MIT License
@@ -64,7 +66,7 @@ Sub Process_Globals
 	Public conf 				As ServerConfigurations
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-	Private Const VERSION_NAME	As String = "4.00 beta 5"
+	Private Const VERSION_NAME	As String = "4.00 beta 6"
 	Type ServerConfigurations (EnableCORS As Boolean, EnableHelp As Boolean, EnableSSL As Boolean, Port As Int, SSLPort As Int, RootUrl As String, RootPath As String, ServerUrl As String, ApiName As String, ApiVersioning As Boolean, VerboseMode As Boolean, SslKeystoreDir As String, SslKeystoreFile As String, SslKeystorePassword As String, StaticFilesBrowsable As Boolean, StaticFilesFolder As String, Version As String, SmtpUserName As String, SmtpPassword As String, SmtpServer As String, SmtpUseSsl As String, SmtpPort As Int)
 End Sub
 
@@ -96,7 +98,7 @@ Private Sub Configurable
 	conf.EnableSSL = True
 	#End If
 	conf.EnableCORS = True
-'	conf.VerboseMode = True
+	conf.VerboseMode = True
 	conf.StaticFilesBrowsable = False
 End Sub
 

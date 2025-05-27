@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 5
+'Version 4.00 beta 6
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -20,8 +20,10 @@ Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
 	HRM.OrderedKeys = True
-	HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
-	HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
+	If HRM.VerboseMode Then
+		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
+		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
+	End If
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -112,7 +114,11 @@ Private Sub GetCategoryById (id As Int)
 	DB.Find(id)
 	If DB.Found Then
 		HRM.ResponseCode = 200
-		HRM.ResponseObject = DB.First
+		If HRM.OrderedKeys Then
+			HRM.ResponseObject = DB.Results2.Get(0)
+		Else
+			HRM.ResponseObject = DB.First
+		End If
 	Else
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Category not found"

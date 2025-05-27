@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 5
+'Version 4.00 beta 6
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -21,8 +21,10 @@ Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
 	HRM.OrderedKeys = True
-	HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
-	HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
+	If HRM.VerboseMode Then
+		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
+		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
+	End If
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -100,10 +102,14 @@ Public Sub GetAllProducts
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
-	HRM.ResponseKeys = Array("a", "s", "m", "e", "r")
-	HRM.ResponseKeysAlias = Array("code", "status", "message", "error", "data")	' if ok, then show message first
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results2
+	If HRM.OrderedKeys Then
+		HRM.ResponseKeys = Array("a", "s", "m", "e", "r")
+		HRM.ResponseKeysAlias = Array("code", "status", "message", "error", "data")	' if ok, then show message first
+		HRM.ResponseData = DB.Results2
+	Else
+		HRM.ResponseData = DB.Results
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -116,10 +122,14 @@ Public Sub GetProductsByCategoryId (id As Int)
 	DB.WhereParam("c.id = ?", id)
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
-	HRM.ResponseKeys = Array("a", "s", "m", "e", "r")
-	HRM.ResponseKeysAlias = Array("code", "status", "message", "error", "data")	' if ok, then show message first
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results2
+	If HRM.OrderedKeys Then
+		HRM.ResponseKeys = Array("a", "s", "m", "e", "r")
+		HRM.ResponseKeysAlias = Array("code", "status", "message", "error", "data")	' if ok, then show message first
+		HRM.ResponseData = DB.Results2
+	Else
+		HRM.ResponseData = DB.Results
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -156,10 +166,13 @@ Public Sub SearchByKeywords
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results2
-	'HRM.OrderedKeys = True
-	HRM.ResponseKeys = Array("m", "a", "r", "s", "e")
-	HRM.ResponseKeysAlias = Array("message", "code", "data", "status", "error")
+	If HRM.OrderedKeys Then
+		HRM.ResponseData = DB.Results2
+		HRM.ResponseKeys = Array("m", "a", "r", "s", "e")
+		HRM.ResponseKeysAlias = Array("message", "code", "data", "status", "error")
+	Else
+		HRM.ResponseData = DB.Results
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub
