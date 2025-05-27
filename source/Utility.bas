@@ -15,7 +15,6 @@ Sub Process_Globals
 	'Private Const RESPONSE_ELEMENT_TYPE As String 		= "type"
 	Private ContentType As String
 	Private Verbose As Boolean
-	Private ExpectAccessToken As Boolean
 End Sub
 
 Public Sub CurrentTimeStamp As String
@@ -114,23 +113,30 @@ End Sub
 
 Private Sub HelpResponsePart (Verb As String) As String
 	Dim script As String
-	Dim ExpectAccessToken As Boolean
-	If Verb = "post" Then ExpectAccessToken = True
 	Select Verb
-		Case "post", "put"
+		Case "post"
 			script = $"type: "${Verb}",
         data: $("#body" + id).val(),
         dataType: "${dataType}",
         headers: headers,
         success: function (response, textStatus, xhr) {
-          showFadeAlertSuccess(id, response)
+          showFadeAlertSuccess(id, xhr, response)
+          ${AccessTokenPart}
+        },"$
+		Case "put"
+			script = $"type: "${Verb}",
+        data: $("#body" + id).val(),
+        dataType: "${dataType}",
+        headers: headers,
+        success: function (response, textStatus, xhr) {
+          showFadeAlertSuccess(id, xhr, response)
         },"$
 		Case Else
 			script = $"type: "${Verb}",
         dataType: "${dataType}",
         headers: headers,
         success: function (response, textStatus, xhr) {
-          showFadeAlertSuccess(id, response)
+          showFadeAlertSuccess(id, xhr, response)
         },"$
 	End Select
 	Return script
@@ -140,8 +146,7 @@ Private Sub AccessTokenPart As String
 	Select ContentType
 		Case WebApiUtils.CONTENT_TYPE_XML
 			If Verbose Then
-				Return $"
-          // Access Token specific
+				Return $"// Access Token
           var result = $(response).find("${RESPONSE_ELEMENT_RESULT}")
           var access_token = $(result).find("token").text()
           if (access_token.length > 0) {
@@ -152,8 +157,7 @@ Private Sub AccessTokenPart As String
             console.log("access token not found")
           }""$
 			Else
-				Return $"
-          // Access Token specific
+				Return $"// Access Token
           var access_token = $(result).find("token").text()
           if (access_token.length > 0) {
             localStorage.setItem("access_token", access_token)
@@ -165,8 +169,7 @@ Private Sub AccessTokenPart As String
 			End If
 		Case Else
 			If Verbose Then
-				Return $"
-          // Access Token
+				Return $"// Access Token
           if (response.${RESPONSE_ELEMENT_RESULT}.length > 0) {
             if ("access_token" in response.${RESPONSE_ELEMENT_RESULT}[0]) {
               localStorage.setItem("access_token", response.${RESPONSE_ELEMENT_RESULT}[0]["access_token"])
@@ -174,8 +177,7 @@ Private Sub AccessTokenPart As String
             }
           }"$
 			Else
-				Return $"
-          // Access Token
+				Return $"// Access Token
           if (response.length > 0) {
             if ("access_token" in response[0]) {
               localStorage.setItem("access_token", response[0]["access_token"])
@@ -888,7 +890,7 @@ Private Sub script21 As String
 	Select ContentType
 		Case WebApiUtils.CONTENT_TYPE_XML
 			If Verbose Then
-				Return $"function showFadeAlertSuccess (id, response) {
+				Return $"function showFadeAlertSuccess (id, xhr, response) {
   var status = $(response).find("status").text()
   var code = $(response).find("code").text()
   var error = $(response).find("error").text()
@@ -901,7 +903,7 @@ Private Sub script21 As String
       $("#alert" + id).removeClass("bg-danger")
       $("#alert" + id).addClass("bg-success")
       $("#alert" + id).fadeIn()
-    })${IIf(ExpectAccessToken, AccessTokenPart, "")}
+    })
   }
   else {
     $("#alert" + id).fadeOut("fast", function () {
@@ -914,19 +916,19 @@ Private Sub script21 As String
   }
 }"$
 			Else
-				Return $"function showFadeAlertSuccess (id, response) {
+				Return $"function showFadeAlertSuccess (id, xhr, response) {
   $("#alert" + id).fadeOut("fast", function () {
     $("#response" + id).val(xhr.responseText)
     $("#alert" + id).html(xhr.status + " " + textStatus)
     $("#alert" + id).removeClass("bg-danger")
     $("#alert" + id).addClass("bg-success")
     $("#alert" + id).fadeIn()
-  })${IIf(ExpectAccessToken, AccessTokenPart, "")}
+  })
 }"$
 			End If
 		Case Else
 			If Verbose Then
-				Return $"function showFadeAlertSuccess (id, response) {
+				Return $"function showFadeAlertSuccess (id, xhr, response) {
   if (response.${RESPONSE_ELEMENT_STATUS} == "ok" || response.${RESPONSE_ELEMENT_STATUS} == "success") {
     var content = JSON.stringify(response, undefined, 2)
     $("#alert" + id).fadeOut("fast", function () {
@@ -935,7 +937,7 @@ Private Sub script21 As String
       $("#alert" + id).removeClass("bg-danger")
       $("#alert" + id).addClass("bg-success")
       $("#alert" + id).fadeIn()
-    })${IIf(ExpectAccessToken, AccessTokenPart, "")}
+    })
   }
   else {
     var content = JSON.stringify(response, undefined, 2)
@@ -949,7 +951,7 @@ Private Sub script21 As String
   }				
 }"$
 			Else
-				Return $"function showFadeAlertSuccess (id, response) {
+				Return $"function showFadeAlertSuccess (id, xhr, response) {
   $("#alert" + id).fadeOut("fast", function () {
     var content = JSON.stringify(response, undefined, 2)
     $("#response" + id).val(content)
@@ -957,7 +959,7 @@ Private Sub script21 As String
     $("#alert" + id).removeClass("bg-danger")
     $("#alert" + id).addClass("bg-success")
     $("#alert" + id).fadeIn()
-  })${IIf(ExpectAccessToken, AccessTokenPart, "")}
+  })
 }"$
 			End If
 	End Select

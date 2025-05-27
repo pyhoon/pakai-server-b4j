@@ -166,7 +166,11 @@ Private Sub CreateNewCategory
 	
 	' Retrieve new row
 	HRM.ResponseCode = 201
-	HRM.ResponseObject = DB.First
+	If HRM.OrderedKeys Then
+		HRM.ResponseObject = DB.Results2.Get(0)
+	Else
+		HRM.ResponseObject = DB.First
+	End If
 	HRM.ResponseMessage = "Category created successfully"
 	ReturnApiResponse
 	DB.Close
@@ -222,7 +226,11 @@ Private Sub UpdateCategoryById (id As Int)
 
 	HRM.ResponseCode = 200
 	HRM.ResponseMessage = "Category updated successfully"
-	HRM.ResponseObject = DB.First
+	If HRM.OrderedKeys Then
+		HRM.ResponseObject = DB.Results2.Get(0)
+	Else
+		HRM.ResponseObject = DB.First
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub

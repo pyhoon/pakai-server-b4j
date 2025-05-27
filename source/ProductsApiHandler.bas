@@ -177,7 +177,11 @@ Private Sub PostProduct
 
 	' Retrieve new row
 	HRM.ResponseCode = 201
-	HRM.ResponseObject = DB.First
+	If HRM.OrderedKeys Then
+		HRM.ResponseObject = DB.Results2.Get(0)
+	Else
+		HRM.ResponseObject = DB.First
+	End If
 	HRM.ResponseMessage = "Product created successfully"
 	ReturnApiResponse
 	DB.Close
@@ -231,7 +235,11 @@ Private Sub PutProductById (id As Int)
 
 	HRM.ResponseCode = 200
 	HRM.ResponseMessage = "Product updated successfully"
-	HRM.ResponseObject = DB.First
+	If HRM.OrderedKeys Then
+		HRM.ResponseObject = DB.Results2.Get(0)
+	Else
+		HRM.ResponseObject = DB.First
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub

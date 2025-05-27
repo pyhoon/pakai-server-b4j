@@ -98,7 +98,7 @@ Private Sub Configurable
 	conf.EnableSSL = True
 	#End If
 	conf.EnableCORS = True
-	conf.VerboseMode = True
+'	conf.VerboseMode = True
 	conf.StaticFilesBrowsable = False
 End Sub
 
