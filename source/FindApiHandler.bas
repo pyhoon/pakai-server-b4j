@@ -20,7 +20,7 @@ End Sub
 Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
-	HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML
+	HRM.ContentType = Main.conf.ContentType
 	HRM.OrderedKeys = True
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")

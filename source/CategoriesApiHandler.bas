@@ -19,7 +19,7 @@ End Sub
 Public Sub Initialize
 	HRM.Initialize
 	HRM.VerboseMode = Main.conf.VerboseMode
-	HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML
+	HRM.ContentType = Main.conf.ContentType
 	HRM.XmlElement = "item"
 	HRM.OrderedKeys = True
 	If HRM.VerboseMode Then

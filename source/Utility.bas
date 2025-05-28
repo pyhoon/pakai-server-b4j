@@ -364,7 +364,7 @@ Private Sub script07 As String
   <tbody>`
         $.each(data, function (i, item) {
           const id = item.id || ""
-          const name = item.name || ""
+          const name = item.category_name || ""
           tblBody += `
     <tr>
       <td class="align-middle" style="text-align: right">${dollar}{id}</td>

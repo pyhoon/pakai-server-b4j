@@ -99,7 +99,7 @@ Private Sub Configurable
 	#End If
 	conf.EnableCORS = True
 '	conf.VerboseMode = True
-	conf.ContentType = WebApiUtils.CONTENT_TYPE_XML
+'	conf.ContentType = WebApiUtils.CONTENT_TYPE_XML
 	conf.StaticFilesBrowsable = False
 End Sub
 
