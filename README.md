@@ -44,4 +44,4 @@ End Sub
 
 **Support this project**
 
-<a href="https://paypal.me/aeric80/"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width="174" title="Buy me a coffee" /></a>
+<a href="https://paypal.me/aeric80/"><img src="https://github.com/pyhoon/web-api-server-b4j/blob/v4.00beta/source/Objects/www/assets/img/sponsor.png" width="174" title="Buy me a coffee" /></a>
