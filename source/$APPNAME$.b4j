@@ -16,7 +16,6 @@ Library1=jcore
 Library2=miniormutils
 Library3=webapiutils
 Module1=CategoriesApiHandler
-Module10=|absolute|C:\B4X\Development\WebApiUtils-B4J\WebApiUtils
 Module2=CategoriesWebHandler
 Module3=CorsFilter
 Module4=FindApiHandler
@@ -27,17 +26,17 @@ Module8=ProductsApiHandler
 Module9=Utility
 NumberOfFiles=5
 NumberOfLibraries=3
-NumberOfModules=10
+NumberOfModules=9
 Version=10.2
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: 				Pakai
-' Version: 				4.00 beta 7
+' Version: 				4.00 beta 8
 ' Description: 			Server application project template
 ' Developer:			Poon Yip Hoon (Aeric) (https://www.b4x.com/android/forum/members/aeric.74499/)
 ' License:				MIT License
 ' GitHub:				https://github.com/pyhoon/web-api-server-b4j/tree/v4.00beta
-' Forum thread:			https://www.b4x.com/android/forum/threads/project-template-web-api-server-v4-beta.167080/
+' Forum thread:			https://www.b4x.com/android/forum/threads/project-template-pakai-framework.167080/
 ' Tutorial:				Not available
 ' Donation:				PayPal (https://paypal.me/aeric80/)
 ' *** IDE Shorcuts ***
@@ -64,7 +63,7 @@ Sub Process_Globals
 	Public conf 				As ServerConfigurations
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-	Private Const VERSION_NAME	As String = "4.00 beta 7"
+	Private Const VERSION_NAME	As String = "4.00 beta 8"
 	Type ServerConfigurations (EnableCORS As Boolean, EnableHelp As Boolean, EnableSSL As Boolean, Port As Int, SSLPort As Int, RootUrl As String, RootPath As String, ServerUrl As String, ApiName As String, ApiVersioning As Boolean, PayloadType As String, ContentType As String, VerboseMode As Boolean, OrderedKeys As Boolean, SslKeystoreDir As String, SslKeystoreFile As String, SslKeystorePassword As String, StaticFilesBrowsable As Boolean, StaticFilesFolder As String, Version As String, SmtpUserName As String, SmtpPassword As String, SmtpServer As String, SmtpUseSsl As String, SmtpPort As Int)
 End Sub
 
@@ -96,9 +95,9 @@ Private Sub Configurable
 	conf.EnableSSL = True
 	#End If
 	conf.EnableCORS = True
+	conf.VerboseMode = True
 	'conf.PayloadType = "xml"
 	conf.ContentType = WebApiUtils.CONTENT_TYPE_XML
-	conf.VerboseMode = True
 	'conf.OrderedKeys = True
 	conf.StaticFilesBrowsable = False
 End Sub
@@ -149,6 +148,98 @@ Private Sub CreateDatabase
 		LogColor("Database creation failed!", COLOR_RED)
 	End If
 	DB.Close
+End Sub
+
+' Setting default values for Server Configurations
+Private Sub InitServer
+	srvr.Initialize("")
+	If File.Exists(File.DirApp, "config.ini") = False Then
+		File.Copy(File.DirAssets, "config.example", File.DirApp, "config.ini")
+	End If
+	ctx = WebApiUtils.ReadMapFile(File.DirApp, "config.ini")
+	ctx.Put("VERSION", VERSION_NAME)
+	conf.Initialize
+	conf.Version = VERSION_NAME
+	conf.ContentType = WebApiUtils.CONTENT_TYPE_JSON ' Default format
+	conf.StaticFilesFolder = File.Combine(File.DirApp, "www")
+	conf.Port = ctx.GetDefault("ServerPort", 8080)
+	conf.SSLPort = ctx.GetDefault("SSLPort", 0)
+	conf.RootUrl = ctx.GetDefault("ROOT_URL", "http://127.0.0.1")
+	conf.RootPath = ctx.GetDefault("ROOT_PATH", "")
+	conf.ServerUrl = conf.RootUrl
+	conf.ApiName = ctx.GetDefault("API_NAME", "api")
+	conf.ApiVersioning = ctx.GetDefault("API_VERSIONING", "False").As(String).EqualsIgnoreCase("True")
+	conf.SslKeystoreDir = ctx.GetDefault("SSL_KEYSTORE_DIR", "")
+	conf.SslKeystoreFile = ctx.GetDefault("SSL_KEYSTORE_FILE", "")
+	conf.SslKeystorePassword = ctx.GetDefault("SSL_KEYSTORE_PASSWORD", "")
+	Configurable
+	ConfigurePort
+	ConfigureCORS
+	ConfigureStaticFiles
+	CreateJSFiles
+End Sub
+
+' Create Database Connection
+Private Sub InitDatabase
+	Try
+		LogColor("Checking database...", COLOR_BLUE)
+		info.Initialize
+		info.DBType = ctx.GetDefault("DbType", "")
+		Select info.DBType
+			Case "MySQL"
+				#If MySQL
+				info.DBHost = ctx.GetDefault("DbHost", "")
+				info.DBPort = ctx.GetDefault("DbPort", "")
+				info.DBName = ctx.GetDefault("DbName", "")
+				info.DriverClass = ctx.GetDefault("DriverClass", "")
+				info.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
+				info.User = ctx.GetDefault("User", "")
+				info.Password = ctx.GetDefault("Password", "")
+				info.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
+				conn.Initialize(info)
+				Wait For (conn.InitSchema) Complete (Success As Boolean)
+				If Success = False Then
+					LogColor("Database initilialization failed!", COLOR_RED)
+					Log("Application is terminated.")
+					ExitApplication
+				End If
+				If conn.Test = False Then
+					LogColor("Database connection failed!", COLOR_RED)
+					Log("Application is terminated.")
+					ExitApplication
+				End If
+				Wait For (conn.DBExist2) Complete (DBFound As Boolean)				
+				#Else
+				ShowBuildConfigurationNotMatch
+				Return
+				#End If
+			Case "SQLite"
+				#If SQLite
+				info.DBDir = ctx.GetDefault("DbDir", "")
+				info.DBFile = ctx.GetDefault("DbFile", "")
+				info.JournalMode = "WAL"
+				conn.Initialize(info)
+				Dim DBFound As Boolean = conn.DBExist
+				#Else
+				ShowBuildConfigurationNotMatch
+				Return
+				#End If				
+		End Select
+		If DBFound Then
+			LogColor($"${info.DBType} database found!"$, COLOR_BLUE)
+			#If MySQL
+			conn.InitPool
+			#End If
+		Else
+			LogColor($"${info.DBType} database not found!"$, COLOR_RED)
+			CreateDatabase
+		End If
+	Catch
+		LogError(LastException.Message)
+		LogColor("Error checking database!", COLOR_RED)
+		Log("Application is terminated.")
+		ExitApplication
+	End Try
 End Sub
 
 ' Configure Cross Origin in JavaScript call
@@ -253,98 +344,6 @@ End Sub
 Private Sub ConfigureStaticFiles
 	srvr.StaticFilesFolder = conf.StaticFilesFolder
 	srvr.SetStaticFilesOptions(CreateMap("dirAllowed": conf.StaticFilesBrowsable))
-End Sub
-
-' Setting default values for Server Configurations
-Private Sub InitServer
-	srvr.Initialize("")
-	If File.Exists(File.DirApp, "config.ini") = False Then
-		File.Copy(File.DirAssets, "config.example", File.DirApp, "config.ini")
-	End If
-	ctx = WebApiUtils.ReadMapFile(File.DirApp, "config.ini")
-	ctx.Put("VERSION", VERSION_NAME)
-	conf.Initialize
-	conf.Version = VERSION_NAME
-	conf.ContentType = WebApiUtils.CONTENT_TYPE_JSON ' Default format
-	conf.StaticFilesFolder = File.Combine(File.DirApp, "www")
-	conf.Port = ctx.GetDefault("ServerPort", 8080)
-	conf.SSLPort = ctx.GetDefault("SSLPort", 0)
-	conf.RootUrl = ctx.GetDefault("ROOT_URL", "http://127.0.0.1")
-	conf.RootPath = ctx.GetDefault("ROOT_PATH", "")
-	conf.ServerUrl = conf.RootUrl
-	conf.ApiName = ctx.GetDefault("API_NAME", "api")
-	conf.ApiVersioning = ctx.GetDefault("API_VERSIONING", "False").As(String).EqualsIgnoreCase("True")
-	conf.SslKeystoreDir = ctx.GetDefault("SSL_KEYSTORE_DIR", "")
-	conf.SslKeystoreFile = ctx.GetDefault("SSL_KEYSTORE_FILE", "")
-	conf.SslKeystorePassword = ctx.GetDefault("SSL_KEYSTORE_PASSWORD", "")
-	Configurable
-	ConfigurePort
-	ConfigureCORS
-	ConfigureStaticFiles
-	CreateJSFiles
-End Sub
-
-' Create Database Connection
-Private Sub InitDatabase
-	Try
-		LogColor("Checking database...", COLOR_BLUE)
-		info.Initialize
-		info.DBType = ctx.GetDefault("DbType", "")
-		Select info.DBType
-			Case "MySQL"
-				#If MySQL
-				info.DBHost = ctx.GetDefault("DbHost", "")
-				info.DBPort = ctx.GetDefault("DbPort", "")
-				info.DBName = ctx.GetDefault("DbName", "")
-				info.DriverClass = ctx.GetDefault("DriverClass", "")
-				info.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
-				info.User = ctx.GetDefault("User", "")
-				info.Password = ctx.GetDefault("Password", "")
-				info.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
-				conn.Initialize(info)
-				Wait For (conn.InitSchema) Complete (Success As Boolean)
-				If Success = False Then
-					LogColor("Database initilialization failed!", COLOR_RED)
-					Log("Application is terminated.")
-					ExitApplication
-				End If
-				If conn.Test = False Then
-					LogColor("Database connection failed!", COLOR_RED)
-					Log("Application is terminated.")
-					ExitApplication
-				End If
-				Wait For (conn.DBExist2) Complete (DBFound As Boolean)				
-				#Else
-				ShowBuildConfigurationNotMatch
-				Return
-				#End If
-			Case "SQLite"
-				#If SQLite
-				info.DBDir = ctx.GetDefault("DbDir", "")
-				info.DBFile = ctx.GetDefault("DbFile", "")
-				info.JournalMode = "WAL"
-				conn.Initialize(info)
-				Dim DBFound As Boolean = conn.DBExist
-				#Else
-				ShowBuildConfigurationNotMatch
-				Return
-				#End If				
-		End Select
-		If DBFound Then
-			LogColor($"${info.DBType} database found!"$, COLOR_BLUE)
-			#If MySQL
-			conn.InitPool
-			#End If
-		Else
-			LogColor($"${info.DBType} database not found!"$, COLOR_RED)
-			CreateDatabase
-		End If
-	Catch
-		LogError(LastException.Message)
-		LogColor("Error checking database!", COLOR_RED)
-		Log("Application is terminated.")
-		ExitApplication
-	End Try
 End Sub
 
 ' Generate JS files from code to save some file size

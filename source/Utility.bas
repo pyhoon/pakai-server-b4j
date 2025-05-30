@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-'Version 4.00 beta 7
+'Version 4.00 beta 8
 Sub Process_Globals
 	Private Const RESPONSE_ELEMENT_CODE As String		= "code"
 	Private Const RESPONSE_ELEMENT_ERROR As String 		= "error"
@@ -344,20 +344,16 @@ Private Sub script07 As String
       let data = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
       $"// XML format
+      const root = $(response).find("${XmlRoot}")
       ${IIf(Verbose, _
-	  $"const root = $(response).find("${XmlRoot}")
-      //const status = $(root).children("${RESPONSE_ELEMENT_STATUS}").text()
-      //const code = $(root).children("${RESPONSE_ELEMENT_CODE}").text()
-      //const error = $(root).children("${RESPONSE_ELEMENT_ERROR}").text()
-      //const message = $(root).children("${RESPONSE_ELEMENT_MESSAGE}").text()
-      const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
-	  $"const result = $(response)"$)}
+	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(root)"$)}
       const $items = $(result).children("${XmlElement}")
       $items.each(function () {
         const $item = $(this)
         data.push({
           id: $item.children("id").text(),
-          name: $item.children("category_name").text()
+          category_name: $item.children("category_name").text()
         })
       })"$, _
       $"// JSON format
@@ -375,8 +371,8 @@ Private Sub script07 As String
   <tbody>`
         $.each(data, function (i, item) {
           const id = item.id || ""
-          const name = item.name || ""
-		  //console.log(id, name)
+          const name = item.category_name || ""
+		  //console.log(id, category_name)
           tblBody += `
     <tr>
       <td class="align-middle" style="text-align: right">${dollar}{id}</td>
@@ -577,22 +573,22 @@ Private Sub script14 As String
       $category2.empty()
       let data = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
-	  $"${IIf(Verbose, _
 	  $"const root = $(response).find("${XmlRoot}")
-      const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
-	  $"const result = $(response)"$)}
+	  ${IIf(Verbose, _
+	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(root)"$)}
       const $items = $(result).children("${XmlElement}")
       $items.each(function () {
         const $item = $(this)
         data.push({
           id: $item.children("id").text(),
-          name: $item.children("category_name").text()
+          category_name: $item.children("category_name").text()
         })
       })"$, _
 	  $"data = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, "response")}"$)}
       // Append To both dropdowns
       data.forEach(function (item) {
-        const option = $("<option />").val(item.id).text(item.name)
+        const option = $("<option />").val(item.id).text(item.category_name)
         $category1.append(option.clone())
         $category2.append(option)
       })
@@ -616,10 +612,10 @@ Private Sub script15 (Verb As String) As String
       let rows = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
       $"// XML format
+      const root = $(response).find("${XmlRoot}")
       ${IIf(Verbose, _
-	  $"const root = $(response).find("${XmlRoot}")
-      const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
-	  $"const result = $(response)"$)}
+	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(root)"$)}
       const $items = $(result).children("${XmlElement}")
       $items.each(function () {
         const $item = $(this)
