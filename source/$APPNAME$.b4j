@@ -67,7 +67,7 @@ Sub Process_Globals
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
 	Private Const VERSION_NAME	As String = "4.00 beta 6"
-	Type ServerConfigurations (EnableCORS As Boolean, EnableHelp As Boolean, EnableSSL As Boolean, Port As Int, SSLPort As Int, RootUrl As String, RootPath As String, ServerUrl As String, ApiName As String, ApiVersioning As Boolean, VerboseMode As Boolean, ContentType As String, SslKeystoreDir As String, SslKeystoreFile As String, SslKeystorePassword As String, StaticFilesBrowsable As Boolean, StaticFilesFolder As String, Version As String, SmtpUserName As String, SmtpPassword As String, SmtpServer As String, SmtpUseSsl As String, SmtpPort As Int)
+	Type ServerConfigurations (EnableCORS As Boolean, EnableHelp As Boolean, EnableSSL As Boolean, Port As Int, SSLPort As Int, RootUrl As String, RootPath As String, ServerUrl As String, ApiName As String, ApiVersioning As Boolean, PayloadType As String, ContentType As String, VerboseMode As Boolean, OrderedKeys As Boolean, SslKeystoreDir As String, SslKeystoreFile As String, SslKeystorePassword As String, StaticFilesBrowsable As Boolean, StaticFilesFolder As String, Version As String, SmtpUserName As String, SmtpPassword As String, SmtpServer As String, SmtpUseSsl As String, SmtpPort As Int)
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -98,8 +98,10 @@ Private Sub Configurable
 	conf.EnableSSL = True
 	#End If
 	conf.EnableCORS = True
-'	conf.VerboseMode = True
-'	conf.ContentType = WebApiUtils.CONTENT_TYPE_XML
+	'conf.PayloadType = "xml"
+	conf.ContentType = WebApiUtils.CONTENT_TYPE_XML
+	conf.VerboseMode = True
+	'conf.OrderedKeys = True
 	conf.StaticFilesBrowsable = False
 End Sub
 

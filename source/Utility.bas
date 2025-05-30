@@ -13,9 +13,11 @@ Sub Process_Globals
 	Private Const RESPONSE_ELEMENT_MESSAGE As String	= "message"
 	Private Const RESPONSE_ELEMENT_RESULT As String 	= "data"
 	'Private Const RESPONSE_ELEMENT_TYPE As String 		= "type"
+	Private PayloadType As String
 	Private ContentType As String
 	Private Verbose As Boolean
 	Private XmlRoot As String = "root"
+	Private XmlElement As String = "item"
 End Sub
 
 Public Sub CurrentTimeStamp As String
@@ -52,8 +54,9 @@ Private Sub AlertScript (AlertMessage As String, SuccessCode As Int, SubmitForm 
 	End If
 	Select ContentType
 		Case WebApiUtils.CONTENT_TYPE_XML
-			Return $"var code = $(response).find("${RESPONSE_ELEMENT_CODE}")
-          var error = $(response).find("${RESPONSE_ELEMENT_ERROR}")
+			Return $"const root = $(response).find("${XmlRoot}")
+          const code = $(root).children("${RESPONSE_ELEMENT_CODE}").text()
+          const error = $(root).children("${RESPONSE_ELEMENT_ERROR}").text()
           if (code == ${SuccessCode}) {
             alert("${AlertMessage}")
             location.reload()
@@ -63,8 +66,8 @@ Private Sub AlertScript (AlertMessage As String, SuccessCode As Int, SubmitForm 
           }"$
 		Case Else
 			If SubmitForm Then ' indent
-				Return $"var code = response.${RESPONSE_ELEMENT_CODE}
-          var error = response.${RESPONSE_ELEMENT_ERROR}
+				Return $"const code = response.${RESPONSE_ELEMENT_CODE}
+          const error = response.${RESPONSE_ELEMENT_ERROR}
           if (code == ${SuccessCode}) {
             alert("${AlertMessage}")
             location.reload()
@@ -73,8 +76,8 @@ Private Sub AlertScript (AlertMessage As String, SuccessCode As Int, SubmitForm 
             alert(code + " " + error)
           }"$
 			Else
-				Return $"var code = response.${RESPONSE_ELEMENT_CODE}
-      var error = response.${RESPONSE_ELEMENT_ERROR}
+				Return $"const code = response.${RESPONSE_ELEMENT_CODE}
+      const error = response.${RESPONSE_ELEMENT_ERROR}
       if (code == ${SuccessCode}) {
         alert("${AlertMessage}")
         location.reload()
@@ -119,13 +122,13 @@ End Sub
 
 Private Sub AccessTokenPart As String
 	Return $"// Access Token
-	      var access_token = ""
+	      let access_token = ""
           ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
-          $"var result = ${IIf(Verbose, _
-		  $"$(response).find("${RESPONSE_ELEMENT_RESULT}")"$, _
+          $"const result = ${IIf(Verbose, _
+		  $"$(response).children("${RESPONSE_ELEMENT_RESULT}")"$, _
 		  $"response"$)}
           access_token = $(result).find("token").text()"$, _
-          $"var result = ${IIf(Verbose, _
+          $"const result = ${IIf(Verbose, _
 		  $"response.${RESPONSE_ELEMENT_RESULT}"$, _
 		  $"response"$)}"$)}
           if (result.length > 0) {
@@ -137,9 +140,9 @@ Private Sub AccessTokenPart As String
             localStorage.setItem("access_token", access_token)
             console.log("access token stored!")
           }
-          else {
-            console.log("access token not found")	
-          }"$
+          //else {
+          //  console.log("access token not found")	
+          //}"$
 End Sub
 
 Private Sub dataType As String
@@ -243,11 +246,12 @@ Private Sub script05 As String
 		Case WebApiUtils.CONTENT_TYPE_XML
 			If Verbose Then
 				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
-  var status = $(response).find("status").text()
-  var code = $(response).find("code").text()
-  var error = $(response).find("error").text()
-  var message = $(response).find("message").text()
-  //var result = $(response).find("result")			
+  const root = $(response).find("${XmlRoot}")
+  const status = $(root).children("${RESPONSE_ELEMENT_STATUS}").text()
+  const code = $(root).children("${RESPONSE_ELEMENT_CODE}").text()
+  const error = $(root).children("${RESPONSE_ELEMENT_ERROR}").text()
+  const message = $(root).children("${RESPONSE_ELEMENT_MESSAGE}").text()
+  //const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")			
   if (status == "ok" || status == "success") {
     $("#alert" + id).fadeOut("fast", function () {
       $("#response" + id).val(xhr.responseText)
@@ -282,7 +286,7 @@ Private Sub script05 As String
 			If Verbose Then
 				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
   if (response.${RESPONSE_ELEMENT_STATUS} == "ok" || response.${RESPONSE_ELEMENT_STATUS} == "success") {
-    var content = JSON.stringify(response, undefined, 2)
+    const content = JSON.stringify(response, undefined, 2)
     $("#alert" + id).fadeOut("fast", function () {
       $("#response" + id).val(content)
       $("#alert" + id).html(response.${RESPONSE_ELEMENT_CODE} + " " + response.${RESPONSE_ELEMENT_MESSAGE})
@@ -292,7 +296,7 @@ Private Sub script05 As String
     })
   }
   else {
-    var content = JSON.stringify(response, undefined, 2)
+    const content = JSON.stringify(response, undefined, 2)
     $("#alert" + id).fadeOut("fast", function () {
       $("#response" + id).val(content)
       $("#alert" + id).html(response.${RESPONSE_ELEMENT_CODE} + " " + response.${RESPONSE_ELEMENT_ERROR})
@@ -305,7 +309,7 @@ Private Sub script05 As String
 			Else
 				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
   $("#alert" + id).fadeOut("fast", function () {
-    var content = JSON.stringify(response, undefined, 2)
+    const content = JSON.stringify(response, undefined, 2)
     $("#response" + id).val(content)
     $("#alert" + id).html(xhr.status + " " + textStatus)
     $("#alert" + id).removeClass("bg-danger")
@@ -320,7 +324,7 @@ End Sub
 Private Sub script06 As String
 	Return $"function showFadeAlertError (id, xhr, errorThrown) {
   $("#alert" + id).fadeOut("fast", function () {
-    var content = xhr.responseText
+    const content = xhr.responseText
     $("#response" + id).val(content)
     $("#alert" + id).html(xhr.status + " " + errorThrown)
     $("#alert" + id).removeClass("bg-success")
@@ -340,17 +344,24 @@ Private Sub script07 As String
       let data = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
       $"// XML format
-      data = $(response).find("${XmlRoot}")
-      const $items = $(response).find("item")
+      ${IIf(Verbose, _
+	  $"const root = $(response).find("${XmlRoot}")
+      //const status = $(root).children("${RESPONSE_ELEMENT_STATUS}").text()
+      //const code = $(root).children("${RESPONSE_ELEMENT_CODE}").text()
+      //const error = $(root).children("${RESPONSE_ELEMENT_ERROR}").text()
+      //const message = $(root).children("${RESPONSE_ELEMENT_MESSAGE}").text()
+      const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(response)"$)}
+      const $items = $(result).children("${XmlElement}")
       $items.each(function () {
         const $item = $(this)
         data.push({
-          id: $item.find("id").text(),
-          name: $item.find("category_name").text()
+          id: $item.children("id").text(),
+          name: $item.children("category_name").text()
         })
       })"$, _
       $"// JSON format
-      ${IIf(Verbose, $"data = response.status === "ok" ? response.data : []"$, $"data = response"$)}"$)}
+      ${IIf(Verbose, $"data = response.${RESPONSE_ELEMENT_STATUS} === "ok" ? response.${RESPONSE_ELEMENT_RESULT} : []"$, $"data = response"$)}"$)}
       let tblHead = ""
       let tblBody = ""
       if (data.length) {
@@ -364,7 +375,8 @@ Private Sub script07 As String
   <tbody>`
         $.each(data, function (i, item) {
           const id = item.id || ""
-          const name = item.category_name || ""
+          const name = item.name || ""
+		  //console.log(id, name)
           tblBody += `
     <tr>
       <td class="align-middle" style="text-align: right">${dollar}{id}</td>
@@ -400,8 +412,8 @@ End Sub
 
 Private Sub script08 As String
 	Return $"$(document).on("click", ".edit", function (e) {
-  var id = $(this).attr("data-id")
-  var name = $(this).attr("data-name")
+  const id = $(this).attr("data-id")
+  const name = $(this).attr("data-name")
   $("#id1").val(id)
   $("#name1").val(name)
 })"$
@@ -409,8 +421,8 @@ End Sub
 
 Private Sub script09 As String
 	Return $"$(document).on("click", ".delete", function (e) {
-  var id = $(this).attr("data-id")
-  var name = $(this).attr("data-name")
+  const id = $(this).attr("data-id")
+  const name = $(this).attr("data-name")
   $("#id2").val(id)
   $("#name2").text(name)
 })"$
@@ -418,7 +430,7 @@ End Sub
 
 Private Sub script10 As String
 	Return $"$(document).on("click", "#add", function (e) {
-  var form = $("#add_form")
+  const form = $("#add_form")
   form.validate({
     rules: {
       name: {
@@ -434,9 +446,9 @@ Private Sub script10 As String
     },
     submitHandler: function (form) {
       e.preventDefault()
-      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
-	  $"var data = convertFormToXML(form[0])"$, _
-	  $"var data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
+      ${IIf(PayloadType = "xml", _
+	  $"const data = convertFormToXML(form[0])"$, _
+	  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
         type: "post",
         data: data,
@@ -458,7 +470,7 @@ End Sub
 
 Private Sub script11 As String
 	Return $"$(document).on("click", "#update", function (e) {
-  var form = $("#update_form")
+  const form = $("#update_form")
   form.validate({
     rules: {
       name: {
@@ -474,9 +486,9 @@ Private Sub script11 As String
     },
     submitHandler: function (form) {
       e.preventDefault()
-      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
-	  $"var data = convertFormToXML(form[0])"$, _
-	  $"var data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
+      ${IIf(PayloadType = "xml", _
+	  $"const data = convertFormToXML(form[0])"$, _
+	  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
         type: "put",
         data: data,
@@ -514,8 +526,8 @@ Private Sub script12 As String
 End Sub
 
 Private Sub script13 As String
-	Select ContentType
-		Case WebApiUtils.CONTENT_TYPE_XML
+	Select PayloadType
+		Case "xml"
 			' Credit to: Daestrum
 			' Reference: https://www.b4x.com/android/forum/threads/solved-abmaterial-problem-with-in-string-literals.162280/#post-995431
 			Dim dollar As String = "$"
@@ -554,27 +566,33 @@ function escapeXml(unsafe) {
 End Sub
 
 Private Sub script14 As String
-	Return $"$.ajax({
+	Return $"  $.ajax({
     type: "get",
     dataType: "${dataType}",
     url: "/${Main.conf.ApiName}/categories",
     success: function (response) {
-      var $category1 = $("#category1")
-      var $category2 = $("#category2")
+      const $category1 = $("#category1")
+      const $category2 = $("#category2")
       $category1.empty()
       $category2.empty()
-      var categories = []
+      let data = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
-	  $"      $(response).find("category").each(function () {
-        categories.push({
-          id: $(this).find("id").text(),
-          category_name: $(this).find("category_name").text()
+	  $"${IIf(Verbose, _
+	  $"const root = $(response).find("${XmlRoot}")
+      const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(response)"$)}
+      const $items = $(result).children("${XmlElement}")
+      $items.each(function () {
+        const $item = $(this)
+        data.push({
+          id: $item.children("id").text(),
+          name: $item.children("category_name").text()
         })
       })"$, _
-	  $"categories = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, "response")}"$)}
-      // Append to both dropdowns
-      categories.forEach(function (category) {
-        var option = $("<option />").val(category.id).text(category.category_name)
+	  $"data = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, "response")}"$)}
+      // Append To both dropdowns
+      data.forEach(function (item) {
+        const option = $("<option />").val(item.id).text(item.name)
         $category1.append(option.clone())
         $category2.append(option)
       })
@@ -587,22 +605,25 @@ End Sub
 
 Private Sub script15 (Verb As String) As String
 	Dim dollar As String = "$"
-	Return $"$.ajax({
+	Return $"  $.ajax({
 	${IIf(Verb = "post", _
-	$"  type: "post",
+    $"  type: "post",
     data: data,"$, _
-	$"  type: "get","$)}
+    $"  type: "get","$)}
     dataType: "${dataType}",
     url: "/${Main.conf.ApiName}/find",
     success: function (response, status, xhr) {
-      let data = []
+      let rows = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
       $"// XML format
-      data = $(response).find("${RESPONSE_ELEMENT_RESULT}")
-      const $items = $(response).find("item")
+      ${IIf(Verbose, _
+	  $"const root = $(response).find("${XmlRoot}")
+      const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(response)"$)}
+      const $items = $(result).children("${XmlElement}")
       $items.each(function () {
         const $item = $(this)
-        data.push({
+        rows.push({
           id: $item.find("id").text(),
           code: $item.find("code").text(),
           name: $item.find("name").text(),
@@ -612,10 +633,12 @@ Private Sub script15 (Verb As String) As String
         })
       })"$, _
       $"// JSON format
-      ${IIf(Verbose, $"data = response.status === "ok" ? response.data : []"$, $"data = response"$)}"$)}
+      ${IIf(Verbose, _
+	  $"rows = response.${RESPONSE_ELEMENT_STATUS} === "ok" ? response.${RESPONSE_ELEMENT_RESULT} : []"$, _
+	  $"rows = response"$)}"$)}
       let tblHead = ""
       let tblBody = ""
-      if (data.length) {
+      if (rows.length) {
         tblHead = `
   <thead class="bg-light">
     <th style="text-align: right; width: 50px">#</th>
@@ -627,13 +650,14 @@ Private Sub script15 (Verb As String) As String
   </thead>`
         tblBody = `
   <tbody>`
-        $.each(data, function (i, item) {
+        $.each(rows, function (i, item) {
           const id = item.id || ""
           const code = item.code || ""
           const name = item.name || ""
           const catid = item.catid || ""
           const category = item.category || ""
           const price = item.price || ""
+		  //console.log(id, code, name, category, price)
           tblBody += `
     <tr>
       <td class="align-middle" style="text-align: right">${dollar}{id}</td>
@@ -676,11 +700,11 @@ Private Sub script16 As String
 	Select ContentType
 		Case WebApiUtils.CONTENT_TYPE_XML
 			Return $"$(document).on("click", ".edit", function (e) {
-  var id = $(this).attr("data-id")
-  var code = $(this).attr("data-code")
-  var name = $(this).attr("data-name")
-  var category = $(this).attr("data-category")
-  var price = $(this).attr("data-price").replace(",", "")
+  const id = $(this).attr("data-id")
+  const code = $(this).attr("data-code")
+  const name = $(this).attr("data-name")
+  const category = $(this).attr("data-category")
+  const price = $(this).attr("data-price").replace(",", "")
   $("#id1").val(id)
   $("#code1").val(code)
   $("#name1").val(name)
@@ -689,11 +713,11 @@ Private Sub script16 As String
 })"$
 		Case Else
 			Return $"$(document).on("click", ".edit", function (e) {
-  var id = $(this).attr("data-id")
-  var category = $(this).attr("data-category")
-  var code = $(this).attr("data-code")
-  var name = $(this).attr("data-name")
-  var price = $(this).attr("data-price").replace(",", "")
+  const id = $(this).attr("data-id")
+  const category = $(this).attr("data-category")
+  const code = $(this).attr("data-code")
+  const name = $(this).attr("data-name")
+  const price = $(this).attr("data-price").replace(",", "")
   $("#id1").val(id)
   $("#code1").val(code)
   $("#name1").val(name)
@@ -705,9 +729,9 @@ End Sub
 
 Private Sub script17 As String
 	Return $"$(document).on("click", ".delete", function (e) {
-  var id = $(this).attr("data-id")
-  var code = $(this).attr("data-code")
-  var name = $(this).attr("data-name")
+  const id = $(this).attr("data-id")
+  const code = $(this).attr("data-code")
+  const name = $(this).attr("data-name")
   $("#id2").val(id)
   $("#code_name").text("(" + code + ") " + name)
 })"$
@@ -716,7 +740,7 @@ End Sub
 
 Private Sub script18 As String
 	Return $"$(document).on("click", "#add", function (e) {
-  var form = $("#add_form")
+  const form = $("#add_form")
   form.validate({
     rules: {
       product_code: {
@@ -740,9 +764,9 @@ Private Sub script18 As String
     },
     submitHandler: function (form) {
       e.preventDefault()
-      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
-      $"var data = convertFormToXML(form[0])"$, _
-      $"var data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
+      ${IIf(PayloadType = "xml", _
+      $"const data = convertFormToXML(form[0])"$, _
+      $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
         type: "post",
         data: data,
@@ -763,7 +787,7 @@ End Sub
 
 Private Sub script19 As String
 	Return $"$(document).on("click", "#update", function (e) {
-  var form = $("#update_form")
+  const form = $("#update_form")
   form.validate({
     rules: {
       product_code: {
@@ -787,9 +811,9 @@ Private Sub script19 As String
     },
     submitHandler: function (form) {
       e.preventDefault()
-      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
-      $"var data = convertFormToXML(form[0])"$, _
-      $"var data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
+      ${IIf(PayloadType = "xml", _
+      $"const data = convertFormToXML(form[0])"$, _
+      $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
         type: "put",
         data: data,
@@ -856,16 +880,16 @@ Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, StrCo
 	Verbose = BlnVerbose
 	ContentType = StrContentType
 	Dim Script As String = $"$(document).ready(function () {
-  ${script14}
-  ${script15("get")}
+${script14}
+${script15("get")}
 })
 $("#btnsearch").click(function (e) {
   e.preventDefault()
-  var form = $("#search_form")
-  ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
-  $"var data = convertFormToXML(form[0])"$, _
-  $"var data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
-  ${script15("post")}
+  const form = $("#search_form")
+  ${IIf(PayloadType = "xml", _
+  $"const data = convertFormToXML(form[0])"$, _
+  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
+${script15("post")}
 })
 ${script16}
 ${script17}

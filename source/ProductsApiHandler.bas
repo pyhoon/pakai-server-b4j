@@ -18,9 +18,11 @@ End Sub
 
 Public Sub Initialize
 	HRM.Initialize
-	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.PayloadType = Main.conf.PayloadType
 	HRM.ContentType = Main.conf.ContentType
-	HRM.OrderedKeys = True
+	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.OrderedKeys = Main.conf.OrderedKeys
+	HRM.XmlElement = "item"
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
 		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
@@ -136,17 +138,30 @@ Private Sub PostProduct
 	'	ReturnApiResponse
 	'	Return
 	'End If
-	Try
-		Dim str As String = WebApiUtils.RequestDataText(Request)
-		Dim data As Map = str.As(JSON).ToMap
-	Catch
+	'Try
+	'	Dim str As String = WebApiUtils.RequestDataText(Request)
+	'	Dim data As Map = str.As(JSON).ToMap
+	'Catch
+	'	HRM.ResponseCode = 422
+	'	'HRM.ResponseError = LastException.Message
+	'	HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
+	'	ReturnApiResponse
+	'	Return
+	'End Try
+	Dim str As String = WebApiUtils.RequestDataText(Request)
+	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
-		'HRM.ResponseError = LastException.Message
-		HRM.ResponseError = $"Invalid ${IIf(HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")} object"$
+		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
 		ReturnApiResponse
 		Return
-	End Try
-	
+	End If
+	Select HRM.PayloadType
+		Case "xml"
+			Dim data As Map = WebApiUtils.ParseXML(str).Get("root") ' XML
+		Case Else
+			Dim data As Map = str.As(JSON).ToMap ' JSON
+	End Select
+	Log(data)
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys

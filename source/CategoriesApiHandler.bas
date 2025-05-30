@@ -18,13 +18,14 @@ End Sub
 
 Public Sub Initialize
 	HRM.Initialize
-	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.PayloadType = Main.conf.PayloadType
 	HRM.ContentType = Main.conf.ContentType
+	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.OrderedKeys = Main.conf.OrderedKeys
 	HRM.XmlElement = "item"
-	HRM.OrderedKeys = True
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
-		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "item")
+		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
 	End If
 End Sub
 
@@ -97,6 +98,7 @@ Private Sub ReturnMethodNotAllow
 End Sub
 
 Private Sub GetCategories
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Query
@@ -111,6 +113,7 @@ Private Sub GetCategories
 End Sub
 
 Private Sub GetCategoryById (id As Int)
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Find(id)
@@ -130,6 +133,7 @@ Private Sub GetCategoryById (id As Int)
 End Sub
 
 Private Sub CreateNewCategory
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	'Dim data As Map = WebApiUtils.RequestData(Request)
 	'If Not(data.IsInitialized) Then
 	'	HRM.ResponseCode = 400
@@ -137,16 +141,30 @@ Private Sub CreateNewCategory
 	'	ReturnApiResponse
 	'	Return
 	'End If
-	Try
-		Dim str As String = WebApiUtils.RequestDataText(Request)
-		Dim data As Map = str.As(JSON).ToMap
-	Catch
+	'Try
+	'	Dim str As String = WebApiUtils.RequestDataText(Request)
+	'	Dim data As Map = str.As(JSON).ToMap
+	'Catch
+	'	HRM.ResponseCode = 422
+	'	'HRM.ResponseError = LastException.Message
+	'	HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
+	'	ReturnApiResponse
+	'	Return
+	'End Try
+	Dim str As String = WebApiUtils.RequestDataText(Request)
+	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
-		'HRM.ResponseError = LastException.Message
-		HRM.ResponseError = $"Invalid ${IIf(HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")} object"$
+		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
 		ReturnApiResponse
 		Return
-	End Try
+	End If
+	Select HRM.PayloadType
+		Case "xml"
+			Dim data As Map = WebApiUtils.ParseXML(str).Get("root") ' XML
+		Case Else
+			Dim data As Map = str.As(JSON).ToMap ' JSON
+	End Select
+	Log(data)
 	' Check whether required keys are provided
 	If data.ContainsKey("category_name") = False Then
 		HRM.ResponseCode = 400
@@ -188,6 +206,7 @@ Private Sub CreateNewCategory
 End Sub
 
 Private Sub UpdateCategoryById (id As Int)
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	'Dim data As Map = WebApiUtils.RequestData(Request)
 	'If Not(data.IsInitialized) Then
 	'	HRM.ResponseCode = 400
@@ -256,6 +275,7 @@ Private Sub UpdateCategoryById (id As Int)
 End Sub
 
 Private Sub DeleteCategoryById (id As Int)
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Find(id)
