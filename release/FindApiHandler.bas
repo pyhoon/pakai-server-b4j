@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 2
+'Version 4.00 beta 8
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -19,7 +19,16 @@ End Sub
 
 Public Sub Initialize
 	HRM.Initialize
+	HRM.PayloadType = Main.conf.PayloadType
+	HRM.ContentType = Main.conf.ContentType
 	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.OrderedKeys = Main.conf.OrderedKeys
+	HRM.XmlElement = "item"
+	'If HRM.PayloadType = "" Then HRM.PayloadType = "json"
+	If HRM.VerboseMode Then
+		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
+		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
+	End If
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -91,19 +100,27 @@ Private Sub ReturnMethodNotAllow
 End Sub
 
 Public Sub GetAllProducts
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products p"
-	DB.Select = Array("p.*", "c.category_name")
+	DB.Select = Array("category_id catid", "category_name category", "p.id id", "product_code code", "product_name name", "product_price price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	If HRM.OrderedKeys Then
+		HRM.ResponseKeys = Array("a", "s", "m", "e", "r")
+		HRM.ResponseKeysAlias = Array("code", "status", "message", "error", "data")	' if ok, then show message first
+		HRM.ResponseData = DB.Results2
+	Else
+		HRM.ResponseData = DB.Results
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub
 
 Public Sub GetProductsByCategoryId (id As Int)
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products p"
 	DB.Select = Array("p.*", "c.category_name")
@@ -112,22 +129,43 @@ Public Sub GetProductsByCategoryId (id As Int)
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	If HRM.OrderedKeys Then
+		HRM.ResponseKeys = Array("a", "s", "m", "e", "r")
+		HRM.ResponseKeysAlias = Array("code", "status", "message", "error", "data")	' if ok, then show message first
+		HRM.ResponseData = DB.Results2
+	Else
+		HRM.ResponseData = DB.Results
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub
 
 Public Sub SearchByKeywords
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
-		HRM.ResponseError = $"Invalid ${IIf(HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML, "xml", "json")} object"$
-		ReturnApiResponse
-		Return
-	End If
-	
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
+	'Try
+		Dim str As String = WebApiUtils.RequestDataText(Request)
+		If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
+			HRM.ResponseCode = 422
+			HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
+			ReturnApiResponse
+			Return
+		End If
+		Select HRM.PayloadType
+			Case "xml"
+				Dim data As Map = WebApiUtils.ParseXML(str).Get("root") ' XML
+			Case Else
+				Dim data As Map = str.As(JSON).ToMap ' JSON
+		End Select
+		'Log(data)
+	'Catch
+	'	HRM.ResponseCode = 422
+	'	'HRM.ResponseError = LastException.Message
+	'	HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
+	'	ReturnApiResponse
+	'	Return
+	'End Try
 	'If HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML Then
-	'	data = data.Get("root")		
+	'	data = data.Get("root")
 	'End If
 	' Check whether required keys are provided
 	If data.ContainsKey("keyword") = False Then
@@ -140,7 +178,7 @@ Public Sub SearchByKeywords
 	
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products p"
-	DB.Select = Array("p.*", "c.category_name")
+	DB.Select = Array("p.id id", "product_code code", "product_name AS name", "category_id catid", "category_name category", "product_price price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	If SearchForText <> "" Then
 		DB.Where = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
@@ -149,7 +187,13 @@ Public Sub SearchByKeywords
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	If HRM.OrderedKeys Then
+		HRM.ResponseData = DB.Results2
+		HRM.ResponseKeys = Array("m", "a", "r", "s", "e")
+		HRM.ResponseKeysAlias = Array("message", "code", "data", "status", "error")
+	Else
+		HRM.ResponseData = DB.Results
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub

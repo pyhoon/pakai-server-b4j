@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 2
+'Version 4.00 beta 8
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -18,7 +18,15 @@ End Sub
 
 Public Sub Initialize
 	HRM.Initialize
+	HRM.PayloadType = Main.conf.PayloadType
+	HRM.ContentType = Main.conf.ContentType
 	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.OrderedKeys = Main.conf.OrderedKeys
+	HRM.XmlElement = "item"
+	If HRM.VerboseMode Then
+		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
+		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
+	End If
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -94,7 +102,11 @@ Private Sub GetProducts
 	DB.Table = "tbl_products"
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	If HRM.OrderedKeys Then
+		HRM.ResponseData = DB.Results2
+	Else
+		HRM.ResponseData = DB.Results
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub
@@ -105,7 +117,11 @@ Private Sub GetProductById (id As Int)
 	DB.Find(id)
 	If DB.Found Then
 		HRM.ResponseCode = 200
-		HRM.ResponseObject = DB.First
+		If HRM.OrderedKeys Then
+			HRM.ResponseObject = DB.Results2.Get(0)
+		Else
+			HRM.ResponseObject = DB.First
+		End If
 	Else
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
@@ -115,14 +131,37 @@ Private Sub GetProductById (id As Int)
 End Sub
 
 Private Sub PostProduct
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
-		HRM.ResponseError = "Invalid json object"
+	'Dim data As Map = WebApiUtils.RequestData(Request)
+	'If NotInitialized(data) Then
+	'	HRM.ResponseCode = 400
+	'	HRM.ResponseError = "Invalid json object"
+	'	ReturnApiResponse
+	'	Return
+	'End If
+	'Try
+	'	Dim str As String = WebApiUtils.RequestDataText(Request)
+	'	Dim data As Map = str.As(JSON).ToMap
+	'Catch
+	'	HRM.ResponseCode = 422
+	'	'HRM.ResponseError = LastException.Message
+	'	HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
+	'	ReturnApiResponse
+	'	Return
+	'End Try
+	Dim str As String = WebApiUtils.RequestDataText(Request)
+	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
 		ReturnApiResponse
 		Return
 	End If
-	
+	Select HRM.PayloadType
+		Case "xml"
+			Dim data As Map = WebApiUtils.ParseXML(str).Get("root") ' XML
+		Case Else
+			Dim data As Map = str.As(JSON).ToMap ' JSON
+	End Select
+	Log(data)
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys
@@ -164,21 +203,34 @@ Private Sub PostProduct
 
 	' Retrieve new row
 	HRM.ResponseCode = 201
-	HRM.ResponseObject = DB.First
+	If HRM.OrderedKeys Then
+		HRM.ResponseObject = DB.Results2.Get(0)
+	Else
+		HRM.ResponseObject = DB.First
+	End If
 	HRM.ResponseMessage = "Product created successfully"
 	ReturnApiResponse
 	DB.Close
 End Sub
 
 Private Sub PutProductById (id As Int)
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
+	'Dim data As Map = WebApiUtils.RequestData(Request)
+	'If Not(data.IsInitialized) Then
+	'	HRM.ResponseCode = 400
+	'	HRM.ResponseError = "Invalid json object"
+	'	ReturnApiResponse
+	'	Return
+	'End If
+	Try
+		Dim str As String = WebApiUtils.RequestDataText(Request)
+		Dim data As Map = str.As(JSON).ToMap
+	Catch
+		HRM.ResponseCode = 422
+		'HRM.ResponseError = LastException.Message
 		HRM.ResponseError = "Invalid json object"
 		ReturnApiResponse
 		Return
-	End If
-
+	End Try
 	' Check conflict product code
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products"
@@ -218,7 +270,11 @@ Private Sub PutProductById (id As Int)
 
 	HRM.ResponseCode = 200
 	HRM.ResponseMessage = "Product updated successfully"
-	HRM.ResponseObject = DB.First
+	If HRM.OrderedKeys Then
+		HRM.ResponseObject = DB.Results2.Get(0)
+	Else
+		HRM.ResponseObject = DB.First
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub
