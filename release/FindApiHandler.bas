@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 8
+'Version 4.00 beta 9
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -23,8 +23,6 @@ Public Sub Initialize
 	HRM.ContentType = Main.conf.ContentType
 	HRM.VerboseMode = Main.conf.VerboseMode
 	HRM.OrderedKeys = Main.conf.OrderedKeys
-	HRM.XmlElement = "item"
-	'If HRM.PayloadType = "" Then HRM.PayloadType = "json"
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
 		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
@@ -142,7 +140,7 @@ End Sub
 
 Public Sub SearchByKeywords
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	'Try
+	Try
 		Dim str As String = WebApiUtils.RequestDataText(Request)
 		If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 			HRM.ResponseCode = 422
@@ -157,16 +155,13 @@ Public Sub SearchByKeywords
 				Dim data As Map = str.As(JSON).ToMap ' JSON
 		End Select
 		'Log(data)
-	'Catch
-	'	HRM.ResponseCode = 422
-	'	'HRM.ResponseError = LastException.Message
-	'	HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
-	'	ReturnApiResponse
-	'	Return
-	'End Try
-	'If HRM.ContentType = WebApiUtils.CONTENT_TYPE_XML Then
-	'	data = data.Get("root")
-	'End If
+	Catch
+		HRM.ResponseCode = 422
+		'HRM.ResponseError = LastException.Message
+		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
+		ReturnApiResponse
+		Return
+	End Try
 	' Check whether required keys are provided
 	If data.ContainsKey("keyword") = False Then
 		HRM.ResponseCode = 400

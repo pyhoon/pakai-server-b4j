@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 8
+'Version 4.00 beta 9
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -22,7 +22,6 @@ Public Sub Initialize
 	HRM.ContentType = Main.conf.ContentType
 	HRM.VerboseMode = Main.conf.VerboseMode
 	HRM.OrderedKeys = Main.conf.OrderedKeys
-	HRM.XmlElement = "item"
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
 		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
