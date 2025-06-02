@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00 beta 8
+'Version 4.00 beta 9
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -22,7 +22,6 @@ Public Sub Initialize
 	HRM.ContentType = Main.conf.ContentType
 	HRM.VerboseMode = Main.conf.VerboseMode
 	HRM.OrderedKeys = Main.conf.OrderedKeys
-	HRM.XmlElement = "item"
 	If HRM.VerboseMode Then
 		HRM.ResponseKeys = Array("a", "s", "e", "m", "r")
 		HRM.ResponseKeysAlias = Array("code", "status", "error", "message", "data")
@@ -120,7 +119,7 @@ Private Sub GetCategoryById (id As Int)
 	If DB.Found Then
 		HRM.ResponseCode = 200
 		If HRM.OrderedKeys Then
-			HRM.ResponseObject = DB.Results2.Get(0)
+			HRM.ResponseObject = DB.Results2.Get(0) ' Results2 returns List containing maps with __order key
 		Else
 			HRM.ResponseObject = DB.First
 		End If
@@ -134,23 +133,6 @@ End Sub
 
 Private Sub CreateNewCategory
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	'Dim data As Map = WebApiUtils.RequestData(Request)
-	'If Not(data.IsInitialized) Then
-	'	HRM.ResponseCode = 400
-	'	HRM.ResponseError = "Invalid json object"
-	'	ReturnApiResponse
-	'	Return
-	'End If
-	'Try
-	'	Dim str As String = WebApiUtils.RequestDataText(Request)
-	'	Dim data As Map = str.As(JSON).ToMap
-	'Catch
-	'	HRM.ResponseCode = 422
-	'	'HRM.ResponseError = LastException.Message
-	'	HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
-	'	ReturnApiResponse
-	'	Return
-	'End Try
 	Dim str As String = WebApiUtils.RequestDataText(Request)
 	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
@@ -207,19 +189,11 @@ End Sub
 
 Private Sub UpdateCategoryById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	'Dim data As Map = WebApiUtils.RequestData(Request)
-	'If Not(data.IsInitialized) Then
-	'	HRM.ResponseCode = 400
-	'	HRM.ResponseError = "Invalid json object"
-	'	ReturnApiResponse
-	'	Return
-	'End If
 	Try
 		Dim str As String = WebApiUtils.RequestDataText(Request)
 		Dim data As Map = str.As(JSON).ToMap
 	Catch
 		HRM.ResponseCode = 422
-		'HRM.ResponseError = LastException.Message
 		HRM.ResponseError = "Invalid json object"
 		ReturnApiResponse
 		Return

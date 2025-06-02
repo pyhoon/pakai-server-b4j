@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-'Version 4.00 beta 8
+'Version 4.00 beta 9
 Sub Process_Globals
 	Private Const RESPONSE_ELEMENT_CODE As String		= "code"
 	Private Const RESPONSE_ELEMENT_ERROR As String 		= "error"
