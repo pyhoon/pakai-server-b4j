@@ -10,7 +10,7 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
-	
+
 End Sub
 
 'Return True to allow the request to proceed.

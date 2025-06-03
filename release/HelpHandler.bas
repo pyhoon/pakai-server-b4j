@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Help Handler class
-'Version 4.00 beta 9
+'Version 4.00
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
@@ -119,11 +119,6 @@ Private Sub BuildMethods
 	Dim FormatMap As Map = CreateMap("category_name": "category_name")
 	Method.Put("Format", FormatMap.As(JSON).ToString)
 	Method.Put("Body", FormatMap.As(JSON).ToString)
-	'Dim BodyMap As Map = CreateMap("root": CreateMap("category_name": "category_name"))
-	'Dim m2x As Map2Xml
-	'm2x.Initialize
-	'Dim xml As String = m2x.MapToXml(BodyMap)
-	'Method.Put("Body", EscapeXml(xml))
 	ReplaceMethod(Method)
 
 	Dim Method As Map = RetrieveMethod("Categories", "UpdateCategoryById (id As Int) '#PUT")
@@ -132,11 +127,6 @@ Private Sub BuildMethods
 	Dim FormatMap As Map = CreateMap("category_name": "category_name")
 	Method.Put("Format", FormatMap.As(JSON).ToString)
 	Method.Put("Body", FormatMap.As(JSON).ToString)
-	'Dim BodyMap As Map = CreateMap("root": CreateMap("category_name": "category_name"))
-	'Dim m2x As Map2Xml
-	'm2x.Initialize
-	'Dim xml As String = m2x.MapToXml(BodyMap)
-	'Method.Put("Body", EscapeXml(xml))
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Categories", "DeleteCategoryById (id As Int)")
@@ -169,14 +159,6 @@ Private Sub BuildMethods
 }"$
 	Method.Put("Format", Format)
 	Method.Put("Body", Body)
-
-'	Dim xml As String = $"<root>
-'  <category_id>1</category_id>
-'  <product_code>CODE</product_code>
-'  <product_name>ProductName</product_name>
-'  <product_price>0</product_price>
-'</root>"$
-	'Method.Put("Body", EscapeXml(xml))
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Products", "PutProductById (id As Int)")
@@ -195,14 +177,6 @@ Private Sub BuildMethods
 }"$
 	Method.Put("Format", Format)
 	Method.Put("Body", Body)
-	
-	'Dim xml As String = $"<root>
-'  <category_id>1</category_id>
-'  <product_code>CODE</product_code>
-'  <product_name>ProductName</product_name>
-'  <product_price>10</product_price>
-'</root>"$
-	'Method.Put("Body", EscapeXml(xml))
 	Method.Put("Elements", $"["{id}"]"$)
 	ReplaceMethod(Method)
 	
@@ -225,11 +199,6 @@ Private Sub BuildMethods
 	Method.Put("Format", FormatMap.As(JSON).ToString)
 	Dim BodytMap As Map = CreateMap("keyword": "")
 	Method.Put("Body", BodytMap.As(JSON).ToString)
-	'Dim BodyMap As Map = CreateMap("root": CreateMap("keyword": "text")) ' valid XML requires root element
-	'Dim m2x As Map2Xml
-	'm2x.Initialize
-	'Dim xml As String = m2x.MapToXml(BodyMap)
-	'Method.Put("Body", EscapeXml(xml))
 	Method.Put("Desc", "Filter Products (with Category name)")
 	Dim Expected As StringBuilder
 	Expected.Initialize
@@ -518,15 +487,13 @@ Private Sub GenerateDocItem (Props As Map) As String
 	section.Format = section.Format.Replace(CRLF, "<br>")	' convert to html
 	section.Format = section.Format.Replace("  ", "&nbsp;")	' convert to html
 	section.Body = Props.Get("Body")
-	'section.Body = section.Body.Replace(CRLF, "<br>")	' convert to html
+	'section.Body = section.Body.Replace(CRLF, "<br>")		' convert to html
 	'section.Body = section.Body.Replace("  ", "&nbsp;")	' convert to html
 	section.Expected = IIf(Props.ContainsKey("Expected"), Props.Get("Expected"), GetExpectedResponse(section.Verb))
 	If section.Params.EqualsIgnoreCase("Not required") Then
 		section.InputDisabled = True
-		'section.DisabledBackground = "#F0F9FF"
 		section.DisabledBackground = "#696969"
 	Else
-		'section.DisabledBackground = "#FFFFFF"
 		section.DisabledBackground = "#363636"
 	End If
 	Return GenerateVerbSection(section)

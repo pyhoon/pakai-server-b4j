@@ -5,14 +5,14 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-'Version 4.00 beta 9
+'Version 4.00
 Sub Process_Globals
 	Private Const RESPONSE_ELEMENT_CODE As String		= "code"
 	Private Const RESPONSE_ELEMENT_ERROR As String 		= "error"
 	Private Const RESPONSE_ELEMENT_STATUS As String 	= "status"
 	Private Const RESPONSE_ELEMENT_MESSAGE As String	= "message"
 	Private Const RESPONSE_ELEMENT_RESULT As String 	= "data"
-	'Private Const RESPONSE_ELEMENT_TYPE As String 		= "type"
+	Private Const RESPONSE_ELEMENT_TYPE As String 		= "type" 'ignore
 	Private PayloadType As String
 	Private ContentType As String
 	Private Verbose As Boolean

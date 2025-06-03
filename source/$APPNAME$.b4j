@@ -30,12 +30,12 @@ NumberOfModules=9
 Version=10.2
 @EndOfDesignText@
 #Region Project Attributes
-' Product: 				Pakai
-' Version: 				4.00 beta 9
+' Product: 				Pakai Server
+' Version: 				4.00
 ' Description: 			Server application project template
 ' Developer:			Poon Yip Hoon (Aeric) (https://www.b4x.com/android/forum/members/aeric.74499/)
 ' License:				MIT License
-' GitHub:				https://github.com/pyhoon/web-api-server-b4j/tree/v4.00beta
+' GitHub:				https://github.com/pyhoon/pakai-server-b4j
 ' Forum thread:			https://www.b4x.com/android/forum/threads/project-template-pakai-framework.167080/
 ' Tutorial:				Not available
 ' Donation:				PayPal (https://paypal.me/aeric80/)
@@ -57,13 +57,13 @@ Version=10.2
 
 Sub Process_Globals
 	Public ctx					As Map
-	Public info 				As ConnectionInfo
 	Public srvr 				As Server
 	Public conn					As ORMConnector
+	Public info 				As ConnectionInfo
 	Public conf 				As ServerConfigurations
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-	Private Const VERSION_NAME	As String = "4.00 beta 9"
+	Private Const VERSION_NAME	As String = "4.00"
 	Type ServerConfigurations (EnableCORS As Boolean, EnableHelp As Boolean, EnableSSL As Boolean, Port As Int, SSLPort As Int, RootUrl As String, RootPath As String, ServerUrl As String, ApiName As String, ApiVersioning As Boolean, PayloadType As String, ContentType As String, VerboseMode As Boolean, OrderedKeys As Boolean, SslKeystoreDir As String, SslKeystoreFile As String, SslKeystorePassword As String, StaticFilesBrowsable As Boolean, StaticFilesFolder As String, Version As String, SmtpUserName As String, SmtpPassword As String, SmtpServer As String, SmtpUseSsl As String, SmtpPort As Int)
 End Sub
 
@@ -95,11 +95,8 @@ Private Sub Configurable
 	conf.EnableSSL = True
 	#End If
 	conf.EnableCORS = True
-	conf.StaticFilesBrowsable = False
 	conf.VerboseMode = True
-	conf.OrderedKeys = True 'emoji becomes ?? in xml format
-	'conf.PayloadType = "xml"
-	'conf.ContentType = WebApiUtils.CONTENT_TYPE_XML
+	conf.StaticFilesBrowsable = False
 End Sub
 
 ' Create Database Tables and Populate Data
@@ -259,8 +256,6 @@ Private Sub ConfigureCORS
 	Dim Paths As List
 	Paths.Initialize
 	Paths.Add(CreateMap("path": "*", "origins": "*", "methods": "POST,PUT,DELETE", "headers": "*")) ' All origins access
-	'Paths.Add(CreateMap("path": "*", "origins": "http://127.0.0.1:3000", "methods": "POST,PUT,DELETE", "headers": "*"))
-	
 	For Each Item As Map In Paths
 		Dim path As String = Item.Get("path")
 		Dim settings As Map = CreateMap( _
@@ -311,7 +306,6 @@ Private Sub ConfigurePort
 			LogColor("SslKeystoreFile is found (SSL is disabled)", COLOR_RED)
 			Return
 		End If
-		
 		Dim ssl As SslConfiguration
 		ssl.Initialize
 		ssl.SetKeyStorePath(conf.SslKeystoreDir, conf.SslKeystoreFile)
@@ -355,7 +349,7 @@ Private Sub CreateJSFiles
 		File.MakeDir(Parent, "scripts")
 	Else
 	#If Release
-		skip = True ' skip overwriting files in release if scripts folder exists
+	skip = True ' skip overwriting files in release if scripts folder exists
 	#End If
 	End If
 	If skip = False Then

@@ -28,19 +28,15 @@ Public Sub AddToServer (ServerObject As Server)
 End Sub
 
 #If JAVA
-
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
 // import javax.servlet.DispatcherType;
 // import javax.servlet.Filter;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
-
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
-
 import anywheresoftware.b4a.objects.collections.Map.MyMap;
 
 public void addFilter(ServletContextHandler context, String path, MyMap settings) throws Exception {
@@ -64,5 +60,4 @@ private void copyMyMap(MyMap m, java.util.Map<String, String> o, boolean integer
         }
     }
 }
-
 #End If
