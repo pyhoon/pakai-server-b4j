@@ -5,14 +5,14 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Help Handler class
-'Version 3.50
+'Version 4.00
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
 	Private Handlers As List
 	Private AllMethods As List
 	Private AllGroups As Map
-	Type VerbSection (Verb As String, Color As String, ElementId As String, Link As String, FileUpload As String, Authenticate As String, Description As String, Params As String, Body As String, Expected As String, InputDisabled As Boolean, DisabledBackground As String, Raw As Boolean, Noapi As Boolean)
+	Type VerbSection (Verb As String, Color As String, ElementId As String, Link As String, FileUpload As String, Authenticate As String, Description As String, Params As String, Format As String, Body As String, Expected As String, InputDisabled As Boolean, DisabledBackground As String, Raw As Boolean, Noapi As Boolean)
 End Sub
 
 Public Sub Initialize
@@ -36,7 +36,7 @@ Private Sub ShowHelpPage
 	#End If
 	BuildMethods ' Build page programatically
 	Dim Contents As String = GenerateHtml
-	Dim strMain As String = WebApiUtils.ReadTextFile("main.html")
+	Dim strMain As String = WebApiUtils.ReadTextFile("help.html")
 	strMain = WebApiUtils.BuildDocView(strMain, Contents)
 	strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
 	strMain = WebApiUtils.BuildHtml(strMain, Main.ctx)
@@ -116,15 +116,17 @@ Private Sub BuildMethods
 	
 	Dim Method As Map = RetrieveMethod("Categories", "CreateNewCategory '#POST")
 	Method.Put("Desc", "Add new Category")
-	Dim BodyMap As Map = CreateMap("category_name": "category_name")
-	Method.Put("Body", BodyMap.As(JSON).ToString)
+	Dim FormatMap As Map = CreateMap("category_name": "category_name")
+	Method.Put("Format", FormatMap.As(JSON).ToString)
+	Method.Put("Body", FormatMap.As(JSON).ToString)
 	ReplaceMethod(Method)
 
 	Dim Method As Map = RetrieveMethod("Categories", "UpdateCategoryById (id As Int) '#PUT")
 	Method.Put("Desc", "Update Category by id")
 	Method.Put("Elements", $"["{id}"]"$)
-	Dim BodyMap As Map = CreateMap("category_name": "category_name")
-	Method.Put("Body", BodyMap.As(JSON).ToString)
+	Dim FormatMap As Map = CreateMap("category_name": "category_name")
+	Method.Put("Format", FormatMap.As(JSON).ToString)
+	Method.Put("Body", FormatMap.As(JSON).ToString)
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Categories", "DeleteCategoryById (id As Int)")
@@ -143,20 +145,44 @@ Private Sub BuildMethods
 
 	Dim Method As Map = CreateMethodProperties("Products", "PostProduct")
 	Method.Put("Desc", "Add new Product")
-	Method.Put("Body", $"{<br>&nbsp; "category_id": 1,<br>&nbsp; "product_code": "CODE",<br>&nbsp; "product_name": "ProductName",<br>&nbsp; "product_price": 0<br>}"$)
+	Dim Format As String = $"{
+  "category_id": 1,
+  "product_code": "CODE",
+  "product_name": "ProductName",
+  "product_price": 0
+}"$
+	Dim Body As String = $"{
+  "category_id": 1,
+  "product_code": "",
+  "product_name": "",
+  "product_price": 0
+}"$
+	Method.Put("Format", Format)
+	Method.Put("Body", Body)
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Products", "PutProductById (id As Int)")
 	Method.Put("Desc", "Update Product by id")
-	Method.Put("Body", $"{<br>&nbsp; "category_id": 1,<br>&nbsp; "product_code": "CODE",<br>&nbsp; "product_name": "ProductName",<br>&nbsp; "product_price": 10<br>}"$)
+	Dim Format As String = $"{
+  "category_id": 1,
+  "product_code": "CODE",
+  "product_name": "ProductName",
+  "product_price": 10
+}"$
+	Dim Body As String = $"{
+  "category_id": 1,
+  "product_code": "",
+  "product_name": "",
+  "product_price": 0
+}"$
+	Method.Put("Format", Format)
+	Method.Put("Body", Body)
 	Method.Put("Elements", $"["{id}"]"$)
-	'Method.Put("Authenticate", $"Token"$)
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Products", "DeleteProductById (id As Int)")
 	Method.Put("Desc", "Delete Product by id")
 	Method.Put("Elements", $"["{id}"]"$)
-	'Method.Put("Authenticate", $"Basic"$)
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Find", "GetAllProducts")
@@ -168,9 +194,11 @@ Private Sub BuildMethods
 	Method.Put("Elements", $"["products-by-category_id", "{id}"]"$)
 	ReplaceMethod(Method)
 	
-	Dim Method As Map = RetrieveMethod("Find", "SearchByKeywords ' #post")
-	Dim BodyMap As Map = CreateMap("keywords": "search words")
-	Method.Put("Body", BodyMap.As(JSON).ToString)
+	Dim Method As Map = RetrieveMethod("Find", "SearchByKeywords ' #POST")
+	Dim FormatMap As Map = CreateMap("keyword": "text")
+	Method.Put("Format", FormatMap.As(JSON).ToString)
+	Dim BodytMap As Map = CreateMap("keyword": "")
+	Method.Put("Body", BodytMap.As(JSON).ToString)
 	Method.Put("Desc", "Filter Products (with Category name)")
 	Dim Expected As StringBuilder
 	Expected.Initialize
@@ -291,7 +319,8 @@ Private Sub CreateMethodProperties (groupName As String, methodLine As String) A
 	methodProps.Put("Desc", methodProps.Get("Method"))
 	methodProps.Put("Verb", ExtractVerb(methodLine))
 	methodProps.Put("Params", ExtractParams(methodLine))
-	methodProps.Put("Body", "&nbsp;")
+	methodProps.Put("Format", "&nbsp;")
+	methodProps.Put("Body", "")
 	methodProps.Put("Noapi", False)
 	methodProps.Put("Format", "")
 	Return methodProps
@@ -383,17 +412,17 @@ End Sub
 Private Sub GenerateVerbSection (section As VerbSection) As String
 	Select section.FileUpload
 		Case "Image", "PDF"
-			Dim strBodyInput As String = $"File: <label for="file1${section.ElementId}">Choose a file:</label><input type="file" id="file1${section.ElementId}" class="pb-3" name="file1">"$
+			Dim strBodyInput As String = $"<p><strong>File:</strong> <label for="file1${section.ElementId}">Choose a file:</label><input type="file" id="file1${section.ElementId}" class="pb-3" name="file1"></p>"$
 		Case Else
-			Dim strBodySample As String = $"Format: <p class="form-control" style="height: fit-content; background-color: #F0F9FF; font-size: small">${section.Body}</p>"$
-			Dim strBodyInput As String = $"Body: <textarea id="body${section.ElementId}" rows="6" class="form-control data-body" style="background-color: #FFFFFF; font-size: small"></textarea></p>"$
+			Dim strBodySample As String = $"<p><strong>Format:</strong> <span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">${section.Format}</span></p>"$
+			Dim strBodyInput As String = $"<p><strong>Body:</strong> <textarea id="body${section.ElementId}" rows="6" class="form-control data-body" style="background-color: #363636; color: white; font-size: small">${section.Body}</textarea></p>"$
 	End Select
 	Return $"
-        <button style="color: #363636" class="collapsible collapsible-background-${section.Color}"><span style="width: 60px" class="badge badge-${section.Color} text-white py-1 mr-1">${section.Verb}</span>
+        <button class="collapsible collapsible-background-${section.Color}"><span style="width: 60px" class="badge badge-${section.Color} text-dark py-1 mr-1">${section.Verb}</span>
 		${IIf(section.Authenticate.EqualsIgnoreCase("Basic") Or section.Authenticate.EqualsIgnoreCase("Token"), _
-			$"<span style="width: 50px" class="badge rounded-pill pill-yellow pill-yellow-text px-2 py-1">${WebApiUtils.ProperCase(section.Authenticate)}</span>"$, "")} ${section.Description}
+			$"<span style="width: 50px" class="badge rounded-pill pill-yellow pill-yellow-text px-2 py-1">${WebApiUtils.ProperCase(section.Authenticate)}</span>"$, "")}<span class="ml-1">${section.Description}</span>
 		</button>
-        <div class="details">
+        <div class="details mb-1">
             <!--<div class="row">
                 <div class="col-md-6 pt-3">
                     ${IIf(section.Authenticate.EqualsIgnoreCase("Basic") Or section.Authenticate.EqualsIgnoreCase("Token"), _
@@ -404,23 +433,23 @@ Private Sub GenerateVerbSection (section As VerbSection) As String
             <div class="row">
                 <div class="col-md-3 p-3">
                     <p><strong>Parameters</strong><br/>
-                    <label class="col control-label border rounded" style="padding-top: 5px; padding-bottom: 5px; background-color: #F0F9FF; font-size: small; white-space: pre-wrap;">${section.Params}</label></p>
+                    <label class="col control-label border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; white-space: pre-wrap;">${section.Params}</label></p>
                     ${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strBodySample, "")}
-                    <p><strong>Status Code</strong><br/>
-                    ${section.Expected}</p>
+                    <div class="mt-3"><strong>Status Code</strong><br/>
+                    ${section.Expected}</div>
                 </div>
 	            <div class="col-md-3 p-3">
 					<form id="form1" method="${section.Verb}">
 					<p><strong>Path</strong><br/>
-	                <input${IIf(section.InputDisabled, " disabled", "")} id="path${section.ElementId}" class="form-control data-path" style="background-color: ${section.DisabledBackground}; font-size: small" value="${section.Link & IIf(section.Raw, "?format=json", "")}"></p>
+	                <input${IIf(section.InputDisabled, " disabled", "")} id="path${section.ElementId}" class="form-control data-path text-light" style="background-color: ${section.DisabledBackground}; font-size: small" value="${section.Link & IIf(section.Raw, "?format=json", "")}"></p>
 					${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strBodyInput, $""$)}
 					<button id="btn${section.ElementId}" class="${IIf(section.FileUpload.EqualsIgnoreCase("Image") Or section.FileUpload.EqualsIgnoreCase("PDF"), $"file"$, $"${section.Verb.ToLowerCase}"$)}${IIf(section.Authenticate.ToUpperCase = "BASIC" Or section.Authenticate.ToUpperCase = "TOKEN", " " & section.Authenticate.ToLowerCase, "")} button submit-button-${section.Color} text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px"><strong>Submit</strong></button>
 	            	</form>
 				</div>
                 <div class="col-md-6 p-3">
                     <p><strong>Response</strong><br/>
-                    <textarea rows="10" id="response${section.ElementId}" class="form-control" style="background-color: #696969; color: white; font-size: small"></textarea></p>
-                    <div id="alert${section.ElementId}" class="alert alert-default" role="alert" style="display: block"></div>
+                    <textarea rows="10" id="response${section.ElementId}" class="form-control" style="background-color: #363636; color: white; font-size: small"></textarea></p>
+                    <div id="alert${section.ElementId}" class="alert text-light" role="alert" style="display: block"></div>
                 </div>
             </div>
         </div>"$
@@ -454,15 +483,18 @@ Private Sub GenerateDocItem (Props As Map) As String
 	section.Authenticate = Props.Get("Authenticate")
 	section.Description = Props.Get("Desc")
 	section.Params = Props.Get("Params")
+	section.Format = Props.Get("Format")
+	section.Format = section.Format.Replace(CRLF, "<br>")	' convert to html
+	section.Format = section.Format.Replace("  ", "&nbsp;")	' convert to html
 	section.Body = Props.Get("Body")
-	section.Body = section.Body.Replace(CRLF, "<br>")	' convert to html
-	section.Body = section.Body.Replace("  ", "&nbsp;")	' convert to html
+	'section.Body = section.Body.Replace(CRLF, "<br>")		' convert to html
+	'section.Body = section.Body.Replace("  ", "&nbsp;")	' convert to html
 	section.Expected = IIf(Props.ContainsKey("Expected"), Props.Get("Expected"), GetExpectedResponse(section.Verb))
 	If section.Params.EqualsIgnoreCase("Not required") Then
 		section.InputDisabled = True
-		section.DisabledBackground = "#F0F9FF"
+		section.DisabledBackground = "#696969"
 	Else
-		section.DisabledBackground = "#FFFFFF"
+		section.DisabledBackground = "#363636"
 	End If
 	Return GenerateVerbSection(section)
 End Sub
@@ -497,4 +529,28 @@ Private Sub GetExpectedResponse (verb As String) As String
 	Expected.Append("<br/>405 Method not allowed")
 	Expected.Append("<br/>422 Error execute query")
 	Return Expected.ToString
+End Sub
+
+' Reference: https://www.b4x.com/android/forum/threads/escapexml-code-snippet.35720/
+Public Sub EscapeXml (Raw As String) As String
+	Dim sb As StringBuilder
+	sb.Initialize
+	For i = 0 To Raw.Length - 1
+		Dim c As Char = Raw.CharAt(i)
+		Select c
+			Case QUOTE
+				sb.Append("&quot;")
+			Case "'"
+				sb.Append("&apos;")
+			Case "<"
+				sb.Append("&lt;")
+			Case ">"
+				sb.Append("&gt;")
+			Case "&"
+				sb.Append("&amp;")
+			Case Else
+				sb.Append(c)
+		End Select
+	Next
+	Return sb.ToString
 End Sub

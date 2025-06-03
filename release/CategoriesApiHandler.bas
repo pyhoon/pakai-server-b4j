@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 3.50
+'Version 4.00
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -18,7 +18,7 @@ End Sub
 
 Public Sub Initialize
 	HRM.Initialize
-	HRM.SimpleResponse = Main.conf.SimpleResponse
+	HRM.VerboseMode = Main.conf.VerboseMode
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -90,6 +90,7 @@ Private Sub ReturnMethodNotAllow
 End Sub
 
 Private Sub GetCategories
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Query
@@ -100,6 +101,7 @@ Private Sub GetCategories
 End Sub
 
 Private Sub GetCategoryById (id As Int)
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Find(id)
@@ -115,22 +117,25 @@ Private Sub GetCategoryById (id As Int)
 End Sub
 
 Private Sub CreateNewCategory
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
-		HRM.ResponseError = "Invalid json object"
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
+	Dim str As String = WebApiUtils.RequestDataText(Request)
+	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
 		ReturnApiResponse
 		Return
 	End If
-	
+	Dim data As Map = str.As(JSON).ToMap ' JSON payload
 	' Check whether required keys are provided
-	If data.ContainsKey("category_name") = False Then
-		HRM.ResponseCode = 400
-		HRM.ResponseError = "Key 'category_name' not found"
-		ReturnApiResponse
-		Return
-	End If
-	
+	Dim RequiredKeys As List = Array As String("category_name") 
+	For Each requiredkey As String In RequiredKeys
+		If data.ContainsKey(requiredkey) = False Then
+			HRM.ResponseCode = 400
+			HRM.ResponseError = $"Key '${requiredkey}' not found"$
+			ReturnApiResponse
+			Return
+		End If
+	Next
 	' Check conflict category name
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
@@ -144,13 +149,13 @@ Private Sub CreateNewCategory
 		DB.Close
 		Return
 	End If
-	
 	' Insert new row
 	DB.Reset
-	DB.Columns = Array("category_name", "created_date")
-	DB.Parameters = Array(data.Get("category_name"), data.GetDefault("created_date", WebApiUtils.CurrentDateTime))
+	DB.Columns = Array("category_name", _
+	"created_date")
+	DB.Parameters = Array(data.Get("category_name"), _
+	data.GetDefault("created_date", WebApiUtils.CurrentDateTime))
 	DB.Save
-	
 	' Retrieve new row
 	HRM.ResponseCode = 201
 	HRM.ResponseObject = DB.First
@@ -160,14 +165,15 @@ Private Sub CreateNewCategory
 End Sub
 
 Private Sub UpdateCategoryById (id As Int)
-	Dim data As Map = WebApiUtils.RequestData(Request)
-	If Not(data.IsInitialized) Then
-		HRM.ResponseCode = 400
-		HRM.ResponseError = "Invalid json object"
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
+	Dim str As String = WebApiUtils.RequestDataText(Request)
+	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
 		ReturnApiResponse
 		Return
 	End If
-	
+	Dim data As Map = str.As(JSON).ToMap ' JSON payload
 	' Check whether required keys are provided
 	If data.ContainsKey("category_name") = False Then
 		HRM.ResponseCode = 400
@@ -175,7 +181,6 @@ Private Sub UpdateCategoryById (id As Int)
 		ReturnApiResponse
 		Return
 	End If
-	
 	' Check conflict category name
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
@@ -189,34 +194,7 @@ Private Sub UpdateCategoryById (id As Int)
 		DB.Close
 		Return
 	End If
-	
-	DB.Find(id)
-	If DB.Found = False Then
-		HRM.ResponseCode = 404
-		HRM.ResponseError = "Category not found"
-		ReturnApiResponse
-		DB.Close
-		Return
-	End If					
-
-	DB.Reset
-	DB.Columns = Array("category_name", _
-	"modified_date")
-	DB.Parameters = Array(data.Get("category_name"), _
-	data.GetDefault("created_date", WebApiUtils.CurrentDateTime))
-	DB.Id = id
-	DB.Save
-
-	HRM.ResponseCode = 200
-	HRM.ResponseMessage = "Category updated successfully"
-	HRM.ResponseObject = DB.First
-	ReturnApiResponse
-	DB.Close
-End Sub
-
-Private Sub DeleteCategoryById (id As Int)
-	DB.Initialize(Main.DBType, Main.DBOpen)
-	DB.Table = "tbl_categories"
+	' Find row by id
 	DB.Find(id)
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
@@ -225,7 +203,36 @@ Private Sub DeleteCategoryById (id As Int)
 		DB.Close
 		Return
 	End If
-	
+	' Update row by id
+	DB.Reset
+	DB.Columns = Array("category_name", _
+	"modified_date")
+	DB.Parameters = Array(data.Get("category_name"), _
+	data.GetDefault("created_date", WebApiUtils.CurrentDateTime))
+	DB.Id = id
+	DB.Save
+	' Return updated row
+	HRM.ResponseCode = 200
+	HRM.ResponseMessage = "Category updated successfully"
+	HRM.ResponseObject = DB.First
+	ReturnApiResponse
+	DB.Close
+End Sub
+
+Private Sub DeleteCategoryById (id As Int)
+	Log($"${Request.Method}: ${Request.RequestURI}"$)
+	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.Table = "tbl_categories"
+	' Find row by id
+	DB.Find(id)
+	If DB.Found = False Then
+		HRM.ResponseCode = 404
+		HRM.ResponseError = "Category not found"
+		ReturnApiResponse
+		DB.Close
+		Return
+	End If
+	' Delete row
 	DB.Reset
 	DB.Id = id
 	DB.Delete

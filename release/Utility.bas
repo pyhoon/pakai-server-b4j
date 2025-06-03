@@ -5,282 +5,428 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-'Version 3.50
+'Version 4.00
 Sub Process_Globals
-	
+	Private Const RESPONSE_ELEMENT_CODE As String		= "a"
+	Private Const RESPONSE_ELEMENT_ERROR As String 		= "e"
+	Private Const RESPONSE_ELEMENT_STATUS As String 	= "s"
+	Private Const RESPONSE_ELEMENT_MESSAGE As String	= "m"
+	Private Const RESPONSE_ELEMENT_RESULT As String 	= "r"
+	Private Const RESPONSE_ELEMENT_TYPE As String 		= "t" 'ignore
+	Private PayloadType As String
+	Private ContentType As String
+	Private Verbose As Boolean
+	Private XmlRoot As String = "root"
+	Private XmlElement As String = "item"
 End Sub
 
-Private Sub ReturnAlertScript (SimpleResponseEnable As Boolean, AlertMessage As String, SuccessCode As Int) As String
-	If SimpleResponseEnable Then
-		Return $"alert("${AlertMessage}")
+Public Sub CurrentTimeStamp As String
+	Select Main.DBType.ToUpperCase
+		Case "MYSQL"
+			Return "NOW()"
+		Case "SQLITE"
+			Return "datetime('Now')"
+		Case Else
+			Return ""
+	End Select
+End Sub
+
+Public Sub CurrentTimeStampAddMinute (Value As Int) As String
+	Select Main.DBType.ToUpperCase
+		Case "MYSQL"
+			Return $"DATE_ADD(NOW(), INTERVAL ${Value} MINUTE)"$
+		Case "SQLITE"
+			Return $"datetime('Now', '+${Value} minute')"$
+		Case Else
+			Return ""
+	End Select
+End Sub
+
+Private Sub AlertScript (AlertMessage As String, SuccessCode As Int, SubmitForm As Boolean) As String
+	If Verbose = False Then
+		If SubmitForm Then ' indent
+			Return $"alert("${AlertMessage}")
           location.reload()"$
-	Else
-		Return $"if (response.a == ${SuccessCode}) {
-            alert("${AlertMessage}")
-            location.reload()
-          }
-          else {
-            alert(response.a + " " + response.e)
-          }"$
-	End If
-End Sub
-
-' align for update category and add product
-Private Sub ReturnAlertScript2 (SimpleResponseEnable As Boolean, AlertMessage As String, SuccessCode As Int) As String
-	If SimpleResponseEnable Then
-		Return $"    alert("${AlertMessage}")
-          location.reload()"$
-	Else
-		Return $"	  if (response.a == ${SuccessCode}) {
-            alert("${AlertMessage}")
-            location.reload()
-          }
-          else {
-            alert(response.a + " " + response.e)
-          }"$
-	End If
-End Sub
-
-' align for delete category
-Private Sub ReturnAlertScript3 (SimpleResponseEnable As Boolean, AlertMessage As String, SuccessCode As Int) As String
-	If SimpleResponseEnable Then
-		Return $"	alert("${AlertMessage}")
+		Else
+			Return $"alert("${AlertMessage}")
       location.reload()"$
-	Else
-		Return $"	if (response.a == ${SuccessCode}) {
+		End If
+	End If
+	Select ContentType
+		Case WebApiUtils.CONTENT_TYPE_XML
+			Return $"const root = $(response).find("${XmlRoot}")
+          const code = $(root).children("${RESPONSE_ELEMENT_CODE}").text()
+          const error = $(root).children("${RESPONSE_ELEMENT_ERROR}").text()
+          if (code == ${SuccessCode}) {
+            alert("${AlertMessage}")
+            location.reload()
+          }
+          else {
+            alert(code + " " + error)
+          }"$
+		Case Else
+			If SubmitForm Then ' indent
+				Return $"const code = response.${RESPONSE_ELEMENT_CODE}
+          const error = response.${RESPONSE_ELEMENT_ERROR}
+          if (code == ${SuccessCode}) {
+            alert("${AlertMessage}")
+            location.reload()
+          }
+          else {
+            alert(code + " " + error)
+          }"$
+			Else
+				Return $"const code = response.${RESPONSE_ELEMENT_CODE}
+      const error = response.${RESPONSE_ELEMENT_ERROR}
+      if (code == ${SuccessCode}) {
         alert("${AlertMessage}")
         location.reload()
       }
       else {
-        alert(response.a + " " + response.e)
+        alert(code + " " + error)
       }"$
-	End If
+			End If
+	End Select
 End Sub
 
-Private Sub ReturnSuccessScript (SimpleResponseEnable As Boolean, ExpectAccessToken As Boolean) As String
-	If SimpleResponseEnable Then
-		Return $"success: function (data, textStatus, xhr) {
-					var content = JSON.stringify(data, undefined, 2)
-					$("#alert" + id).fadeOut("fast", function () {
-						$("#response" + id).val(content)
-						$("#alert" + id).html(xhr.status + " " + textStatus)
-						$("#alert" + id).removeClass("alert-danger")
-						$("#alert" + id).addClass("alert-success")
-						$("#alert" + id).fadeIn()
-					})${IIf(ExpectAccessToken, $"
-					// Json Web Token specific
-					if (content) {
-						if ("access_token" in data) {
-							localStorage.setItem("access_token", data["access_token"])
-							console.log("access token stored!")
-						}
-					}"$, "")}
-				},"$
-	Else
-		Return $"success: function (data) {
-					if (data.s == "ok" || data.s == "success") {
-						var content = JSON.stringify(data.r, undefined, 2)
-						$("#alert" + id).fadeOut("fast", function () {
-							$("#response" + id).val(content)
-							$("#alert" + id).html(data.a + " " + data.m)
-							$("#alert" + id).removeClass("alert-danger")
-							$("#alert" + id).addClass("alert-success")
-							$("#alert" + id).fadeIn()
-						})${IIf(ExpectAccessToken, $"
-						// Json Web Token specific
-						if (data.r.length > 0) {
-							if ("access_token" in data.r[0]) {
-								localStorage.setItem("access_token", data.r[0]["access_token"])
-								console.log("access token stored!")
-							}
-						}"$, "")}
-					}
-					else {
-						var content = JSON.stringify(data.r, undefined, 2)
-						$("#alert" + id).fadeOut("fast", function () {
-							$("#response" + id).val(content)
-							$("#alert" + id).html(data.a + " " + data.e)
-							$("#alert" + id).removeClass("alert-success")
-							$("#alert" + id).addClass("alert-danger")
-							$("#alert" + id).fadeIn()
-						})
-					}
-				},"$
-	End If
+Private Sub HelpResponsePart (Verb As String) As String
+	Dim script As String
+	Select Verb
+		Case "post"
+			script = $"type: "${Verb}",
+        data: $("#body" + id).val(),
+        dataType: "${dataType}",
+        headers: headers,
+        success: function (response, textStatus, xhr) {
+          showFadeAlertSuccess(id, xhr, textStatus, response)
+          ${AccessTokenPart}
+        },"$
+		Case "put"
+			script = $"type: "${Verb}",
+        data: $("#body" + id).val(),
+        dataType: "${dataType}",
+        headers: headers,
+        success: function (response, textStatus, xhr) {
+          showFadeAlertSuccess(id, xhr, textStatus, response)
+        },"$
+		Case Else
+			script = $"type: "${Verb}",
+        dataType: "${dataType}",
+        headers: headers,
+        success: function (response, textStatus, xhr) {
+          showFadeAlertSuccess(id, xhr, textStatus, response)
+        },"$
+	End Select
+	Return script
 End Sub
 
-Private Sub ReturnSuccessTableScript (SimpleResponseEnable As Boolean, jsonResponse As String) As String
-	If SimpleResponseEnable Then
-		Return $"    success: function (response) {
-      //console.log(response)
-      var tbl_head = ""
-      var tbl_body = ""
-      if (${jsonResponse}.length) {
-        tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Category</th><th>Name</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
-        tbl_body += "<tbody>"
-        $.each(${jsonResponse}, function () {
-          var col_id = ""
-          var col_code = ""
-          var col_category = ""
-          var col_name = ""
-          var col_price = ""
-          var col_edit = ""
-          var id
-          var code
-          var name
-          var price
-          var catid
-          $.each(this, function (key, value) {
-            if (key == "id") {
-              col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
-              id = value
-            }
-            else if (key == "product_code") {
-              col_code = "<td class=\"align-middle\">" + value + "</td>"
-              code = value
-            }
-            else if (key == "category_name") {
-              col_category = "<td class=\"align-middle\">" + value + "</td>"
-            }
-            else if (key == "product_name") {
-              col_name = "<td class=\"align-middle\">" + value + "</td>"
-              name = value
-            }
-            else if (key == "product_price") {
-              col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
-              price = value
-            }
-            else if (key == "category_id") {
-              catid = value
-            }
-          })
-          col_edit = "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" data-price=\"" + price + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-          tbl_body += "<tr>" + col_id + col_code + col_category + col_name + col_price + col_edit + "</tr>"
+Private Sub AccessTokenPart As String
+	Return $"// Access Token
+	      let access_token = ""
+          ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
+          $"const result = ${IIf(Verbose, _
+		  $"$(response).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+		  $"response"$)}
+          access_token = $(result).find("token").text()"$, _
+          $"const result = ${IIf(Verbose, _
+		  $"response.${RESPONSE_ELEMENT_RESULT}"$, _
+		  $"response"$)}"$)}
+          if (result.length > 0) {
+            if ("access_token" in result[0]) {
+              access_token = result[0]["access_token"]
+             }
+           }
+          if (access_token.length > 0) {
+            localStorage.setItem("access_token", access_token)
+            console.log("access token stored!")
+          }
+          //else {
+          //  console.log("access token not found")	
+          //}"$
+End Sub
+
+Private Sub dataType As String
+	Select ContentType
+		Case  WebApiUtils.CONTENT_TYPE_XML
+			Return "xml"
+		Case Else
+			Return "json"
+	End Select
+End Sub
+
+Private Sub script01 As String
+	Return $"// Button click event for all verbs
+$(".get, .post, .put, .delete").click(function (e) {
+  e.preventDefault()
+  const element = $(this)
+  const id = element.attr("id").substring(3)
+  makeApiRequest(id)
+})"$
+End Sub
+
+Private Sub script02 As String
+	Return $"// Function to set options
+function setOptions(id) {
+  const element = $("#btn" + id)
+  const headers = setHeaders(element)
+  switch (true) {
+    case element.hasClass("get"):
+      return {
+        ${HelpResponsePart("get")}
+        error: function (xhr, textStatus, errorThrown) {
+          showFadeAlertError(id, xhr, errorThrown)
+        }
+      }
+      break
+    case element.hasClass("post"):
+      return {
+        ${HelpResponsePart("post")}
+        error: function (xhr, textStatus, errorThrown) {
+          showFadeAlertError(id, xhr, errorThrown)
+        }
+      }
+      break
+    case element.hasClass("put"):
+      return {
+        ${HelpResponsePart("put")}
+        error: function (xhr, textStatus, errorThrown) {
+          showFadeAlertError(id, xhr, errorThrown)
+        }
+      }
+      break
+    case element.hasClass("delete"):
+      return {
+        ${HelpResponsePart("delete")}
+        error: function (xhr, textStatus, errorThrown) {
+          showFadeAlertError(id, xhr, errorThrown)
+        }
+      }
+      break
+    default: // unsupported verbs
+      return {}
+  }
+}"$
+End Sub
+
+Private Sub script03 As String
+	Return $"// Function to return headers base on button class
+function setHeaders(element) {
+  switch (true) {
+    case element.hasClass("basic"):
+      return {
+        "Accept": "application/json",
+        "Authorization": "Basic " + btoa(localStorage.getItem("client_id") + ":" + localStorage.getItem("client_secret"))
+      }
+      break
+    case element.hasClass("token"):
+      return {
+        "Accept": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("access_token")
+      }
+      break
+    default:
+      return {
+        "Accept": "application/json"
+      }
+  }
+}"$
+End Sub
+
+Private Sub script04 As String
+	Return $"// Function to make API call using Ajax
+function makeApiRequest(id) {
+  const url = $("#path" + id).val()
+  const options = setOptions(id)
+  $.ajax(url, options)
+}"$
+End Sub
+
+Private Sub script05 As String
+	Select ContentType
+		Case WebApiUtils.CONTENT_TYPE_XML
+			If Verbose Then
+				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
+  const root = $(response).find("${XmlRoot}")
+  const status = $(root).children("${RESPONSE_ELEMENT_STATUS}").text()
+  const code = $(root).children("${RESPONSE_ELEMENT_CODE}").text()
+  const error = $(root).children("${RESPONSE_ELEMENT_ERROR}").text()
+  const message = $(root).children("${RESPONSE_ELEMENT_MESSAGE}").text()
+  //const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")			
+  if (status == "ok" || status == "success") {
+    $("#alert" + id).fadeOut("fast", function () {
+      $("#response" + id).val(xhr.responseText)
+      $("#alert" + id).html(code + " " + message)
+      $("#alert" + id).removeClass("bg-danger")
+      $("#alert" + id).addClass("bg-success")
+      $("#alert" + id).fadeIn()
+    })
+  }
+  else {
+    $("#alert" + id).fadeOut("fast", function () {
+      $("#response" + id).val(xhr.responseText)
+      $("#alert" + id).html(code + " " + error)
+      $("#alert" + id).removeClass("bg-success")
+      $("#alert" + id).addClass("bg-danger")
+      $("#alert" + id).fadeIn()
+    })
+  }
+}"$
+			Else
+				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
+  $("#alert" + id).fadeOut("fast", function () {
+    $("#response" + id).val(xhr.responseText)
+    $("#alert" + id).html(xhr.status + " " + textStatus)
+    $("#alert" + id).removeClass("bg-danger")
+    $("#alert" + id).addClass("bg-success")
+    $("#alert" + id).fadeIn()
+  })
+}"$
+			End If
+		Case Else
+			If Verbose Then
+				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
+  if (response.${RESPONSE_ELEMENT_STATUS} == "ok" || response.${RESPONSE_ELEMENT_STATUS} == "success") {
+    const content = JSON.stringify(response, undefined, 2)
+    $("#alert" + id).fadeOut("fast", function () {
+      $("#response" + id).val(content)
+      $("#alert" + id).html(response.${RESPONSE_ELEMENT_CODE} + " " + response.${RESPONSE_ELEMENT_MESSAGE})
+      $("#alert" + id).removeClass("bg-danger")
+      $("#alert" + id).addClass("bg-success")
+      $("#alert" + id).fadeIn()
+    })
+  }
+  else {
+    const content = JSON.stringify(response, undefined, 2)
+    $("#alert" + id).fadeOut("fast", function () {
+      $("#response" + id).val(content)
+      $("#alert" + id).html(response.${RESPONSE_ELEMENT_CODE} + " " + response.${RESPONSE_ELEMENT_ERROR})
+      $("#alert" + id).removeClass("bg-success")
+      $("#alert" + id).addClass("bg-danger")
+      $("#alert" + id).fadeIn()
+    })
+  }				
+}"$
+			Else
+				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
+  $("#alert" + id).fadeOut("fast", function () {
+    const content = JSON.stringify(response, undefined, 2)
+    $("#response" + id).val(content)
+    $("#alert" + id).html(xhr.status + " " + textStatus)
+    $("#alert" + id).removeClass("bg-danger")
+    $("#alert" + id).addClass("bg-success")
+    $("#alert" + id).fadeIn()
+  })
+}"$
+			End If
+	End Select
+End Sub
+
+Private Sub script06 As String
+	Return $"function showFadeAlertError (id, xhr, errorThrown) {
+  $("#alert" + id).fadeOut("fast", function () {
+    const content = xhr.responseText
+    $("#response" + id).val(content)
+    $("#alert" + id).html(xhr.status + " " + errorThrown)
+    $("#alert" + id).removeClass("bg-success")
+    $("#alert" + id).addClass("bg-danger")
+    $("#alert" + id).fadeIn()
+  })
+}"$
+End Sub
+
+Private Sub script07 As String
+	Dim dollar As String = "$"
+	Return $"$.ajax({
+    type: "get",
+    dataType: "${dataType}",
+    url: "/${Main.conf.ApiName}/categories",
+    success: function (response, status, xhr) {
+      let data = []
+      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
+      $"// XML format
+      const root = $(response).find("${XmlRoot}")
+      ${IIf(Verbose, _
+	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(root)"$)}
+      const $items = $(result).children("${XmlElement}")
+      $items.each(function () {
+        const $item = $(this)
+        data.push({
+          id: $item.children("id").text(),
+          category_name: $item.children("category_name").text()
         })
-        tbl_body += "</tbody>"
+      })"$, _
+      $"// JSON format
+      ${IIf(Verbose, $"data = response.${RESPONSE_ELEMENT_STATUS} === "ok" ? response.${RESPONSE_ELEMENT_RESULT} : []"$, $"data = response"$)}"$)}
+      let tblHead = ""
+      let tblBody = ""
+      if (data.length) {
+        tblHead = `
+  <thead class="bg-light">
+    <th style="text-align: right; width: 50px">#</th>
+    <th>Name</th>
+    <th style="text-align: center; width: 90px">Actions</th>
+  </thead>`
+        tblBody = `
+  <tbody>`
+        $.each(data, function (i, item) {
+          const id = item.id || ""
+          const name = item.category_name || ""
+		  //console.log(id, category_name)
+          tblBody += `
+    <tr>
+      <td class="align-middle" style="text-align: right">${dollar}{id}</td>
+      <td class="align-middle">${dollar}{name}</td>
+      <td>
+        <a href="#edit" class="text-primary mx-2" data-toggle="modal">
+          <i class="edit fa fa-pen" data-toggle="tooltip"
+          data-id="${dollar}{id}" data-name="${dollar}{name}" title="Edit"></i></a>
+        <a href="#delete" class="text-danger mx-2" data-toggle="modal">
+          <i class="delete fa fa-trash" data-toggle="tooltip"
+          data-id="${dollar}{id}" data-name="${dollar}{name}" title="Delete"></i></a>
+      </td>
+    </tr>`
+        })
+        tblBody += `
+  </tbody>`
       }
       else {
-        tbl_body = "<tr><td>No results</td></tr>"
+        tblBody = `
+  <tbody>
+    <tr>
+      <td class="text-center">No results</td>
+    </tr>
+  </tbody>`
       }
-      $("#results table").html(tbl_head + tbl_body)
-    },"$
-	Else
-		Return $"    success: function (response) {
-      if (response.s == "ok") {
-        var tbl_head = ""
-        var tbl_body = ""
-        if (${jsonResponse}.length) {
-          tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Category</th><th>Name</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
-          tbl_body += "<tbody>"
-          $.each(${jsonResponse}, function () {
-            var col_id = ""
-            var col_code = ""
-            var col_category = ""
-            var col_name = ""
-            var col_price = ""
-            var col_edit = ""
-            var id
-            var code
-            var name
-            var price
-            var catid
-            $.each(this, function (key, value) {
-              if (key == "id") {
-                col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
-                id = value
-              }
-              else if (key == "product_code") {
-                col_code = "<td class=\"align-middle\">" + value + "</td>"
-                code = value
-              }
-              else if (key == "category_name") {
-                col_category = "<td class=\"align-middle\">" + value + "</td>"
-              }
-              else if (key == "product_name") {
-                col_name = "<td class=\"align-middle\">" + value + "</td>"
-                name = value
-              }
-              else if (key == "product_price") {
-                col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
-                price = value
-              }
-              else if (key == "category_id") {
-                catid = value
-              }
-            })
-            col_edit = "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\"  data-price=\"" + price + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-            tbl_body += "<tr>" + col_id + col_code + col_category + col_name + col_price + col_edit + "</tr>"
-          })
-          tbl_body += "</tbody>"
-        }
-        else {
-          tbl_body = "<tr><td>No results</td></tr>"
-        }
-        $("#results table").html(tbl_head + tbl_body)
-      }
-      else {
-        $(".alert").html(response.e)
-        $(".alert").fadeIn()
-      }
-    },"$
-	End If
-End Sub
-
-Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, SimpleResponse As SimpleResponse)
-	Dim jsonResponse As String = "response.r"
-	If SimpleResponse.Enable Then
-		If SimpleResponse.Format = "Map" Then
-			jsonResponse = "response." & SimpleResponse.DataKey
-		Else
-			jsonResponse = "response"
-		End If
-	End If
-	Dim script1 As String = $"  $.getJSON("/${Main.conf.ApiName}/categories", function (response) {
-    var tbl_head = ""
-    var tbl_body = ""
-    if (${jsonResponse}.length) {
-      tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Name</th><th style=\"width: 90px\">Actions</th></thead>"
-      tbl_body += "<tbody>"
-      $.each(${jsonResponse}, function () {
-        var tbl_row = ""
-        var col_id = ""
-        var col_name = ""
-        var id
-        var name
-        $.each(this, function (key, value) {
-          if (key == "id") {
-            col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
-            id = value
-          }
-          else if (key == "category_name") {
-            col_name = "<td class=\"align-middle\">" + value + "</td>"
-            name = value
-          }
-        })
-        tbl_row = col_id + col_name + "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-name=\"" + name + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-        tbl_body += "<tr>" + tbl_row + "</tr>"
-      })
-      tbl_body += "</tbody>"
+      $("#results table").html(tblHead + tblBody)
+    },
+    error: function (xhr, ajaxOptions, errorThrown) {
+      $(".alert").html("Error: " + errorThrown).fadeIn()
     }
-    else {
-      tbl_body = "<tr><td>No results</td></tr>"
-    }
-    $("#results table").html(tbl_head + tbl_body)
   })"$
-	Dim script2 As String = $"$(document).on("click", ".edit", function (e) {
-  var id = $(this).attr("data-id")
-  var name = $(this).attr("data-name")
+End Sub
+
+Private Sub script08 As String
+	Return $"$(document).on("click", ".edit", function (e) {
+  const id = $(this).attr("data-id")
+  const name = $(this).attr("data-name")
   $("#id1").val(id)
   $("#name1").val(name)
 })"$
-	Dim script3 As String = $"$(document).on("click", ".delete", function (e) {
-  var id = $(this).attr("data-id")
-  var name = $(this).attr("data-name")
+End Sub
+
+Private Sub script09 As String
+	Return $"$(document).on("click", ".delete", function (e) {
+  const id = $(this).attr("data-id")
+  const name = $(this).attr("data-name")
   $("#id2").val(id)
   $("#name2").text(name)
 })"$
-	Dim script4 As String = $"$(document).on("click", "#add", function (e) {
-  var form = $("#add_form")
+End Sub
+
+Private Sub script10 As String
+	Return $"$(document).on("click", "#add", function (e) {
+  const form = $("#add_form")
   form.validate({
     rules: {
       name: {
@@ -296,26 +442,31 @@ Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, Sim
     },
     submitHandler: function (form) {
       e.preventDefault()
-      var data = JSON.stringify(convertFormToJSON(form), undefined, 2)
+      ${IIf(PayloadType = "xml", _
+	  $"const data = convertFormToXML(form[0])"$, _
+	  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
-        type: "POST",
-        url: "/${Main.conf.ApiName}/categories",
+        type: "post",
         data: data,
-        dataType: "json",
+        dataType: "${dataType}",
+        url: "/${Main.conf.ApiName}/categories",
         success: function (response) {
           $("#new").modal("hide")
-          ${ReturnAlertScript(SimpleResponse.Enable, "New category added !", 201)}
+          ${AlertScript("New category added !", 201, True)}
         },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert(thrownError)
+        error: function (xhr, ajaxOptions, errorThrown) {
+          alert(errorThrown)
         }
       })
       // return false // required to block normal submit since you used ajax
     }
   })
 })"$
-	Dim script5 As String = $"$(document).on("click", "#update", function (e) {
-  var form = $("#update_form")
+End Sub
+
+Private Sub script11 As String
+	Return $"$(document).on("click", "#update", function (e) {
+  const form = $("#update_form")
   form.validate({
     rules: {
       name: {
@@ -331,43 +482,75 @@ Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, Sim
     },
     submitHandler: function (form) {
       e.preventDefault()
-      var data = JSON.stringify(convertFormToJSON(form), undefined, 2)
+      ${IIf(PayloadType = "xml", _
+	  $"const data = convertFormToXML(form[0])"$, _
+	  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
-        data: data,
-        dataType: "json",
         type: "put",
+        data: data,
+        dataType: "${dataType}",
         url: "/${Main.conf.ApiName}/categories/" + $("#id1").val(),
         success: function (response) {
           $("#edit").modal("hide")
-		  ${ReturnAlertScript2(SimpleResponse.Enable, "Category updated successfully !", 200)}
+          ${AlertScript("Category updated successfully !", 200, True)}
         },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert(thrownError)
+        error: function (xhr, ajaxOptions, errorThrown) {
+          alert(errorThrown)
         }
       })
-      // return false // required to block normal submit since you used ajax
+      // Return False // required To block normal submit since you used ajax
     }
   })
 })"$
-	Dim script6 As String = $"$(document).on("click", "#remove", function (e) {
-  e.preventDefault()
-  var form = $("#delete_form")
-  var data = JSON.stringify(convertFormToJSON(form), undefined, 2)
+End Sub
+
+Private Sub script12 As String
+	Return $"$(document).on("click", "#remove", function (e) {
   $.ajax({
-    data: data,
-    dataType: "json",
     type: "delete",
+    dataType: "${dataType}",
     url: "/${Main.conf.ApiName}/categories/" + $("#id2").val(),
     success: function (response) {
       $("#delete").modal("hide")
-	  ${ReturnAlertScript3(SimpleResponse.Enable, "Category deleted successfully !", 200)}
+      ${AlertScript("Category deleted successfully !", 200, False)}
     },
-    error: function (xhr, ajaxOptions, thrownError) {
-      alert(thrownError)
+    error: function (xhr, ajaxOptions, errorThrown) {
+      alert(errorThrown)
     }
   })
 })"$
-	Dim script7 As String = $"function convertFormToJSON(form) {
+End Sub
+
+Private Sub script13 As String
+	Select PayloadType
+		Case "xml"
+			' Credit to: Daestrum
+			' Reference: https://www.b4x.com/android/forum/threads/solved-abmaterial-problem-with-in-string-literals.162280/#post-995431
+			Dim dollar As String = "$"
+			Return $"function convertFormToXML(form) {
+  const formData = new FormData(form)
+  let xml = `<root>\n`
+  for (const [name, value] of formData.entries()) {
+    xml += `  <${dollar}{name}>${dollar}{escapeXml(value)}</${dollar}{name}>\n`
+  }
+  xml += `</root>`
+  return xml
+}
+
+// Utility function to escape special XML characters
+function escapeXml(unsafe) {
+  return unsafe.replace(/[<>&'"]/g, function (c) {
+    switch (c) {
+      case "<": return "&lt;"
+      case ">": return "&gt;"
+      case "&": return "&amp;"
+      case "'": return "&apos;"
+      case '"': return "&quot;"
+    }
+  })
+}"$
+	Case Else
+		Return $"function convertFormToJSON(form) {
   const array = $(form).serializeArray() // Encodes the set of form elements as an array of names and values.
   const json = {}
   $.each(array, function () {
@@ -375,257 +558,185 @@ Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, Sim
   })
   return json
 }"$
-	
-	Dim CategoryFile As String = $"$(document).ready(function () {
-${script1}
-})
-
-${script2}
-
-${script3}
-
-${script4}
-
-${script5}
-
-${script6}
-
-${script7}"$
-	File.WriteString(DirName, FileName, CategoryFile)
+	End Select
 End Sub
 
-Public Sub GenerateJSFileForHelp (DirName As String, FileName As String, SimpleResponse As SimpleResponse)
-	Dim script1 As String = $"// Button click event for all verbs
-$(".get, .post, .put, .delete").click(function (e) {
-	e.preventDefault()
-	const element = $(this)
-	const id = element.attr("id").substring(3)
-	makeApiRequest(id)
-})"$
-	Dim script2 As String = $"// Function to set options
-function setOptions(id) {
-	const element = $("#btn" + id)
-	const headers = setHeaders(element)
-	switch (true) {
-		case element.hasClass("get"):
-			return {
-				type: "GET",
-				headers: headers,
-				${ReturnSuccessScript(SimpleResponse.Enable, False)}
-				error: function (xhr, textStatus, errorThrown) {
-					var content = xhr.responseText
-					$("#alert" + id).fadeOut("fast", function () {
-						$("#response" + id).val(content)
-						$("#alert" + id).html(xhr.status + " " + errorThrown)
-						$("#alert" + id).removeClass("alert-success")
-						$("#alert" + id).addClass("alert-danger")
-						$("#alert" + id).fadeIn()
-					})
-				}
-			}
-			break
-		case element.hasClass("post"):
-			return {
-				type: "POST",
-				data: $("#body" + id).val(),
-				dataType: "json",
-				headers: headers,
-				${ReturnSuccessScript(SimpleResponse.Enable, True)}
-				error: function (xhr, textStatus, thrownError) {
-					var content = xhr.responseText
-					$("#alert" + id).fadeOut("fast", function () {
-						$("#response" + id).val(content)
-						$("#alert" + id).html(xhr.status + " " + thrownError)
-						$("#alert" + id).removeClass("alert-success")
-						$("#alert" + id).addClass("alert-danger")
-						$("#alert" + id).fadeIn()
-					})
-				}
-			}
-			break
-		case element.hasClass("put"):
-			return {
-				type: "PUT",
-				data: $("#body" + id).val(),
-				dataType: "json",
-				headers: headers,
-				${ReturnSuccessScript(SimpleResponse.Enable, False)}
-				error: function (xhr, textStatus, thrownError) {
-					var content = xhr.responseText
-					$("#alert" + id).fadeOut("fast", function () {
-						$("#response" + id).val(content)
-						$("#alert" + id).html(xhr.status + " " + thrownError)
-						$("#alert" + id).removeClass("alert-success")
-						$("#alert" + id).addClass("alert-danger")
-						$("#alert" + id).fadeIn()
-					})
-				}
-			}
-			break
-		case element.hasClass("delete"):
-			return {
-				type: "DELETE",
-				headers: headers,
-				${ReturnSuccessScript(SimpleResponse.Enable, False)}
-				error: function (xhr, textStatus, thrownError) {
-					var content = xhr.responseText
-					$("#alert" + id).fadeOut("fast", function () {
-						$("#response" + id).val(content)
-						$("#alert" + id).html(xhr.status + " " + thrownError)
-						$("#alert" + id).removeClass("alert-success")
-						$("#alert" + id).addClass("alert-danger")
-						$("#alert" + id).fadeIn()
-					})
-				}
-			}
-			break
-		default: // unsupported verbs
-			return {}
-	}
-}"$
-	Dim script3 As String = $"// Function to return headers base on button class
-function setHeaders(element) {
-	// Using switch case for readibility
-	switch (true) {
-		case element.hasClass("basic"):
-			return {
-				"Accept": "application/json",
-				"Authorization": "Basic " + btoa(localStorage.getItem("client_id") + ":" + localStorage.getItem("client_secret"))
-			}
-			break
-		case element.hasClass("token"):
-			return {
-				"Accept": "application/json",
-				"Authorization": "Bearer " + localStorage.getItem("access_token")
-			}
-			break
-		default:
-			return {
-				"Accept": "application/json"
-			}
-	}
-}"$
-	Dim script4 As String = $"// Function to make API call using Ajax
-function makeApiRequest(id) {
-	const url = $("#path" + id).val()
-	const options = setOptions(id)
-	$.ajax(url, options)
-}"$
-	
-	Dim HelpFile As String = $"${script1}
-${script2}
-${script3}
-${script4}"$
-	File.WriteString(DirName, FileName, HelpFile)
-End Sub
-
-Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, SimpleResponse As SimpleResponse)
-	Dim jsonResponse As String = "response.r"
-	If SimpleResponse.Enable Then
-		If SimpleResponse.Format = "Map" Then
-			jsonResponse = "response." & SimpleResponse.DataKey
-		Else
-			jsonResponse = "response"
-		End If
-	End If
-	Dim script1 As String = $"  $.getJSON("/${Main.conf.ApiName}/categories", function (response) {
-    var item = ${jsonResponse}
-    var $category1 = $("#category1")
-    var $category2 = $("#category2")
-    $.each(item, function (i, category) {
-      $category1.append($("<option />").val(category.id).text(category.category_name))
-      $category2.append($("<option />").val(category.id).text(category.category_name))
-    })
-  })"$
-	Dim script2 As String = $"  $.getJSON("/${Main.conf.ApiName}/find", function (response) {
-    var tbl_head = ""
-    var tbl_body = ""
-    if (${jsonResponse}.length) {
-      tbl_head = "<thead class=\"bg-light\"><th style=\"text-align: right; width: 60px\">#</th><th>Code</th><th>Category</th><th>Name</th><th style=\"text-align: right\">Price</th><th style=\"width: 90px\">Actions</th></thead>"
-      tbl_body += "<tbody>"
-      $.each(${jsonResponse}, function () {
-        var col_id = ""
-        var col_code = ""
-        var col_category = ""
-        var col_name = ""
-        var col_price = ""
-        var col_edit = ""
-        var id
-        var code
-        var name
-        var price
-        var catid
-        $.each(this, function (key, value) {
-          if (key == "id") {
-            col_id = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
-            id = value
-          }
-          else if (key == "product_code") {
-            col_code = "<td class=\"align-middle\">" + value + "</td>"
-            code = value
-          }
-          else if (key == "category_name") {
-            col_category = "<td class=\"align-middle\">" + value + "</td>"
-          }
-          else if (key == "product_name") {
-            col_name = "<td class=\"align-middle\">" + value + "</td>"
-            name = value
-          }
-          else if (key == "product_price") {
-            col_price = "<td class=\"align-middle\" style=\"text-align: right\">" + value + "</td>"
-            price = value
-          }
-          else if (key == "category_id") {
-            catid = value
-          }
+Private Sub script14 As String
+	Return $"  $.ajax({
+    type: "get",
+    dataType: "${dataType}",
+    url: "/${Main.conf.ApiName}/categories",
+    success: function (response) {
+      const $category1 = $("#category1")
+      const $category2 = $("#category2")
+      $category1.empty()
+      $category2.empty()
+      let data = []
+      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
+	  $"const root = $(response).find("${XmlRoot}")
+	  ${IIf(Verbose, _
+	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(root)"$)}
+      const $items = $(result).children("${XmlElement}")
+      $items.each(function () {
+        const $item = $(this)
+        data.push({
+          id: $item.children("id").text(),
+          category_name: $item.children("category_name").text()
         })
-        col_edit = "<td><a href=\"#edit\" class=\"text-primary mx-2\" data-toggle=\"modal\"><i class=\"edit fa fa-pen\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" data-price=\"" + price + "\" title=\"Edit\"></i></a> <a href=\"#delete\" class=\"text-danger mx-2\" data-toggle=\"modal\"><i class=\"delete fa fa-trash\" data-toggle=\"tooltip\" data-id=\"" + id + "\" data-code=\"" + code + "\" data-category=\"" + catid + "\" data-name=\"" + name + "\" title=\"Delete\"></i></a></td>"
-        tbl_body += "<tr>" + col_id + col_code + col_category + col_name + col_price + col_edit + "</tr>"
+      })"$, _
+	  $"data = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, "response")}"$)}
+      // Append To both dropdowns
+      data.forEach(function (item) {
+        const option = $("<option />").val(item.id).text(item.category_name)
+        $category1.append(option.clone())
+        $category2.append(option)
       })
-      tbl_body += "</tbody>"
+    },
+    error: function (xhr, ajaxOptions, errorThrown) {
+      alert(errorThrown)
     }
-    else {
-      tbl_body = "<tr><td>No results</td></tr>"
-    }
-    $("#results table").html(tbl_head + tbl_body)
   })"$
-	Dim script3 As String = $"$("#btnsearch").click(function (e) {
-  e.preventDefault()
-  var form = $("#search_form")
-  var data = JSON.stringify(convertFormToJSON(form), undefined, 2)
-  $.ajax({
-    type: "POST",
+End Sub
+
+Private Sub script15 (Verb As String) As String
+	Dim dollar As String = "$"
+	Return $"  $.ajax({
+	${IIf(Verb = "post", _
+    $"  type: "post",
+    data: data,"$, _
+    $"  type: "get","$)}
+    dataType: "${dataType}",
     url: "/${Main.conf.ApiName}/find",
-    data: data,
-    dataType: "json",
-	${ReturnSuccessTableScript(SimpleResponse.Enable, jsonResponse)}
-    error: function (xhr, ajaxOptions, thrownError) {
-      $(".alert").html(thrownError)
-      $(".alert").fadeIn()
+    success: function (response, status, xhr) {
+      let rows = []
+      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
+      $"// XML format
+      const root = $(response).find("${XmlRoot}")
+      ${IIf(Verbose, _
+	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+	  $"const result = $(root)"$)}
+      const $items = $(result).children("${XmlElement}")
+      $items.each(function () {
+        const $item = $(this)
+        rows.push({
+          id: $item.find("id").text(),
+          code: $item.find("code").text(),
+          name: $item.find("name").text(),
+          catid: $item.find("catid").text(),
+          category: $item.find("category").text(),
+          price: $item.find("price").text()
+        })
+      })"$, _
+      $"// JSON format
+      ${IIf(Verbose, _
+	  $"rows = response.${RESPONSE_ELEMENT_STATUS} === "ok" ? response.${RESPONSE_ELEMENT_RESULT} : []"$, _
+	  $"rows = response"$)}"$)}
+      let tblHead = ""
+      let tblBody = ""
+      if (rows.length) {
+        tblHead = `
+  <thead class="bg-light">
+    <th style="text-align: right; width: 50px">#</th>
+    <th>Code</th>
+    <th>Name</th>
+    <th>Category</th>
+    <th style="text-align: right">Price</th>
+    <th style="text-align: center; width: 90px">Actions</th>
+  </thead>`
+        tblBody = `
+  <tbody>`
+        $.each(rows, function (i, item) {
+          const id = item.id || ""
+          const code = item.code || ""
+          const name = item.name || ""
+          const catid = item.catid || ""
+          const category = item.category || ""
+          const price = item.price || ""
+		  //console.log(id, code, name, category, price)
+          tblBody += `
+    <tr>
+      <td class="align-middle" style="text-align: right">${dollar}{id}</td>
+      <td class="align-middle">${dollar}{code}</td>
+      <td class="align-middle">${dollar}{name}</td>
+      <td class="align-middle">${dollar}{category}</td>
+      <td class="align-middle" style="text-align: right">${dollar}{price}</td>
+      <td>
+        <a href="#edit" class="text-primary mx-2" data-toggle="modal">
+          <i class="edit fa fa-pen" data-toggle="tooltip"
+          data-id="${dollar}{id}" data-code="${dollar}{code}" data-category="${dollar}{catid}"
+          data-name="${dollar}{name}" data-price="${dollar}{price}" title="Edit"></i></a>
+        <a href="#delete" class="text-danger mx-2" data-toggle="modal">
+          <i class="delete fa fa-trash" data-toggle="tooltip"
+          data-id="${dollar}{id}" data-code="${dollar}{code}" data-category="${dollar}{catid}"
+          data-name="${dollar}{name}" title="Delete"></i></a>
+      </td>
+    </tr>`
+        })
+        tblBody += `
+  </tbody>`
+      }
+      else {
+        tblBody = `
+  <tbody>
+    <tr>
+      <td class="text-center">No results</td>
+    </tr>
+  </tbody>`
+      }
+      $("#results table").html(tblHead + tblBody)
+    },
+    error: function (xhr, ajaxOptions, errorThrown) {
+      $(".alert").html("Error: " + errorThrown).fadeIn()
     }
-  })
-})"$
-	Dim script4 As String = $"$(document).on("click", ".edit", function (e) {
-  var id = $(this).attr("data-id")
-  var category = $(this).attr("data-category")
-  var code = $(this).attr("data-code")
-  var name = $(this).attr("data-name")
-  var price = $(this).attr("data-price").replace(",", "")
+  })"$
+End Sub
+
+Private Sub script16 As String
+	Select ContentType
+		Case WebApiUtils.CONTENT_TYPE_XML
+			Return $"$(document).on("click", ".edit", function (e) {
+  const id = $(this).attr("data-id")
+  const code = $(this).attr("data-code")
+  const name = $(this).attr("data-name")
+  const category = $(this).attr("data-category")
+  const price = $(this).attr("data-price").replace(",", "")
   $("#id1").val(id)
-  $("#category2").val(category)
   $("#code1").val(code)
   $("#name1").val(name)
+  $("#category2").val(category)
   $("#price1").val(price)
 })"$
-	Dim script5 As String = $"$(document).on("click", ".delete", function (e) {
-  var id = $(this).attr("data-id")
-  var code = $(this).attr("data-code")
-  var name = $(this).attr("data-name")
+		Case Else
+			Return $"$(document).on("click", ".edit", function (e) {
+  const id = $(this).attr("data-id")
+  const category = $(this).attr("data-category")
+  const code = $(this).attr("data-code")
+  const name = $(this).attr("data-name")
+  const price = $(this).attr("data-price").replace(",", "")
+  $("#id1").val(id)
+  $("#code1").val(code)
+  $("#name1").val(name)
+  $("#category2").val(category)
+  $("#price1").val(price)
+})"$
+	End Select
+End Sub
+
+Private Sub script17 As String
+	Return $"$(document).on("click", ".delete", function (e) {
+  const id = $(this).attr("data-id")
+  const code = $(this).attr("data-code")
+  const name = $(this).attr("data-name")
   $("#id2").val(id)
   $("#code_name").text("(" + code + ") " + name)
 })"$
-	Dim script6 As String = $"$(document).on("click", "#add", function (e) {
-  var form = $("#add_form")
+
+End Sub
+
+Private Sub script18 As String
+	Return $"$(document).on("click", "#add", function (e) {
+  const form = $("#add_form")
   form.validate({
     rules: {
       product_code: {
@@ -649,25 +760,30 @@ Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, Simpl
     },
     submitHandler: function (form) {
       e.preventDefault()
-      var data = JSON.stringify(convertFormToJSON(form), undefined, 2)
+      ${IIf(PayloadType = "xml", _
+      $"const data = convertFormToXML(form[0])"$, _
+      $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
-        type: "POST",
-        url: "/${Main.conf.ApiName}/products",
+        type: "post",
         data: data,
-        dataType: "json",
+        dataType: "${dataType}",
+        url: "/${Main.conf.ApiName}/products",
         success: function (response) {
           $("#new").modal("hide")
-		  ${ReturnAlertScript2(SimpleResponse.Enable, "New product added !", 201)}
+          ${AlertScript("New product added !", 201, True)}
         },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert(thrownError)
+        error: function (xhr, ajaxOptions, errorThrown) {
+          alert(errorThrown)
         }
       })
     }
   })
 })"$
-	Dim script7 As String = $"$(document).on("click", "#update", function (e) {
-  var form = $("#update_form")
+End Sub
+
+Private Sub script19 As String
+	Return $"$(document).on("click", "#update", function (e) {
+  const form = $("#update_form")
   form.validate({
     rules: {
       product_code: {
@@ -691,68 +807,91 @@ Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, Simpl
     },
     submitHandler: function (form) {
       e.preventDefault()
-      var data = JSON.stringify(convertFormToJSON(form), undefined, 2)
+      ${IIf(PayloadType = "xml", _
+      $"const data = convertFormToXML(form[0])"$, _
+      $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
-        data: data,
-        dataType: "json",
         type: "put",
+        data: data,
+        dataType: "${dataType}",
         url: "/${Main.conf.ApiName}/products/" + $("#id1").val(),
         success: function (response) {
           $("#edit").modal("hide")
-		  ${ReturnAlertScript2(SimpleResponse.Enable, "Product updated successfully !", 200)}
+          ${AlertScript("Product updated successfully !", 200, True)}
         },
-        error: function (xhr, ajaxOptions, thrownError) {
-          alert(thrownError)
+        error: function (xhr, ajaxOptions, errorThrown) {
+          alert(errorThrown)
         }
       })
     }
   })
 })"$
-	Dim script8 As String = $"$(document).on("click", "#remove", function (e) {
-  e.preventDefault()
-  var form = $("#delete_form")
-  var data = JSON.stringify(convertFormToJSON(form), undefined, 2)
+End Sub
+
+Private Sub script20 As String
+	Return $"$(document).on("click", "#remove", function (e) {
   $.ajax({
-    data: data,
-    dataType: "json",
     type: "delete",
+    dataType: "${dataType}",
     url: "/${Main.conf.ApiName}/products/" + $("#id2").val(),
     success: function (response) {
       $("#delete").modal("hide")
-	  ${ReturnAlertScript3(SimpleResponse.Enable, "Product deleted successfully !", 200)}
+      ${AlertScript("Product deleted successfully !", 200, False)}
     },
-    error: function (xhr, ajaxOptions, thrownError) {
-      alert(thrownError)
+    error: function (xhr, ajaxOptions, errorThrown) {
+      alert(errorThrown)
     }
   })
 })"$
-	Dim script9 As String = $"function convertFormToJSON(form) {
-  const array = $(form).serializeArray() // Encodes the set of form elements as an array of names and values.
-  const json = {}
-  $.each(array, function () {
-    json[this.name] = this.value || ""
-  })
-  return json
-}"$
-  
-	Dim SearchFile As String = $"$(document).ready(function () {
-${script1}
+End Sub
 
-${script2}
+Public Sub GenerateJSFileForHelp (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
+	Verbose = BlnVerbose
+	ContentType = StrContentType
+	Dim Script As String = $"${script01}
+${script02}
+${script03}
+${script04}
+${script05}
+${script06}"$
+	File.WriteString(DirName, FileName, Script)
+End Sub
+
+Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
+	Verbose = BlnVerbose
+	ContentType = StrContentType
+		Dim Script As String = $"$(document).ready(function () {
+  ${script07}
 })
+${script08}
+${script09}
+${script10}
+${script11}
+${script12}
+${script13}"$
+	File.WriteString(DirName, FileName, Script)
+End Sub
 
-${script3}
-
-${script4}
-
-${script5}
-
-${script6}
-
-${script7}
-
-${script8}
-
-${script9}"$
-	File.WriteString(DirName, FileName, SearchFile)
+Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
+	Verbose = BlnVerbose
+	ContentType = StrContentType
+	Dim Script As String = $"$(document).ready(function () {
+${script14}
+${script15("get")}
+})
+$("#btnsearch").click(function (e) {
+  e.preventDefault()
+  const form = $("#search_form")
+  ${IIf(PayloadType = "xml", _
+  $"const data = convertFormToXML(form[0])"$, _
+  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
+${script15("post")}
+})
+${script16}
+${script17}
+${script18}
+${script19}
+${script20}
+${script13}"$
+  File.WriteString(DirName, FileName, Script)
 End Sub

@@ -1,20 +1,16 @@
-# Web API Server
+# Pakai - Web API Server framework
 
-Version: 3.50
+Version: 4.00
 
-Create Web API Server using B4X project template
+Create REST API Backend using B4J project template
 
 ### Preview
-![Web API Server](../main/web-api-server-b4j.png)
-
-*For version 2.08, please check https://github.com/pyhoon/web-api-server-b4j/tree/v2.08*
-
-*If you don't want to connect to any SQL database, see [MinimaList API Server](https://github.com/pyhoon/minimalist-api-b4j)*
+![Pakai](../main/pakai.png)
 
 ---
 
 ## Template:
-- Web API Server (3.50).b4xtemplate
+- Pakai Server (4.00).b4xtemplate
 
 ## Depends on:
 - [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
@@ -23,10 +19,10 @@ Create Web API Server using B4X project template
 - mysql-connector-java-8.0.30.jar (or your preferred version)
 
 ## Features:
-- Code simplified
-- Back to basics - use multiple Server Handlers
+- Use Server Handlers
 - Improved API documentation
-- Built-in web front-end (bootstrap 4)
+- Built-in web front-end with CRUD examples
+- Supports JSON and XML formats payload and response
 
 ### Code Example
 ```basic
@@ -48,4 +44,4 @@ End Sub
 
 **Support this project**
 
-<a href="https://paypal.me/aeric80/"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width="174" title="Buy me a coffee" /></a>
+<a href="https://paypal.me/aeric80/"><img src="https://github.com/pyhoon/pakai-server-b4j/blob/main/source/Objects/www/assets/img/sponsor.png" width="174" title="Buy me a coffee" /></a>
