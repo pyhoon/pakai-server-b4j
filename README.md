@@ -5,7 +5,7 @@ Version: 4.00
 Create REST API Backend using B4J project template
 
 ### Preview
-![Pakai](../v4.00beta/pakai.png)
+![Pakai](../main/pakai.png)
 
 ---
 
@@ -21,8 +21,8 @@ Create REST API Backend using B4J project template
 ## Features:
 - Use Server Handlers
 - Improved API documentation
-- Built-in web front-end (Bootstrap 4)
-- Supports JSON and XML formats
+- Built-in web front-end with CRUD examples
+- Supports JSON and XML formats payload and response
 
 ### Code Example
 ```basic
@@ -44,4 +44,4 @@ End Sub
 
 **Support this project**
 
-<a href="https://paypal.me/aeric80/"><img src="https://github.com/pyhoon/web-api-server-b4j/blob/v4.00beta/source/Objects/www/assets/img/sponsor.png" width="174" title="Buy me a coffee" /></a>
+<a href="https://paypal.me/aeric80/"><img src="https://github.com/pyhoon/pakai-server-b4j/blob/main/source/Objects/www/assets/img/sponsor.png" width="174" title="Buy me a coffee" /></a>
