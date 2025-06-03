@@ -7,12 +7,12 @@ Version=10.2
 'Utility code module
 'Version 4.00
 Sub Process_Globals
-	Private Const RESPONSE_ELEMENT_CODE As String		= "code"
-	Private Const RESPONSE_ELEMENT_ERROR As String 		= "error"
-	Private Const RESPONSE_ELEMENT_STATUS As String 	= "status"
-	Private Const RESPONSE_ELEMENT_MESSAGE As String	= "message"
-	Private Const RESPONSE_ELEMENT_RESULT As String 	= "data"
-	Private Const RESPONSE_ELEMENT_TYPE As String 		= "type" 'ignore
+	Private Const RESPONSE_ELEMENT_CODE As String		= "a"
+	Private Const RESPONSE_ELEMENT_ERROR As String 		= "e"
+	Private Const RESPONSE_ELEMENT_STATUS As String 	= "s"
+	Private Const RESPONSE_ELEMENT_MESSAGE As String	= "m"
+	Private Const RESPONSE_ELEMENT_RESULT As String 	= "r"
+	Private Const RESPONSE_ELEMENT_TYPE As String 		= "t" 'ignore
 	Private PayloadType As String
 	Private ContentType As String
 	Private Verbose As Boolean
