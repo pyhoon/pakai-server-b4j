@@ -10,7 +10,7 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai (4.00).b4xtemplate
+- Pakai Server (4.00).b4xtemplate
 
 ## Depends on:
 - [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
