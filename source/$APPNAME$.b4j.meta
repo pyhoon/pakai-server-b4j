@@ -28,6 +28,10 @@ ModuleClosedNodes6=
 ModuleClosedNodes7=
 ModuleClosedNodes8=
 ModuleClosedNodes9=
+<<<<<<< Updated upstream
 NavigationStack=Main,AppStart,40,0
+=======
+NavigationStack=Main,AppStart,36,0
+>>>>>>> Stashed changes
 SelectedBuild=0
 VisibleModules=

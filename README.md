@@ -1,6 +1,6 @@
 # Pakai - Web API Server framework
 
-Version: 4.00
+Version: 5.00beta1
 
 Create REST API Backend using B4J project template
 
@@ -10,7 +10,7 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai Server (4.00).b4xtemplate
+- Pakai Server (5.00beta1).b4xtemplate
 
 ## Depends on:
 - [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)

@@ -5,7 +5,11 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
+<<<<<<< Updated upstream
 'Version 4.00
+=======
+'Version 5.00
+>>>>>>> Stashed changes
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -19,7 +23,7 @@ End Sub
 
 Public Sub Initialize
 	HRM.Initialize
-	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.VerboseMode = Main.app.api.VerboseMode
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
