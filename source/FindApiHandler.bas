@@ -5,11 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-<<<<<<< Updated upstream
-'Version 4.00
-=======
 'Version 5.00
->>>>>>> Stashed changes
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse

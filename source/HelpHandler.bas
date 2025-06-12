@@ -5,11 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Help Handler class
-<<<<<<< Updated upstream
-'Version 4.00
-=======
 'Version 5.00
->>>>>>> Stashed changes
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse

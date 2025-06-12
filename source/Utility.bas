@@ -5,11 +5,7 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-<<<<<<< Updated upstream
-'Version 4.00
-=======
 'Version 5.00
->>>>>>> Stashed changes
 Sub Process_Globals
 	Private Const RESPONSE_ELEMENT_CODE As String		= "a"
 	Private Const RESPONSE_ELEMENT_ERROR As String 		= "e"

@@ -18,27 +18,19 @@ Library3=webapiutils
 Library4=endsmeet
 Module1=CategoriesApiHandler
 Module2=CategoriesWebHandler
-Module3=CorsFilter
-Module4=FindApiHandler
-Module5=HelpHandler
-Module6=HttpsFilter
-Module7=IndexWebHandler
-Module8=ProductsApiHandler
-Module9=Utility
+Module3=FindApiHandler
+Module4=HelpHandler
+Module5=HttpsFilter
+Module6=IndexWebHandler
+Module7=ProductsApiHandler
+Module8=Utility
 NumberOfFiles=5
 NumberOfLibraries=4
-NumberOfModules=9
+NumberOfModules=8
 Version=10.2
 @EndOfDesignText@
 #Region Project Attributes
-<<<<<<< Updated upstream
-' Product: 				Pakai Server
-' Version: 				4.00
-' Description: 			Server application project template
-' Developer:			Poon Yip Hoon (Aeric) (https://www.b4x.com/android/forum/members/aeric.74499/)
-=======
 ' Version: 				5.00
->>>>>>> Stashed changes
 ' License:				MIT License
 ' Product: 				Pakai Server
 ' Description: 			Server application project template
@@ -68,12 +60,7 @@ Sub Process_Globals
 	Private info 				As ConnectionInfo
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-<<<<<<< Updated upstream
-	Private Const VERSION_NAME	As String = "4.00"
-	Type ServerConfigurations (EnableCORS As Boolean, EnableHelp As Boolean, EnableSSL As Boolean, Port As Int, SSLPort As Int, RootUrl As String, RootPath As String, ServerUrl As String, ApiName As String, ApiVersioning As Boolean, PayloadType As String, ContentType As String, VerboseMode As Boolean, OrderedKeys As Boolean, SslKeystoreDir As String, SslKeystoreFile As String, SslKeystorePassword As String, StaticFilesBrowsable As Boolean, StaticFilesFolder As String, Version As String, SmtpUserName As String, SmtpPassword As String, SmtpServer As String, SmtpUseSsl As String, SmtpPort As Int)
-=======
-	Private Const VERSION 		As String = "5.00 beta 1"
->>>>>>> Stashed changes
+	Private Const VERSION 		As String = "5.00 beta 2"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
