@@ -30,7 +30,7 @@ NumberOfModules=8
 Version=10.2
 @EndOfDesignText@
 #Region Project Attributes
-' Version: 				5.00
+' Version: 				5.00 beta 3
 ' License:				MIT License
 ' Product: 				Pakai Server
 ' Description: 			Server application project template
@@ -60,7 +60,7 @@ Sub Process_Globals
 	Private info 				As ConnectionInfo
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-	Private Const VERSION 		As String = "5.00 beta 2"
+	Private Const VERSION 		As String = "5.00 beta 3"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -103,19 +103,6 @@ Sub AppStart (Args() As String)
 	InitDatabase
 	StartMessageLoop
 End Sub
-
-' Additional Configuration
-'Private Sub Configurable
-'	#If DEBUG
-'	conf.EnableHelp = True
-'	#End If
-'	#If RELEASE
-'	conf.EnableSSL = True
-'	#End If
-'	conf.EnableCORS = True
-'	conf.VerboseMode = True
-'	conf.StaticFilesBrowsable = False
-'End Sub
 
 ' Create Database Tables and Populate Data
 Private Sub CreateDatabase
