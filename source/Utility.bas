@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-'Version 4.00
+'Version 4.10
 Sub Process_Globals
 	Private Const RESPONSE_ELEMENT_CODE As String		= "a"
 	Private Const RESPONSE_ELEMENT_ERROR As String 		= "e"
@@ -335,7 +335,8 @@ Private Sub script06 As String
 End Sub
 
 Private Sub script07 As String
-	Dim dollar As String = "$"
+	' Escape $ inside smart string literals
+	' https://www.b4x.com/android/forum/threads/solved-how-to-escape-a-string-with-the-characters-within.121322/#post-758437
 	Return $"$.ajax({
     type: "get",
     dataType: "${dataType}",
@@ -372,18 +373,18 @@ Private Sub script07 As String
         $.each(data, function (i, item) {
           const id = item.id || ""
           const name = item.category_name || ""
-		  //console.log(id, category_name)
+          //console.log(id, category_name)
           tblBody += `
     <tr>
-      <td class="align-middle" style="text-align: right">${dollar}{id}</td>
-      <td class="align-middle">${dollar}{name}</td>
+      <td class="align-middle" style="text-align: right">${"$"}{id}</td>
+      <td class="align-middle">${"$"}{name}</td>
       <td>
         <a href="#edit" class="text-primary mx-2" data-toggle="modal">
           <i class="edit fa fa-pen" data-toggle="tooltip"
-          data-id="${dollar}{id}" data-name="${dollar}{name}" title="Edit"></i></a>
+          data-id="${"$"}{id}" data-name="${"$"}{name}" title="Edit"></i></a>
         <a href="#delete" class="text-danger mx-2" data-toggle="modal">
           <i class="delete fa fa-trash" data-toggle="tooltip"
-          data-id="${dollar}{id}" data-name="${dollar}{name}" title="Delete"></i></a>
+          data-id="${"$"}{id}" data-name="${"$"}{name}" title="Delete"></i></a>
       </td>
     </tr>`
         })
@@ -458,7 +459,6 @@ Private Sub script10 As String
           alert(errorThrown)
         }
       })
-      // return false // required to block normal submit since you used ajax
     }
   })
 })"$
@@ -498,7 +498,6 @@ Private Sub script11 As String
           alert(errorThrown)
         }
       })
-      // Return False // required To block normal submit since you used ajax
     }
   })
 })"$
@@ -524,14 +523,11 @@ End Sub
 Private Sub script13 As String
 	Select PayloadType
 		Case "xml"
-			' Credit to: Daestrum
-			' Reference: https://www.b4x.com/android/forum/threads/solved-abmaterial-problem-with-in-string-literals.162280/#post-995431
-			Dim dollar As String = "$"
 			Return $"function convertFormToXML(form) {
   const formData = new FormData(form)
   let xml = `<root>\n`
   for (const [name, value] of formData.entries()) {
-    xml += `  <${dollar}{name}>${dollar}{escapeXml(value)}</${dollar}{name}>\n`
+    xml += `  <${"$"}{name}>${"$"}{escapeXml(value)}</${"$"}{name}>\n`
   }
   xml += `</root>`
   return xml
@@ -586,7 +582,7 @@ Private Sub script14 As String
         })
       })"$, _
 	  $"data = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, "response")}"$)}
-      // Append To both dropdowns
+      // Append to both dropdowns
       data.forEach(function (item) {
         const option = $("<option />").val(item.id).text(item.category_name)
         $category1.append(option.clone())
@@ -600,7 +596,6 @@ Private Sub script14 As String
 End Sub
 
 Private Sub script15 (Verb As String) As String
-	Dim dollar As String = "$"
 	Return $"  $.ajax({
 	${IIf(Verb = "post", _
     $"  type: "post",
@@ -656,20 +651,20 @@ Private Sub script15 (Verb As String) As String
 		  //console.log(id, code, name, category, price)
           tblBody += `
     <tr>
-      <td class="align-middle" style="text-align: right">${dollar}{id}</td>
-      <td class="align-middle">${dollar}{code}</td>
-      <td class="align-middle">${dollar}{name}</td>
-      <td class="align-middle">${dollar}{category}</td>
-      <td class="align-middle" style="text-align: right">${dollar}{price}</td>
+      <td class="align-middle" style="text-align: right">${"$"}{id}</td>
+      <td class="align-middle">${"$"}{code}</td>
+      <td class="align-middle">${"$"}{name}</td>
+      <td class="align-middle">${"$"}{category}</td>
+      <td class="align-middle" style="text-align: right">${"$"}{price}</td>
       <td>
         <a href="#edit" class="text-primary mx-2" data-toggle="modal">
           <i class="edit fa fa-pen" data-toggle="tooltip"
-          data-id="${dollar}{id}" data-code="${dollar}{code}" data-category="${dollar}{catid}"
-          data-name="${dollar}{name}" data-price="${dollar}{price}" title="Edit"></i></a>
+          data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
+          data-name="${"$"}{name}" data-price="${"$"}{price}" title="Edit"></i></a>
         <a href="#delete" class="text-danger mx-2" data-toggle="modal">
           <i class="delete fa fa-trash" data-toggle="tooltip"
-          data-id="${dollar}{id}" data-code="${dollar}{code}" data-category="${dollar}{catid}"
-          data-name="${dollar}{name}" title="Delete"></i></a>
+          data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
+          data-name="${"$"}{name}" title="Delete"></i></a>
       </td>
     </tr>`
         })
