@@ -1,6 +1,6 @@
 # Pakai - Web API Server framework
 
-Version: 5.00beta1
+Version: 5.00 beta3
 
 Create REST API Backend using B4J project template
 
@@ -10,7 +10,7 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai Server (5.00beta1).b4xtemplate
+- Pakai.Server.5.00beta3.b4xtemplate
 
 ## Depends on:
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
