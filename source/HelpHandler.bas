@@ -441,7 +441,7 @@ Private Sub GenerateVerbSection (section As VerbSection) As String
                     ${section.Expected}</div>
                 </div>
 	            <div class="col-md-3 p-3">
-					<form id="form1" method="${section.Verb}">
+					<form method="${section.Verb}">
 					<p><strong>Path</strong><br/>
 	                <input${IIf(section.InputDisabled, " disabled", "")} id="path${section.ElementId}" class="form-control data-path text-light" style="background-color: ${section.DisabledBackground}; font-size: small" value="${section.Link & IIf(section.Raw, "?format=json", "")}"></p>
 					${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strBodyInput, $""$)}
