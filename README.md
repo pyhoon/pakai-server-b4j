@@ -27,19 +27,16 @@ Create REST API Backend using B4J project template
 
 ### Code Example
 ```basic
-Private Sub GetCategoryById (id As Int)
-	DB.Initialize(Main.DBType, Main.DBOpen)
-	DB.Table = "tbl_categories"
-	DB.Find(id)
-	If DB.Found Then
-		HRM.ResponseCode = 200
-		HRM.ResponseObject = DB.First
-	Else
-		HRM.ResponseCode = 404
-		HRM.ResponseError = "Category not found"
-	End If
-	ReturnApiResponse
-	DB.Close
+Sub Process_Globals
+	Public app As EndsMeet
+End Sub
+
+' <link>Open in browser|http://127.0.0.1:8080</link>
+Sub AppStart (Args() As String)
+	app.Initialize
+	app.Route("", "Index")
+	app.Start
+	StartMessageLoop
 End Sub
 ```
 
