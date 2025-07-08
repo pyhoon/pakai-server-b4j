@@ -25,43 +25,38 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
 	Method = Request.Method.ToUpperCase
-	Dim api As String = $"/${Main.app.api.Name}"$
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3) ' 3 For Api handler
-	If Main.app.MethodAvailable2(Method, $"/${api}/products/*"$, Me) = False Then
-		WebApiUtils.ReturnHtml("<h1>405 Method Not Allowed</h1>", Response)
+		If ElementMatch("") Then
+		If Main.app.MethodAvailable2(Method, "/api/products", Me) Then
+			Select Method
+				Case "GET"
+					GetProducts
+					Return
+				Case "POST"
+					PostProduct
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	Else If ElementMatch("id") Then
+		If Main.app.MethodAvailable2(Method, "/api/products/*", Me) Then
+			Select Method
+				Case "GET"
+					GetProductById(ElementId)
+					Return
+				Case "PUT"
+					PutProductById(ElementId)
+					Return
+				Case "DELETE"
+					DeleteProductById(ElementId)
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
 		Return
 	End If
-	Select Method
-		Case "GET"
-			If ElementMatch("") Then
-				GetProducts
-				Return
-			End If
-			If ElementMatch("id") Then
-				GetProductById(ElementId)
-				Return
-			End If
-		Case "POST"
-			If ElementMatch("") Then
-				PostProduct
-				Return
-			End If
-		Case "PUT"
-			If ElementMatch("id") Then
-				PutProductById(ElementId)
-				Return
-			End If
-		Case "DELETE"
-			If ElementMatch("id") Then
-				DeleteProductById(ElementId)
-				Return
-			End If
-		Case Else
-			Log("Unsupported method: " & Method)
-			ReturnMethodNotAllow
-			Return
-	End Select
 	ReturnBadRequest
 End Sub
 

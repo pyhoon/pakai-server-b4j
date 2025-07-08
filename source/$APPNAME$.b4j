@@ -30,7 +30,7 @@ NumberOfModules=8
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
-' Version: 				5.00 beta 4
+' Version: 				5.00 beta 5
 ' License:				MIT License
 ' Product: 				Pakai Server
 ' Description: 			Server application project template
@@ -60,7 +60,7 @@ Sub Process_Globals
 	Private info 				As ConnectionInfo
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-	Private Const VERSION 		As String = "5.00 beta 4"
+	Private Const VERSION 		As String = "5.00 beta 5"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -82,10 +82,20 @@ Sub AppStart (Args() As String)
 	app.api.OrderedKeys = True
 	app.Get("", "IndexWebHandler")
     app.Get("/help", "HelpHandler")
-    app.Get("/categories/*", "CategoriesWebHandler")
-    app.Get($"/${app.api.Name}/categories/*"$, "CategoriesApiHandler")
-    app.Get($"/${app.api.Name}/products/*"$, "ProductsApiHandler")
-    app.Get($"/${app.api.Name}/find/*"$, "FindApiHandler")
+    app.Get("/categories", "CategoriesWebHandler")
+    app.Get("/api/categories", "CategoriesApiHandler")
+    app.Get("/api/categories/*", "CategoriesApiHandler")
+    app.Post("/api/categories", "CategoriesApiHandler")
+    app.Put("/api/categories/*", "CategoriesApiHandler")
+    app.Delete("/api/categories/*", "CategoriesApiHandler")
+    app.Get("/api/products", "ProductsApiHandler")
+    app.Get("/api/products/*", "ProductsApiHandler")
+    app.Post("/api/products", "ProductsApiHandler")
+    app.Put("/api/products/*", "ProductsApiHandler")
+    app.Delete("/api/products/*", "ProductsApiHandler")
+    app.Get("/api/find", "FindApiHandler")
+    app.Get("/api/find/products-by-category_id/*", "FindApiHandler")
+    app.Post("/api/find", "FindApiHandler")
     app.LogEnabled = True
 	app.UseConfigFile = True
 	app.Start

@@ -26,35 +26,32 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
 	Method = Request.Method.ToUpperCase
-	Dim api As String = $"/${Main.app.api.Name}"$
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3)
-	If Main.app.MethodAvailable2(Method, $"/${api}/find/*"$, Me) = False Then
-		WebApiUtils.ReturnHtml("<h1>405 Method Not Allowed</h1>", Response)
+	If ElementMatch("") Then
+		If Main.app.MethodAvailable2(Method, "/api/find", Me) Then
+			Select Method
+				Case "GET"
+					GetAllProducts
+					Return
+				Case "POST"
+					SearchByKeywords
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
 		Return
 	End If
-	Select Method
-		Case "GET"
-			If ElementMatch("") Then
-				GetAllProducts
+	If ElementMatch("key/id") Then
+		If Main.app.MethodAvailable2(Method, "/api/find/products-by-category_id/*", Me) Then
+			If ElementKey = "products-by-category_id" Then
+				GetProductsByCategoryId(ElementId)
 				Return
 			End If
-			If ElementMatch("key/id") Then
-				If ElementKey = "products-by-category_id" Then
-					GetProductsByCategoryId(ElementId)
-					Return
-				End If
-			End If
-		Case "POST"
-			If ElementMatch("") Then
-				SearchByKeywords
-				Return
-			End If
-		Case Else
-			Log("Unsupported method: " & Method)
-			ReturnMethodNotAllow
-			Return
-	End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	End If
 	ReturnBadRequest
 End Sub
 
