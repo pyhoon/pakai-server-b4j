@@ -186,11 +186,11 @@ Private Sub BuildMethods
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Find", "GetAllProducts")
-	Method.Put("Desc", "Get all Products (with Category name)")
+	Method.Put("Desc", "Search all Products")
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Find", "GetProductsByCategoryId (id As Int)")
-	Method.Put("Desc", "Get all Products by Category Id (with Category name)")
+	Method.Put("Desc", "Search all Products by Category Id")
 	Method.Put("Elements", $"["products-by-category_id", "{id}"]"$)
 	ReplaceMethod(Method)
 	
@@ -199,7 +199,7 @@ Private Sub BuildMethods
 	Method.Put("Format", FormatMap.As(JSON).ToString)
 	Dim BodytMap As Map = CreateMap("keyword": "")
 	Method.Put("Body", BodytMap.As(JSON).ToString)
-	Method.Put("Desc", "Filter Products (with Category name)")
+	Method.Put("Desc", "Search Products by keyword")
 	Dim Expected As StringBuilder
 	Expected.Initialize
 	Expected.Append("200 Success")
