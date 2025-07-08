@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-'Version 5.00
+'Version 5.00 beta 5
 Sub Process_Globals
 	Private Const RESPONSE_ELEMENT_CODE As String		= "a"
 	Private Const RESPONSE_ELEMENT_ERROR As String 		= "e"
@@ -122,7 +122,7 @@ End Sub
 
 Private Sub AccessTokenPart As String
 	Return $"// Access Token
-	        let access_token = ""
+          let access_token = ""
           ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
           $"const result = ${IIf(Verbose, _
 		  $"$(response).children("${RESPONSE_ELEMENT_RESULT}")"$, _
