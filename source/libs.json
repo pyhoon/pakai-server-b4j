@@ -1,10 +1,10 @@
 {
     "Libraries": [
         {
-            "Name": "EndsMeet.b4xlib",
+            "Name": "EndsMeet.1.00.b4xlib",
             "Platform": "B4J",
-            "Version": 0.96,
-            "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v0.96/EndsMeet.b4xlib"
+            "Version": 1.00,
+            "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v1.00/EndsMeet.1.00.b4xlib"
         },
         {
             "Name": "MiniORMUtils.b4xlib",

@@ -15,7 +15,7 @@ Group=App
 Library1=jcore
 Library2=miniormutils
 Library3=webapiutils
-Library4=endsmeet
+Library4=endsmeet.1.00
 Module1=CategoriesApiHandler
 Module2=CategoriesWebHandler
 Module3=FindApiHandler
@@ -27,10 +27,10 @@ Module8=Utility
 NumberOfFiles=5
 NumberOfLibraries=4
 NumberOfModules=8
-Version=10.2
+Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
-' Version: 				5.00 beta 3
+' Version: 				5.00 beta 4
 ' License:				MIT License
 ' Product: 				Pakai Server
 ' Description: 			Server application project template
@@ -60,13 +60,12 @@ Sub Process_Globals
 	Private info 				As ConnectionInfo
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-	Private Const VERSION 		As String = "5.00 beta 3"
+	Private Const VERSION 		As String = "5.00 beta 4"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
 Sub AppStart (Args() As String)
 	app.Initialize
-	app.UseConfigFile = True
 	#If RELEASE
 	app.ssl.Enabled = True
 	#End If
@@ -78,29 +77,25 @@ Sub AppStart (Args() As String)
 	"allowCredentials": "true", _
 	"preflightMaxAge": 1800, _
 	"chainPreflight": "false")
-	app.LogEnabled = True
-	'app.HelpEnabled = True
 	app.api.EnableHelp = True
 	app.api.VerboseMode = True
 	app.api.OrderedKeys = True
-	app.api.ContentType = WebApiUtils.CONTENT_TYPE_JSON ' Default format
-	app.Route("", "IndexWebHandler")
-    app.Route("/help", "HelpHandler")
-    app.Route("/categories/*", "CategoriesWebHandler")
-    app.Route($"/${app.api.Name}/categories/*"$, "CategoriesApiHandler")
-    app.Route($"/${app.api.Name}/products/*"$, "ProductsApiHandler")
-    app.Route($"/${app.api.Name}/find/*"$, "FindApiHandler")
-	'app.static.Folder = File.Combine(File.DirApp, "www")
-	'app.static.Browsable = False
+	app.Get("", "IndexWebHandler")
+    app.Get("/help", "HelpHandler")
+    app.Get("/categories/*", "CategoriesWebHandler")
+    app.Get($"/${app.api.Name}/categories/*"$, "CategoriesApiHandler")
+    app.Get($"/${app.api.Name}/products/*"$, "ProductsApiHandler")
+    app.Get($"/${app.api.Name}/find/*"$, "FindApiHandler")
+    app.LogEnabled = True
 	app.UseConfigFile = True
-    app.Start
-	CreateJSFiles
-	app.ShowLog
+	app.Start
+	app.LogStartupMessage
 	app.ctx.Put("VERSION", VERSION)
 	Log($"App version: ${VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
 	Log(app.ServerUrl)
 	InitDatabase
+	CreateJSFiles
 	StartMessageLoop
 End Sub
 
@@ -219,7 +214,7 @@ End Sub
 ' Generate JS files from code to save some file size
 Private Sub CreateJSFiles
 	Dim skip As Boolean
-	Dim Parent As String = File.Combine(app.static.Folder, "assets")
+	Dim Parent As String = File.Combine(app.staticfiles.Folder, "assets")
 	Dim DirName As String = File.Combine(Parent, "scripts")
 	If File.Exists(DirName, "") = False Then
 		File.MakeDir(Parent, "scripts")
@@ -229,9 +224,9 @@ Private Sub CreateJSFiles
 	#End If
 	End If
 	If skip = False Then
-		Utility.GenerateJSFileForCategory(DirName, "category.js", app.api.ContentType, app.api.VerboseMode)
-		Utility.GenerateJSFileForSearch(DirName, "search.js", app.api.ContentType, app.api.VerboseMode)
 		Utility.GenerateJSFileForHelp(DirName, "help.js", app.api.ContentType, app.api.VerboseMode)
+		Utility.GenerateJSFileForSearch(DirName, "search.js", app.api.ContentType, app.api.VerboseMode)
+		Utility.GenerateJSFileForCategory(DirName, "category.js", app.api.ContentType, app.api.VerboseMode)
 	End If
 End Sub
 
