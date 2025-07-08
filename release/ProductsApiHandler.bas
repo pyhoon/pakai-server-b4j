@@ -27,36 +27,36 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Method = Request.Method.ToUpperCase
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3) ' 3 For Api handler
-	Select Method
-		Case "GET"
-			If ElementMatch("") Then
-				GetProducts
-				Return
-			End If
-			If ElementMatch("id") Then
-				GetProductById(ElementId)
-				Return
-			End If
-		Case "POST"
-			If ElementMatch("") Then
-				PostProduct
-				Return
-			End If
-		Case "PUT"
-			If ElementMatch("id") Then
-				PutProductById(ElementId)
-				Return
-			End If
-		Case "DELETE"
-			If ElementMatch("id") Then
-				DeleteProductById(ElementId)
-				Return
-			End If
-		Case Else
-			Log("Unsupported method: " & Method)
-			ReturnMethodNotAllow
-			Return
-	End Select
+		If ElementMatch("") Then
+		If Main.app.MethodAvailable2(Method, "/api/products", Me) Then
+			Select Method
+				Case "GET"
+					GetProducts
+					Return
+				Case "POST"
+					PostProduct
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	Else If ElementMatch("id") Then
+		If Main.app.MethodAvailable2(Method, "/api/products/*", Me) Then
+			Select Method
+				Case "GET"
+					GetProductById(ElementId)
+					Return
+				Case "PUT"
+					PutProductById(ElementId)
+					Return
+				Case "DELETE"
+					DeleteProductById(ElementId)
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	End If
 	ReturnBadRequest
 End Sub
 
@@ -125,7 +125,7 @@ Private Sub PostProduct
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	Dim data As Map = str.As(JSON).ToMap
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys

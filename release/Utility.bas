@@ -122,7 +122,7 @@ End Sub
 
 Private Sub AccessTokenPart As String
 	Return $"// Access Token
-	      let access_token = ""
+	        let access_token = ""
           ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
           $"const result = ${IIf(Verbose, _
 		  $"$(response).children("${RESPONSE_ELEMENT_RESULT}")"$, _

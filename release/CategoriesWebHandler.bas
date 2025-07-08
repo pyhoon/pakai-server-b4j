@@ -23,8 +23,8 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Method = Request.Method.ToUpperCase
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 2) ' 2 For Web handler
-	If Method <> "GET" Then
-		WebApiUtils.ReturnHtmlMethodNotAllowed(Response)
+	If Main.app.MethodAvailable2(Method, "/categories", Me) = False Then
+		WebApiUtils.ReturnHtml("<h1>405 Method Not Allowed</h1>", Response)
 		Return
 	End If
 	If Elements.Length = 0 Then

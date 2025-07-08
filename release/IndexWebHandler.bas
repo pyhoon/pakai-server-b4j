@@ -22,8 +22,8 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Response = resp
 	Method = Request.Method.ToUpperCase
 	Elements = WebApiUtils.GetUriElements(Request.RequestURI)
-	If Method <> "GET" Then
-		WebApiUtils.ReturnHtmlMethodNotAllowed(Response)
+	If Main.app.MethodAvailable2(Method, "", Me) = False Then
+		WebApiUtils.ReturnHtml("<h1>405 Method Not Allowed</h1>", Response)
 		Return
 	End If
 	If Elements.Length = 0 Then

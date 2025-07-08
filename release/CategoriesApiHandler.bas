@@ -27,36 +27,36 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Method = Request.Method.ToUpperCase
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3) ' 3 For Api handler
-	Select Method
-		Case "GET"
-			If ElementMatch("") Then
-				GetCategories
-				Return
-			End If
-			If ElementMatch("id") Then
-				GetCategoryById(ElementId)
-				Return
-			End If
-		Case "POST"
-			If ElementMatch("") Then
-				CreateNewCategory
-				Return
-			End If
-		Case "PUT"
-			If ElementMatch("id") Then
-				UpdateCategoryById(ElementId)
-				Return
-			End If
-		Case "DELETE"
-			If ElementMatch("id") Then
-				DeleteCategoryById(ElementId)
-				Return
-			End If
-		Case Else
-			Log("Unsupported method: " & Method)
-			ReturnMethodNotAllow
-			Return
-	End Select
+	If ElementMatch("") Then
+		If Main.app.MethodAvailable2(Method, "/api/categories", Me) Then
+			Select Method
+				Case "GET"
+					GetCategories
+					Return
+				Case "POST"
+					CreateNewCategory
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	Else If ElementMatch("id") Then
+		If Main.app.MethodAvailable2(Method, "/api/categories/*", Me) Then
+			Select Method
+				Case "GET"
+					GetCategoryById(ElementId)
+					Return
+				Case "PUT"
+					UpdateCategoryById(ElementId)
+					Return
+				Case "DELETE"
+					DeleteCategoryById(ElementId)
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	End If
 	ReturnBadRequest
 End Sub
 
