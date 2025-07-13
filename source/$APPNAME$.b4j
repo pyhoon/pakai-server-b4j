@@ -12,10 +12,10 @@ FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 Group=App
-Library1=jcore
-Library2=miniormutils
-Library3=webapiutils
-Library4=endsmeet.1.00
+Library1=endsmeet.1.10
+Library2=jcore
+Library3=miniormutils
+Library4=webapiutils
 Module1=CategoriesApiHandler
 Module2=CategoriesWebHandler
 Module3=FindApiHandler
@@ -30,7 +30,7 @@ NumberOfModules=8
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
-' Version: 				5.00 beta 5
+' Version: 				5.00 beta 6
 ' License:				MIT License
 ' Product: 				Pakai Server
 ' Description: 			Server application project template
@@ -60,23 +60,12 @@ Sub Process_Globals
 	Private info 				As ConnectionInfo
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-	Private Const VERSION 		As String = "5.00 beta 5"
+	Private Const VERSION 		As String = "5.00 beta 6"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
 Sub AppStart (Args() As String)
 	app.Initialize
-	#If RELEASE
-	app.ssl.Enabled = True
-	#End If
-	app.cors.Path = Array("*")
-	app.cors.Settings = CreateMap( _
-	"allowedOrigins": "*", _
-	"allowedHeaders": "*", _
-	"allowedMethods": "*", _
-	"allowCredentials": "true", _
-	"preflightMaxAge": 1800, _
-	"chainPreflight": "false")
 	app.api.EnableHelp = True
 	app.api.VerboseMode = True
 	app.api.OrderedKeys = True
@@ -98,6 +87,9 @@ Sub AppStart (Args() As String)
     app.Post("/api/find", "FindApiHandler")
     app.LogEnabled = True
 	app.UseConfigFile = True
+	#If RELEASE
+	app.RedirectToHttps = True
+	#End If
 	app.Start
 	app.LogStartupMessage
 	app.ctx.Put("VERSION", VERSION)
