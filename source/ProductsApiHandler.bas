@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 5.00 beta 5
+'Version 5.00 beta 6
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -140,7 +140,7 @@ Private Sub PostProduct
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products"
 	DB.Where = Array("product_code = ?")
-	DB.Parameters = Array As String(data.Get("product_code"))
+	DB.Parameters = Array(data.Get("product_code"))
 	DB.Query
 	If DB.Found Then
 		HRM.ResponseCode = 409
@@ -194,7 +194,7 @@ Private Sub PutProductById (id As Int)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_products"
 	DB.Where = Array("product_code = ?", "id <> ?")
-	DB.Parameters = Array As String(data.Get("product_code"), id)
+	DB.Parameters = Array(data.Get("product_code"), id)
 	DB.Query
 	If DB.Found Then
 		HRM.ResponseCode = 409
