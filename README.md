@@ -10,7 +10,7 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai.Server.5.00.b4xtemplate
+- Pakai Server (5.00).b4xtemplate
 
 ## Depends on:
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
