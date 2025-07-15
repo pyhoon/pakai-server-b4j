@@ -31,17 +31,17 @@ Create REST API Backend using B4J project template
 - Optional config file
 
 ### Code Example
-```basic
+```b4x
 Sub AppStart (Args() As String)
 	app.Initialize
 	app.api.VerboseMode = True
 	app.api.OrderedKeys = True
 	app.Get("", "IndexWebHandler")
-    app.Get("/api/products", "ProductsApiHandler")
-    app.Get("/api/products/*", "ProductsApiHandler")
-    app.Post("/api/products", "ProductsApiHandler")
-    app.Put("/api/products/*", "ProductsApiHandler")
-    app.Delete("/api/products/*", "ProductsApiHandler")
+	app.Get("/api/products", "ProductsApiHandler")
+	app.Get("/api/products/*", "ProductsApiHandler")
+	app.Post("/api/products", "ProductsApiHandler")
+	app.Put("/api/products/*", "ProductsApiHandler")
+	app.Delete("/api/products/*", "ProductsApiHandler")
 	app.UseConfigFile = True
 	app.Start
 	StartMessageLoop
