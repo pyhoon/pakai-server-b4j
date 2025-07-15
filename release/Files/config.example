@@ -1,14 +1,14 @@
-# Product: 		Pakai framework (formerly known as Web API Server)
-# Version: 		4.00
-# Description: 	B4J project template for building JSON and XML formats API backend
-# Developer:	Poon Yip Hoon (Aeric)
+# Version: 		5.00
 # License:		MIT License
-# GitHub:		https://github.com/pyhoon/pakai-server-b4j
-# Forum:	    https://www.b4x.com/android/forum/threads/project-template-pakai-framework.167080/
-# Donation:		https://paypal.me/aeric80/
+# Developer:	Poon Yip Hoon (Aeric)
+# Product: 		Pakai Server (formerly known as Web API Server)
+# Description: 	B4J project template for building JSON and XML formats API backend
+# B4X Forum:    https://www.b4x.com/android/forum/threads/project-template-pakai-server-v5.167788/
+# GitHub:	    https://github.com/pyhoon/pakai-server-b4j
 
 # Thanks to Erel, Anywhere Software for the great products and B4X community for encouragement and supports.
 # Please consider to donate to me so I can continue to improve this project
+# My paypal link: https://paypal.me/aeric80/
 
 # Lines starting with '#' are comments.
 # Lines starting with ';' are disabled.
@@ -24,16 +24,18 @@ APP_COPYRIGHT=Copyright Computerise System Solutions 2025
 ROOT_URL=http://127.0.0.1
 ROOT_PATH=
 API_NAME=api
-API_VERSIONING=False
+#API_VERSIONING=False
+#API_VERBOSE_MODE=True
+#API_ORDERED_KEYS=True
 
 # Java server port
-ServerPort=8080
-SSLPort=0
+PORT=8080
 
-# SSL Keystores
+# SSL Settings
 # Generate a keystore from Windows CMD
-# C:\Java\jdk-11.0.1\bin\keytool -keystore keystore -alias jetty -genkey -keyalg RSA
+# C:\Java\jdk-19.0.2\bin\keytool -keystore keystore -alias jetty -genkey -keyalg RSA
 # Copy keystore file to Objects folder of the B4J project
+SSL_PORT=0
 SSL_KEYSTORE_DIR=/etc/letsencrypt/live/mydomain.com
 SSL_KEYSTORE_FILE=keystore.jks
 SSL_KEYSTORE_PASSWORD=xxxxxxxxx

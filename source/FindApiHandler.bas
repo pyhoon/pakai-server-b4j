@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.10
+'Version 5.00
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -19,7 +19,7 @@ End Sub
 
 Public Sub Initialize
 	HRM.Initialize
-	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.VerboseMode = Main.app.api.VerboseMode
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -28,28 +28,30 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Method = Request.Method.ToUpperCase
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3)
-	Select Method
-		Case "GET"
-			If ElementMatch("") Then
-				GetAllProducts
-				Return
-			End If
-			If ElementMatch("key/id") Then
-				If ElementKey = "products-by-category_id" Then
-					GetProductsByCategoryId(ElementId)
+	If ElementMatch("") Then
+		If Main.app.MethodAvailable2(Method, "/api/find", Me) Then
+			Select Method
+				Case "GET"
+					GetAllProducts
 					Return
-				End If
-			End If
-		Case "POST"
-			If ElementMatch("") Then
-				SearchByKeywords
+				Case "POST"
+					SearchByKeywords
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	End If
+	If ElementMatch("key/id") Then
+		If Main.app.MethodAvailable2(Method, "/api/find/products-by-category_id/*", Me) Then
+			If ElementKey = "products-by-category_id" Then
+				GetProductsByCategoryId(ElementId)
 				Return
 			End If
-		Case Else
-			Log("Unsupported method: " & Method)
-			ReturnMethodNotAllow
-			Return
-	End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	End If
 	ReturnBadRequest
 End Sub
 
@@ -100,7 +102,8 @@ Public Sub GetAllProducts
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -116,7 +119,8 @@ Public Sub GetProductsByCategoryId (id As Int)
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -151,7 +155,8 @@ Public Sub SearchByKeywords
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub

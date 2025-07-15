@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.2
 @EndOfDesignText@
 'Utility code module
-'Version 4.10
+'Version 5.00
 Sub Process_Globals
 	Private Const RESPONSE_ELEMENT_CODE As String		= "a"
 	Private Const RESPONSE_ELEMENT_ERROR As String 		= "e"
@@ -122,7 +122,7 @@ End Sub
 
 Private Sub AccessTokenPart As String
 	Return $"// Access Token
-	      let access_token = ""
+          let access_token = ""
           ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
           $"const result = ${IIf(Verbose, _
 		  $"$(response).children("${RESPONSE_ELEMENT_RESULT}")"$, _
@@ -340,7 +340,7 @@ Private Sub script07 As String
 	Return $"$.ajax({
     type: "get",
     dataType: "${dataType}",
-    url: "/${Main.conf.ApiName}/categories",
+    url: "/${Main.app.api.Name}/categories",
     success: function (response, status, xhr) {
       let data = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
@@ -450,7 +450,7 @@ Private Sub script10 As String
         type: "post",
         data: data,
         dataType: "${dataType}",
-        url: "/${Main.conf.ApiName}/categories",
+        url: "/${Main.app.api.Name}/categories",
         success: function (response) {
           $("#new").modal("hide")
           ${AlertScript("New category added !", 201, True)}
@@ -489,7 +489,7 @@ Private Sub script11 As String
         type: "put",
         data: data,
         dataType: "${dataType}",
-        url: "/${Main.conf.ApiName}/categories/" + $("#id1").val(),
+        url: "/${Main.app.api.Name}/categories/" + $("#id1").val(),
         success: function (response) {
           $("#edit").modal("hide")
           ${AlertScript("Category updated successfully !", 200, True)}
@@ -508,7 +508,7 @@ Private Sub script12 As String
   $.ajax({
     type: "delete",
     dataType: "${dataType}",
-    url: "/${Main.conf.ApiName}/categories/" + $("#id2").val(),
+    url: "/${Main.app.api.Name}/categories/" + $("#id2").val(),
     success: function (response) {
       $("#delete").modal("hide")
       ${AlertScript("Category deleted successfully !", 200, False)}
@@ -561,7 +561,7 @@ Private Sub script14 As String
 	Return $"  $.ajax({
     type: "get",
     dataType: "${dataType}",
-    url: "/${Main.conf.ApiName}/categories",
+    url: "/${Main.app.api.Name}/categories",
     success: function (response) {
       const $category1 = $("#category1")
       const $category2 = $("#category2")
@@ -602,7 +602,7 @@ Private Sub script15 (Verb As String) As String
     data: data,"$, _
     $"  type: "get","$)}
     dataType: "${dataType}",
-    url: "/${Main.conf.ApiName}/find",
+    url: "/${Main.app.api.Name}/find",
     success: function (response, status, xhr) {
       let rows = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
@@ -762,7 +762,7 @@ Private Sub script18 As String
         type: "post",
         data: data,
         dataType: "${dataType}",
-        url: "/${Main.conf.ApiName}/products",
+        url: "/${Main.app.api.Name}/products",
         success: function (response) {
           $("#new").modal("hide")
           ${AlertScript("New product added !", 201, True)}
@@ -809,7 +809,7 @@ Private Sub script19 As String
         type: "put",
         data: data,
         dataType: "${dataType}",
-        url: "/${Main.conf.ApiName}/products/" + $("#id1").val(),
+        url: "/${Main.app.api.Name}/products/" + $("#id1").val(),
         success: function (response) {
           $("#edit").modal("hide")
           ${AlertScript("Product updated successfully !", 200, True)}
@@ -828,7 +828,7 @@ Private Sub script20 As String
   $.ajax({
     type: "delete",
     dataType: "${dataType}",
-    url: "/${Main.conf.ApiName}/products/" + $("#id2").val(),
+    url: "/${Main.app.api.Name}/products/" + $("#id2").val(),
     success: function (response) {
       $("#delete").modal("hide")
       ${AlertScript("Product deleted successfully !", 200, False)}

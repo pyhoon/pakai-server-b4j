@@ -5,6 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Https Filter class
+'Version 5.00
 Sub Class_Globals
 
 End Sub
@@ -19,7 +20,7 @@ Public Sub Filter (req As ServletRequest, resp As ServletResponse) As Boolean
 		Return True
 	Else
 		resp.SendRedirect(req.FullRequestURI.Replace("http:", "https:") _
-       .Replace(Main.srvr.Port, Main.srvr.SslPort))
+       .Replace(Main.app.Port, Main.app.ssl.Port))
 		Return False
 	End If
 End Sub

@@ -1,6 +1,6 @@
 # Pakai - Web API Server framework
 
-Version: 4.00
+Version: 5.00
 
 Create REST API Backend using B4J project template
 
@@ -10,13 +10,14 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai Server (4.00).b4xtemplate
+- Pakai.Server.5.00.b4xtemplate
 
 ## Depends on:
+- [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
 - [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
 - [MiniORMUtils.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
-- sqlite-jdbc-3.7.2.jar (or your preferred version)
-- mysql-connector-java-8.0.30.jar (or your preferred version)
+- sqlite-jdbc-3.7.2.jar (SQLite)
+- mysql-connector-java-8.0.30.jar (MySQL)
 
 ## Features:
 - Use Server Handlers
@@ -24,21 +25,26 @@ Create REST API Backend using B4J project template
 - Built-in web front-end with CRUD examples
 - Supports JSON and XML formats payload and response
 
+## What's New
+- More cleaner code in Main module
+- More control to allowed http methods
+- Optional config file
+
 ### Code Example
 ```basic
-Private Sub GetCategoryById (id As Int)
-	DB.Initialize(Main.DBType, Main.DBOpen)
-	DB.Table = "tbl_categories"
-	DB.Find(id)
-	If DB.Found Then
-		HRM.ResponseCode = 200
-		HRM.ResponseObject = DB.First
-	Else
-		HRM.ResponseCode = 404
-		HRM.ResponseError = "Category not found"
-	End If
-	ReturnApiResponse
-	DB.Close
+Sub AppStart (Args() As String)
+	app.Initialize
+	app.api.VerboseMode = True
+	app.api.OrderedKeys = True
+	app.Get("", "IndexWebHandler")
+    app.Get("/api/products", "ProductsApiHandler")
+    app.Get("/api/products/*", "ProductsApiHandler")
+    app.Post("/api/products", "ProductsApiHandler")
+    app.Put("/api/products/*", "ProductsApiHandler")
+    app.Delete("/api/products/*", "ProductsApiHandler")
+	app.UseConfigFile = True
+	app.Start
+	StartMessageLoop
 End Sub
 ```
 

@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 4.00
+'Version 5.00
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -18,7 +18,7 @@ End Sub
 
 Public Sub Initialize
 	HRM.Initialize
-	HRM.VerboseMode = Main.conf.VerboseMode
+	HRM.VerboseMode = Main.app.api.VerboseMode
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -27,36 +27,36 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Method = Request.Method.ToUpperCase
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3) ' 3 For Api handler
-	Select Method
-		Case "GET"
-			If ElementMatch("") Then
-				GetCategories
-				Return
-			End If
-			If ElementMatch("id") Then
-				GetCategoryById(ElementId)
-				Return
-			End If
-		Case "POST"
-			If ElementMatch("") Then
-				CreateNewCategory
-				Return
-			End If
-		Case "PUT"
-			If ElementMatch("id") Then
-				UpdateCategoryById(ElementId)
-				Return
-			End If
-		Case "DELETE"
-			If ElementMatch("id") Then
-				DeleteCategoryById(ElementId)
-				Return
-			End If
-		Case Else
-			Log("Unsupported method: " & Method)
-			ReturnMethodNotAllow
-			Return
-	End Select
+	If ElementMatch("") Then
+		If Main.app.MethodAvailable2(Method, "/api/categories", Me) Then
+			Select Method
+				Case "GET"
+					GetCategories
+					Return
+				Case "POST"
+					CreateNewCategory
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	Else If ElementMatch("id") Then
+		If Main.app.MethodAvailable2(Method, "/api/categories/*", Me) Then
+			Select Method
+				Case "GET"
+					GetCategoryById(ElementId)
+					Return
+				Case "PUT"
+					UpdateCategoryById(ElementId)
+					Return
+				Case "DELETE"
+					DeleteCategoryById(ElementId)
+					Return
+			End Select
+		End If
+		ReturnMethodNotAllow
+		Return
+	End If
 	ReturnBadRequest
 End Sub
 
@@ -140,7 +140,7 @@ Private Sub CreateNewCategory
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Where = Array("category_name = ?")
-	DB.Parameters = Array As String(data.Get("category_name"))
+	DB.Parameters = Array(data.Get("category_name"))
 	DB.Query
 	If DB.Found Then
 		HRM.ResponseCode = 409
@@ -185,7 +185,7 @@ Private Sub UpdateCategoryById (id As Int)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Where = Array("category_name = ?", "id <> ?")
-	DB.Parameters = Array As String(data.Get("category_name"), id)
+	DB.Parameters = Array(data.Get("category_name"), id)
 	DB.Query
 	If DB.Found Then
 		HRM.ResponseCode = 409
