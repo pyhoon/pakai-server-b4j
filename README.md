@@ -28,6 +28,7 @@ Create REST API Backend using B4J project template
 ## What's New
 - More cleaner code in Main module
 - More control to allowed http methods
+- Build-in CORS
 - Optional config file
 
 ### Code Example
