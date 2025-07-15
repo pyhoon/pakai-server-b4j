@@ -1,4 +1,4 @@
-# Version: 		5.00beta5
+# Version: 		5.00
 # License:		MIT License
 # Product: 		Pakai framework (formerly known as Web API Server)
 # Description: 	B4J project template for building JSON and XML formats API backend
@@ -33,7 +33,7 @@ PORT=8080
 
 # SSL Settings
 # Generate a keystore from Windows CMD
-# C:\Java\jdk-11.0.1\bin\keytool -keystore keystore -alias jetty -genkey -keyalg RSA
+# C:\Java\jdk-19.0.2\bin\keytool -keystore keystore -alias jetty -genkey -keyalg RSA
 # Copy keystore file to Objects folder of the B4J project
 SSL_PORT=0
 SSL_KEYSTORE_DIR=/etc/letsencrypt/live/mydomain.com
