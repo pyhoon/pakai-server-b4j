@@ -1,6 +1,6 @@
 # Pakai - Web API Server framework
 
-Version: 5.00 beta6
+Version: 5.00
 
 Create REST API Backend using B4J project template
 
@@ -10,14 +10,14 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai.Server.5.00beta6.b4xtemplate
+- Pakai.Server.5.00.b4xtemplate
 
 ## Depends on:
-- [EndsMeet.1.10.b4xlib](https://github.com/pyhoon/EndsMeet)
+- [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
 - [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
 - [MiniORMUtils.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
-- sqlite-jdbc-3.7.2.jar (or your preferred version)
-- mysql-connector-java-8.0.30.jar (or your preferred version)
+- sqlite-jdbc-3.7.2.jar (SQLite)
+- mysql-connector-java-8.0.30.jar (MySQL)
 
 ## Features:
 - Use Server Handlers
@@ -25,19 +25,10 @@ Create REST API Backend using B4J project template
 - Built-in web front-end with CRUD examples
 - Supports JSON and XML formats payload and response
 
-### Code Example
-```basic
-Private Sub GetCategories
-	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
-	DB.Table = "tbl_categories"
-	DB.Query
-	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
-	ReturnApiResponse
-	DB.Close
-End Sub
-```
+## What's New
+- More cleaner code in Main module
+- More control to allowed http methods
+- Optional config file
 
 **Support this project**
 

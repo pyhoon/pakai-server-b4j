@@ -12,7 +12,7 @@ FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 Group=App
-Library1=endsmeet.1.10
+Library1=endsmeet
 Library2=jcore
 Library3=miniormutils
 Library4=webapiutils
@@ -30,19 +30,19 @@ NumberOfModules=8
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
-' Version: 				5.00 beta 6
+' Version: 				5.00
 ' License:				MIT License
 ' Product: 				Pakai Server
 ' Description: 			Server application project template
 ' Donation:				PayPal (https://paypal.me/aeric80/)
 ' Source Code:			GitHub (https://github.com/pyhoon/pakai-server-b4j)
 ' Developer:			Poon Yip Hoon (Aeric) (https://www.b4x.com/android/forum/members/aeric.74499/)
-' More information:		B4X Forum (https://www.b4x.com/android/forum/threads/project-template-pakai-framework.167080/)
+' More information:		B4X Forum (https://www.b4x.com/android/forum/threads/project-template-pakai-server-v5.167788/)
 ' *** IDE Shorcuts ***
 ' 1. AppStart: 			ide://goto?Module=Main&Sub=AppStart
 ' 2. CreateDatabase: 	ide://goto?Module=Main&Sub=CreateDatabase
 ' 3. Objects folder: 	ide://run?file=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
-' 4. LibDownloader: 	ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\libget-non-ui.jar&Args=%PROJECT%&Args=true
+' 4. LibDownloader: 	ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\libget-non-ui.jar&Args=%PROJECT%
 ' 5. Publish:			ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&Args=-cMf&Args=Publish.zip&Args=www&Args=*.jar&Args=*.ini
 #CommandLineArgs:
 #MergeLibraries: True
@@ -60,7 +60,7 @@ Sub Process_Globals
 	Private info 				As ConnectionInfo
 	Private Const COLOR_RED 	As Int = -65536
 	Private Const COLOR_BLUE 	As Int = -16776961
-	Private Const VERSION 		As String = "5.00 beta 6"
+	Private Const VERSION 		As String = "5.00"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>

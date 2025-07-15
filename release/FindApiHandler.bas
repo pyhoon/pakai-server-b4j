@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 5.00 beta 5
+'Version 5.00
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -102,7 +102,8 @@ Public Sub GetAllProducts
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -118,7 +119,8 @@ Public Sub GetProductsByCategoryId (id As Int)
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -153,7 +155,8 @@ Public Sub SearchByKeywords
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub

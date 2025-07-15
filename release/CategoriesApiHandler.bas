@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 5.00 beta 5
+'Version 5.00
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -140,7 +140,7 @@ Private Sub CreateNewCategory
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Where = Array("category_name = ?")
-	DB.Parameters = Array As String(data.Get("category_name"))
+	DB.Parameters = Array(data.Get("category_name"))
 	DB.Query
 	If DB.Found Then
 		HRM.ResponseCode = 409
@@ -185,7 +185,7 @@ Private Sub UpdateCategoryById (id As Int)
 	DB.Initialize(Main.DBType, Main.DBOpen)
 	DB.Table = "tbl_categories"
 	DB.Where = Array("category_name = ?", "id <> ?")
-	DB.Parameters = Array As String(data.Get("category_name"), id)
+	DB.Parameters = Array(data.Get("category_name"), id)
 	DB.Query
 	If DB.Found Then
 		HRM.ResponseCode = 409
