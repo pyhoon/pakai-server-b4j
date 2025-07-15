@@ -6,6 +6,7 @@ Create REST API Backend using B4J project template
 
 ### Preview
 ![Index](../main/pakai-index.png)
+![Edit](../main/pakai-form-validation.png)
 ![Documentation](../main/pakai.png)
 ---
 
