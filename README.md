@@ -5,8 +5,8 @@ Version: 5.00
 Create REST API Backend using B4J project template
 
 ### Preview
-![Pakai](../main/pakai.png)
-
+![Index](../main/pakai-index.png)
+![Documentation](../main/pakai.png)
 ---
 
 ## Template:
