@@ -30,6 +30,24 @@ Create REST API Backend using B4J project template
 - More control to allowed http methods
 - Optional config file
 
+### Code Example
+```basic
+Sub AppStart (Args() As String)
+	app.Initialize
+	app.api.VerboseMode = True
+	app.api.OrderedKeys = True
+	app.Get("", "IndexWebHandler")
+    app.Get("/api/products", "ProductsApiHandler")
+    app.Get("/api/products/*", "ProductsApiHandler")
+    app.Post("/api/products", "ProductsApiHandler")
+    app.Put("/api/products/*", "ProductsApiHandler")
+    app.Delete("/api/products/*", "ProductsApiHandler")
+	app.UseConfigFile = True
+	app.Start
+	StartMessageLoop
+End Sub
+```
+
 **Support this project**
 
 <a href="https://paypal.me/aeric80/"><img src="https://github.com/pyhoon/pakai-server-b4j/blob/main/source/Objects/www/assets/img/sponsor.png" width="174" title="Buy me a coffee" /></a>
