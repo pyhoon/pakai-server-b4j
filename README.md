@@ -1,6 +1,6 @@
 # Web API Server
 
-Version: 3.50
+Version: 3.51
 
 Create Web API Server using B4X project template
 
@@ -14,11 +14,11 @@ Create Web API Server using B4X project template
 ---
 
 ## Template:
-- Web API Server (3.50).b4xtemplate
+- Web API Server (3.51).b4xtemplate
 
 ## Depends on:
-- [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
-- [MiniORMUtils.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
+- [WebApiUtils (3.05).b4xlib](https://github.com/pyhoon/WebApiUtils-B4J/blob/v3.05/WebApiUtils%20(3.05).b4xlib)
+- [MiniORMUtils (2.60).b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X/blob/v2.60/MiniORMUtils%20(2.60).b4xlib)
 - sqlite-jdbc-3.7.2.jar (or your preferred version)
 - mysql-connector-java-8.0.30.jar (or your preferred version)
 
