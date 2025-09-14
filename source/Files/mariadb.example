@@ -1,0 +1,11 @@
+## MariaDB configuration:
+
+DbType=MariaDB
+DbHost=localhost
+DbPort=3306
+DbName=pakai
+User=root
+Password=password
+DriverClass=org.mariadb.jdbc.Driver
+JdbcUrl=jdbc:mariadb://{DbHost}:{DbPort}/{DbName}
+MaxPoolSize=0

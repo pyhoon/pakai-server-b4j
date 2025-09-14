@@ -5,20 +5,26 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 5.00
+'Version 5.10
 Sub Class_Globals
+	Private DB As MiniORM
+	Private App As EndsMeet
+	Private Api As ApiSettings
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private HRM As HttpResponseMessage
-	Private DB As MiniORM
 	Private Method As String
 	Private Elements() As String
 	Private ElementId As Int
 End Sub
 
 Public Sub Initialize
+	App = Main.app
+	Api = App.api
 	HRM.Initialize
-	HRM.VerboseMode = Main.app.api.VerboseMode
+	HRM.VerboseMode = Api.VerboseMode
+	HRM.OrderedKeys = Api.OrderedKeys
+	DB.Initialize(Main.DBType, Null)
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -28,7 +34,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3) ' 3 For Api handler
 	If ElementMatch("") Then
-		If Main.app.MethodAvailable2(Method, "/api/categories", Me) Then
+		If App.MethodAvailable2(Method, "/api/categories", Me) Then
 			Select Method
 				Case "GET"
 					GetCategories
@@ -41,7 +47,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 		ReturnMethodNotAllow
 		Return
 	Else If ElementMatch("id") Then
-		If Main.app.MethodAvailable2(Method, "/api/categories/*", Me) Then
+		If App.MethodAvailable2(Method, "/api/categories/*", Me) Then
 			Select Method
 				Case "GET"
 					GetCategoryById(ElementId)
@@ -91,18 +97,18 @@ End Sub
 
 Private Sub GetCategories
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
 	ReturnApiResponse
 	DB.Close
 End Sub
 
 Private Sub GetCategoryById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Find(id)
 	If DB.Found Then
@@ -137,7 +143,7 @@ Private Sub CreateNewCategory
 		End If
 	Next
 	' Check conflict category name
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Where = Array("category_name = ?")
 	DB.Parameters = Array(data.Get("category_name"))
@@ -182,7 +188,7 @@ Private Sub UpdateCategoryById (id As Int)
 		Return
 	End If
 	' Check conflict category name
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Where = Array("category_name = ?", "id <> ?")
 	DB.Parameters = Array(data.Get("category_name"), id)
@@ -221,7 +227,7 @@ End Sub
 
 Private Sub DeleteCategoryById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	' Find row by id
 	DB.Find(id)
