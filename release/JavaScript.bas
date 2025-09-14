@@ -1,45 +1,50 @@
 ﻿B4J=true
-Group=App
+Group=Classes
 ModulesStructureVersion=1
-Type=StaticCode
-Version=10.2
+Type=Class
+Version=10.3
 @EndOfDesignText@
-'Utility code module
-'Version 5.00
-Sub Process_Globals
-	Private Const RESPONSE_ELEMENT_CODE As String		= "a"
-	Private Const RESPONSE_ELEMENT_ERROR As String 		= "e"
-	Private Const RESPONSE_ELEMENT_STATUS As String 	= "s"
-	Private Const RESPONSE_ELEMENT_MESSAGE As String	= "m"
-	Private Const RESPONSE_ELEMENT_RESULT As String 	= "r"
-	Private Const RESPONSE_ELEMENT_TYPE As String 		= "t" 'ignore
-	Private PayloadType As String
+'JavaScript class module
+'Version 5.10
+Sub Class_Globals
 	Private ContentType As String
-	Private Verbose As Boolean
-	Private XmlRoot As String = "root"
-	Private XmlElement As String = "item"
+	Private PayloadType As String
+	Private XmlRoot 	As String = "root"
+	Private XmlElement 	As String = "item"
+	Private Verbose 	As Boolean
+	Private App 		As EndsMeet
+	Private Api 		As ApiSettings
+	Private Const RESPONSE_ELEMENT_CODE 	As String = "a"
+	Private Const RESPONSE_ELEMENT_ERROR 	As String = "e"
+	Private Const RESPONSE_ELEMENT_STATUS 	As String = "s"
+	Private Const RESPONSE_ELEMENT_MESSAGE 	As String = "m"
+	Private Const RESPONSE_ELEMENT_RESULT 	As String = "r"
+	Private Const RESPONSE_ELEMENT_TYPE 	As String = "t" 'ignore
 End Sub
 
-Public Sub CurrentTimeStamp As String
-	Select Main.DBType.ToUpperCase
-		Case "MYSQL"
-			Return "NOW()"
-		Case "SQLITE"
-			Return "datetime('Now')"
-		Case Else
-			Return ""
-	End Select
+Public Sub Initialize
+	App = Main.app
+	Api = App.api
+	CreateJSFiles
 End Sub
 
-Public Sub CurrentTimeStampAddMinute (Value As Int) As String
-	Select Main.DBType.ToUpperCase
-		Case "MYSQL"
-			Return $"DATE_ADD(NOW(), INTERVAL ${Value} MINUTE)"$
-		Case "SQLITE"
-			Return $"datetime('Now', '+${Value} minute')"$
-		Case Else
-			Return ""
-	End Select
+' Generate JS files from code to save some file size
+Private Sub CreateJSFiles
+	Dim skip As Boolean
+	Dim Parent As String = File.Combine(App.staticfiles.Folder, "assets")
+	Dim DirName As String = File.Combine(Parent, "scripts")
+	If File.Exists(DirName, "") = False Then
+		File.MakeDir(Parent, "scripts")
+	Else
+	#If Release
+	skip = True ' skip overwriting files in release if scripts folder exists
+	#End If
+	End If
+	If skip = False Then
+		GenerateJSFileForHelp(DirName, "help.js", Api.ContentType, Api.VerboseMode)
+		GenerateJSFileForSearch(DirName, "search.js", Api.ContentType, Api.VerboseMode)
+		GenerateJSFileForCategory(DirName, "category.js", Api.ContentType, Api.VerboseMode)
+	End If
 End Sub
 
 Private Sub AlertScript (AlertMessage As String, SuccessCode As Int, SubmitForm As Boolean) As String
@@ -335,11 +340,12 @@ Private Sub script06 As String
 End Sub
 
 Private Sub script07 As String
-	Dim dollar As String = "$"
+	' Escape $ inside smart string literals
+	' https://www.b4x.com/android/forum/threads/solved-how-to-escape-a-string-with-the-characters-within.121322/#post-758437
 	Return $"$.ajax({
     type: "get",
     dataType: "${dataType}",
-    url: "/${Main.app.api.Name}/categories",
+    url: "/${Api.Name}/categories",
     success: function (response, status, xhr) {
       let data = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
@@ -372,18 +378,18 @@ Private Sub script07 As String
         $.each(data, function (i, item) {
           const id = item.id || ""
           const name = item.category_name || ""
-		  //console.log(id, category_name)
+          //console.log(id, category_name)
           tblBody += `
     <tr>
-      <td class="align-middle" style="text-align: right">${dollar}{id}</td>
-      <td class="align-middle">${dollar}{name}</td>
+      <td class="align-middle" style="text-align: right">${"$"}{id}</td>
+      <td class="align-middle">${"$"}{name}</td>
       <td>
         <a href="#edit" class="text-primary mx-2" data-toggle="modal">
           <i class="edit fa fa-pen" data-toggle="tooltip"
-          data-id="${dollar}{id}" data-name="${dollar}{name}" title="Edit"></i></a>
+          data-id="${"$"}{id}" data-name="${"$"}{name}" title="Edit"></i></a>
         <a href="#delete" class="text-danger mx-2" data-toggle="modal">
           <i class="delete fa fa-trash" data-toggle="tooltip"
-          data-id="${dollar}{id}" data-name="${dollar}{name}" title="Delete"></i></a>
+          data-id="${"$"}{id}" data-name="${"$"}{name}" title="Delete"></i></a>
       </td>
     </tr>`
         })
@@ -449,7 +455,7 @@ Private Sub script10 As String
         type: "post",
         data: data,
         dataType: "${dataType}",
-        url: "/${Main.app.api.Name}/categories",
+        url: "/${Api.Name}/categories",
         success: function (response) {
           $("#new").modal("hide")
           ${AlertScript("New category added !", 201, True)}
@@ -458,7 +464,6 @@ Private Sub script10 As String
           alert(errorThrown)
         }
       })
-      // return false // required to block normal submit since you used ajax
     }
   })
 })"$
@@ -489,7 +494,7 @@ Private Sub script11 As String
         type: "put",
         data: data,
         dataType: "${dataType}",
-        url: "/${Main.app.api.Name}/categories/" + $("#id1").val(),
+        url: "/${Api.Name}/categories/" + $("#id1").val(),
         success: function (response) {
           $("#edit").modal("hide")
           ${AlertScript("Category updated successfully !", 200, True)}
@@ -498,7 +503,6 @@ Private Sub script11 As String
           alert(errorThrown)
         }
       })
-      // Return False // required To block normal submit since you used ajax
     }
   })
 })"$
@@ -509,7 +513,7 @@ Private Sub script12 As String
   $.ajax({
     type: "delete",
     dataType: "${dataType}",
-    url: "/${Main.app.api.Name}/categories/" + $("#id2").val(),
+    url: "/${Api.Name}/categories/" + $("#id2").val(),
     success: function (response) {
       $("#delete").modal("hide")
       ${AlertScript("Category deleted successfully !", 200, False)}
@@ -524,14 +528,11 @@ End Sub
 Private Sub script13 As String
 	Select PayloadType
 		Case "xml"
-			' Credit to: Daestrum
-			' Reference: https://www.b4x.com/android/forum/threads/solved-abmaterial-problem-with-in-string-literals.162280/#post-995431
-			Dim dollar As String = "$"
 			Return $"function convertFormToXML(form) {
   const formData = new FormData(form)
   let xml = `<root>\n`
   for (const [name, value] of formData.entries()) {
-    xml += `  <${dollar}{name}>${dollar}{escapeXml(value)}</${dollar}{name}>\n`
+    xml += `  <${"$"}{name}>${"$"}{escapeXml(value)}</${"$"}{name}>\n`
   }
   xml += `</root>`
   return xml
@@ -565,7 +566,7 @@ Private Sub script14 As String
 	Return $"  $.ajax({
     type: "get",
     dataType: "${dataType}",
-    url: "/${Main.app.api.Name}/categories",
+    url: "/${Api.Name}/categories",
     success: function (response) {
       const $category1 = $("#category1")
       const $category2 = $("#category2")
@@ -586,7 +587,7 @@ Private Sub script14 As String
         })
       })"$, _
 	  $"data = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, "response")}"$)}
-      // Append To both dropdowns
+      // Append to both dropdowns
       data.forEach(function (item) {
         const option = $("<option />").val(item.id).text(item.category_name)
         $category1.append(option.clone())
@@ -600,14 +601,13 @@ Private Sub script14 As String
 End Sub
 
 Private Sub script15 (Verb As String) As String
-	Dim dollar As String = "$"
 	Return $"  $.ajax({
 	${IIf(Verb = "post", _
     $"  type: "post",
     data: data,"$, _
     $"  type: "get","$)}
     dataType: "${dataType}",
-    url: "/${Main.app.api.Name}/find",
+    url: "/${Api.Name}/find",
     success: function (response, status, xhr) {
       let rows = []
       ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
@@ -656,20 +656,20 @@ Private Sub script15 (Verb As String) As String
 		  //console.log(id, code, name, category, price)
           tblBody += `
     <tr>
-      <td class="align-middle" style="text-align: right">${dollar}{id}</td>
-      <td class="align-middle">${dollar}{code}</td>
-      <td class="align-middle">${dollar}{name}</td>
-      <td class="align-middle">${dollar}{category}</td>
-      <td class="align-middle" style="text-align: right">${dollar}{price}</td>
+      <td class="align-middle" style="text-align: right">${"$"}{id}</td>
+      <td class="align-middle">${"$"}{code}</td>
+      <td class="align-middle">${"$"}{name}</td>
+      <td class="align-middle">${"$"}{category}</td>
+      <td class="align-middle" style="text-align: right">${"$"}{price}</td>
       <td>
         <a href="#edit" class="text-primary mx-2" data-toggle="modal">
           <i class="edit fa fa-pen" data-toggle="tooltip"
-          data-id="${dollar}{id}" data-code="${dollar}{code}" data-category="${dollar}{catid}"
-          data-name="${dollar}{name}" data-price="${dollar}{price}" title="Edit"></i></a>
+          data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
+          data-name="${"$"}{name}" data-price="${"$"}{price}" title="Edit"></i></a>
         <a href="#delete" class="text-danger mx-2" data-toggle="modal">
           <i class="delete fa fa-trash" data-toggle="tooltip"
-          data-id="${dollar}{id}" data-code="${dollar}{code}" data-category="${dollar}{catid}"
-          data-name="${dollar}{name}" title="Delete"></i></a>
+          data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
+          data-name="${"$"}{name}" title="Delete"></i></a>
       </td>
     </tr>`
         })
@@ -767,7 +767,7 @@ Private Sub script18 As String
         type: "post",
         data: data,
         dataType: "${dataType}",
-        url: "/${Main.app.api.Name}/products",
+        url: "/${Api.Name}/products",
         success: function (response) {
           $("#new").modal("hide")
           ${AlertScript("New product added !", 201, True)}
@@ -814,7 +814,7 @@ Private Sub script19 As String
         type: "put",
         data: data,
         dataType: "${dataType}",
-        url: "/${Main.app.api.Name}/products/" + $("#id1").val(),
+        url: "/${Api.Name}/products/" + $("#id1").val(),
         success: function (response) {
           $("#edit").modal("hide")
           ${AlertScript("Product updated successfully !", 200, True)}
@@ -833,7 +833,7 @@ Private Sub script20 As String
   $.ajax({
     type: "delete",
     dataType: "${dataType}",
-    url: "/${Main.app.api.Name}/products/" + $("#id2").val(),
+    url: "/${Api.Name}/products/" + $("#id2").val(),
     success: function (response) {
       $("#delete").modal("hide")
       ${AlertScript("Product deleted successfully !", 200, False)}

@@ -5,10 +5,12 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Help Handler class
-'Version 5.00
+'Version 5.10
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
+	Private App As EndsMeet
+	Private Api As ApiSettings
 	Private Handlers As List
 	Private AllMethods As List
 	Private AllGroups As Map
@@ -16,6 +18,8 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
+	App = Main.app
+	Api = App.api
 	AllMethods.Initialize
 	AllGroups.Initialize
 	Handlers.Initialize
@@ -39,8 +43,8 @@ Private Sub ShowHelpPage
 	Dim strMain As String = WebApiUtils.ReadTextFile("help.html")
 	strMain = WebApiUtils.BuildDocView(strMain, Contents)
 	strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
-	strMain = WebApiUtils.BuildHtml(strMain, Main.ctx)
-	strMain = WebApiUtils.BuildScript(strMain, $"<script src="${Main.app.ServerUrl}/assets/scripts/help.js"></script>"$)
+	strMain = WebApiUtils.BuildHtml(strMain, App.ctx)
+	strMain = WebApiUtils.BuildScript(strMain, $"<script src="${App.ServerUrl}/assets/scripts/help.js"></script>"$)
 	WebApiUtils.ReturnHtml(strMain, Response)
 End Sub
 
@@ -386,10 +390,10 @@ Private Sub ExtractParams (methodLine As String) As String
 End Sub
 
 Private Sub GenerateLink (ApiVersion As String, Handler As String, Elements As List) As String
-	Dim Link As String = "$SERVER_URL$/" & Main.app.api.Name
+	Dim Link As String = "$SERVER_URL$/" & Api.Name
 	If Link.EndsWith("/") = False Then Link = Link & "/"
 	If ApiVersion.EqualsIgnoreCase("null") = False Then
-		If Main.app.api.Versioning Then Link = Link & ApiVersion
+		If Api.Versioning Then Link = Link & ApiVersion
 		If Link.EndsWith("/") = False Then Link = Link & "/"
 	End If
 	Link = Link & Handler.ToLowerCase
