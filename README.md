@@ -1,6 +1,6 @@
 # Pakai - Web API Server framework
 
-Version: 5.00
+Version: 5.10
 
 Create REST API Backend using B4J project template
 
@@ -11,14 +11,15 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai Server (5.00).b4xtemplate
+- Pakai Server (5.10).b4xtemplate
 
 ## Depends on:
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
 - [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
 - [MiniORMUtils.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
 - sqlite-jdbc-3.7.2.jar (SQLite)
-- mysql-connector-java-8.0.30.jar (MySQL)
+- mysql-connector-j-9.3.0.jar (MySQL)
+- mariadb-java-client-3.5.6.jar (MariaDB)
 
 ## Features:
 - Use Server Handlers
