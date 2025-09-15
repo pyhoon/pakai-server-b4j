@@ -7,5 +7,5 @@ DbName=pakai
 User=root
 Password=password
 DriverClass=org.mariadb.jdbc.Driver
-JdbcUrl=jdbc:mariadb://{DbHost}:{DbPort}/{DbName}
+JdbcUrl=jdbc:mariadb://{DbHost}:{DbPort}/{DbName}?characterEncoding=utf8&useSSL=false
 MaxPoolSize=0
