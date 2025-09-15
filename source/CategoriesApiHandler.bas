@@ -113,7 +113,7 @@ Private Sub GetCategoryById (id As Int)
 	DB.Find(id)
 	If DB.Found Then
 		HRM.ResponseCode = 200
-		HRM.ResponseObject = DB.First
+		HRM.ResponseObject = DB.First2
 	Else
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Category not found"
@@ -164,7 +164,7 @@ Private Sub CreateNewCategory
 	DB.Save
 	' Retrieve new row
 	HRM.ResponseCode = 201
-	HRM.ResponseObject = DB.First
+	HRM.ResponseObject = DB.First2
 	HRM.ResponseMessage = "Category created successfully"
 	ReturnApiResponse
 	DB.Close
@@ -220,7 +220,7 @@ Private Sub UpdateCategoryById (id As Int)
 	' Return updated row
 	HRM.ResponseCode = 200
 	HRM.ResponseMessage = "Category updated successfully"
-	HRM.ResponseObject = DB.First
+	HRM.ResponseObject = DB.First2
 	ReturnApiResponse
 	DB.Close
 End Sub

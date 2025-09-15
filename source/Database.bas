@@ -29,7 +29,7 @@ Public Sub Engine As String
 End Sub
 
 ' Make Connection to Database
-Private Sub ConnectDatabase
+Public Sub ConnectDatabase
 	Try
 		LogColor("Checking database...", Main.COLOR_BLUE)
 		#If SQLite

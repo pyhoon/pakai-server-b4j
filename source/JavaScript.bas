@@ -25,11 +25,10 @@ End Sub
 Public Sub Initialize
 	App = Main.app
 	Api = App.api
-	CreateJSFiles
 End Sub
 
 ' Generate JS files from code to save some file size
-Private Sub CreateJSFiles
+Public Sub CreateJSFiles
 	Dim skip As Boolean
 	Dim Parent As String = File.Combine(App.staticfiles.Folder, "assets")
 	Dim DirName As String = File.Combine(Parent, "scripts")
