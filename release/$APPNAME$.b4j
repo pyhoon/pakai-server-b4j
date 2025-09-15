@@ -39,13 +39,13 @@ Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 5.10 beta2
+' Version: 5.10
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 '#Macro: Title, Start, 	ide://goto?Module=Main&Sub=AppStart
 #Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
-'#Macro: Title, AddLibs, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\libget-non-ui.jar&Args=%PROJECT%&Args=False
-#Macro: Title, Backup,	ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_yyyy-MM-dd_HHmm.zip&Args=Files&Args=Objects\www&Args=Objects\config.*&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
+#Macro: Title, AddLibs, ide://run?file=%JAVABIN%\java.exe&Args=-jar&Args=%ADDITIONAL%\..\B4X\libget-non-ui.jar&Args=%PROJECT%&Args=False
+#Macro: Title, Backup,	ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-09-15_0234.zip&Args=Files&Args=Objects\www&Args=Objects\config.*&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
 '#Macro: Title, Publish, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&Args=-cMf&Args=Publish.zip&Args=www&Args=*.jar&Args=*.ini
 #CommandLineArgs:
 #MergeLibraries: True
@@ -59,11 +59,12 @@ Version=10.3
 #End Region
 
 Sub Process_Globals
-	Public DB 					As Database
 	Public App 					As EndsMeet
+	Public DB 					As Database
+	Private JS 					As JavaScript
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "5.10 beta2"
+	Public Const VERSION 		As String = "5.10"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -100,6 +101,7 @@ Sub AppStart (Args() As String)
 	' *** Misc Settings ***
 	App.LogEnabled = True
 	App.UseConfigFile = True
+	
 	#If Release
 	App.RedirectToHttps = True
 	#End If
@@ -112,9 +114,12 @@ Sub AppStart (Args() As String)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
 	
-	Dim JS As JavaScript
+	
 	JS.Initialize
+	JS.CreateJSFiles
+	
 	DB.Initialize
+	DB.ConnectDatabase
 	StartMessageLoop
 End Sub
 
