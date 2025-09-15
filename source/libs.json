@@ -10,8 +10,8 @@
         {
             "Name": "MiniORMUtils.b4xlib",
             "Platform": "B4X",
-            "Version": 3.40,
-            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v3.40/MiniORMUtils.b4xlib"
+            "Version": 3.50,
+            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v3.50/MiniORMUtils.b4xlib"
         },
         {
             "Name": "WebApiUtils.b4xlib",
