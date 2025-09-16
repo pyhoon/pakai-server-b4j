@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'JavaScript class module
-'Version 5.10
+'Version 5.20
 Sub Class_Globals
 	Private ContentType As String
 	Private PayloadType As String
@@ -14,12 +14,12 @@ Sub Class_Globals
 	Private Verbose 	As Boolean
 	Private App 		As EndsMeet
 	Private Api 		As ApiSettings
-	Private Const RESPONSE_ELEMENT_CODE 	As String = "a"
-	Private Const RESPONSE_ELEMENT_ERROR 	As String = "e"
-	Private Const RESPONSE_ELEMENT_STATUS 	As String = "s"
 	Private Const RESPONSE_ELEMENT_MESSAGE 	As String = "m"
-	Private Const RESPONSE_ELEMENT_RESULT 	As String = "r"
+	Private Const RESPONSE_ELEMENT_CODE 	As String = "a"
+	Private Const RESPONSE_ELEMENT_STATUS 	As String = "s"
 	Private Const RESPONSE_ELEMENT_TYPE 	As String = "t" 'ignore
+	Private Const RESPONSE_ELEMENT_ERROR 	As String = "e"
+	Private Const RESPONSE_ELEMENT_RESULT 	As String = "r"
 End Sub
 
 Public Sub Initialize
@@ -40,9 +40,9 @@ Public Sub CreateJSFiles
 	#End If
 	End If
 	If skip = False Then
-		GenerateJSFileForHelp(DirName, "help.js", Api.ContentType, Api.VerboseMode)
-		GenerateJSFileForSearch(DirName, "search.js", Api.ContentType, Api.VerboseMode)
-		GenerateJSFileForCategory(DirName, "category.js", Api.ContentType, Api.VerboseMode)
+		GenerateJSFileForHelp(DirName, "help.js", Api.PayloadType, Api.ContentType, Api.VerboseMode)
+		GenerateJSFileForSearch(DirName, "search.js", Api.PayloadType, Api.ContentType, Api.VerboseMode)
+		GenerateJSFileForCategory(DirName, "category.js", Api.PayloadType, Api.ContentType, Api.VerboseMode)
 	End If
 End Sub
 
@@ -57,7 +57,7 @@ Private Sub AlertScript (AlertMessage As String, SuccessCode As Int, SubmitForm 
 		End If
 	End If
 	Select ContentType
-		Case WebApiUtils.CONTENT_TYPE_XML
+		Case WebApiUtils.MIME_TYPE_XML
 			Return $"const root = $(response).find("${XmlRoot}")
           const code = $(root).children("${RESPONSE_ELEMENT_CODE}").text()
           const error = $(root).children("${RESPONSE_ELEMENT_ERROR}").text()
@@ -127,7 +127,7 @@ End Sub
 Private Sub AccessTokenPart As String
 	Return $"// Access Token
           let access_token = ""
-          ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
+          ${IIf(dataType = "xml", _
           $"const result = ${IIf(Verbose, _
 		  $"$(response).children("${RESPONSE_ELEMENT_RESULT}")"$, _
 		  $"response"$)}
@@ -149,12 +149,15 @@ Private Sub AccessTokenPart As String
           //}"$
 End Sub
 
+' For jQuery Ajax
 Private Sub dataType As String
-	Select ContentType
-		Case  WebApiUtils.CONTENT_TYPE_XML
+	Select PayloadType
+		Case WebApiUtils.MIME_TYPE_XML
 			Return "xml"
-		Case Else
+		Case WebApiUtils.MIME_TYPE_JSON
 			Return "json"
+		Case Else
+			Return ""
 	End Select
 End Sub
 
@@ -247,7 +250,7 @@ End Sub
 
 Private Sub script05 As String
 	Select ContentType
-		Case WebApiUtils.CONTENT_TYPE_XML
+		Case WebApiUtils.MIME_TYPE_XML
 			If Verbose Then
 				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
   const root = $(response).find("${XmlRoot}")
@@ -347,7 +350,7 @@ Private Sub script07 As String
     url: "/${Api.Name}/categories",
     success: function (response, status, xhr) {
       let data = []
-      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
+      ${IIf(ContentType = WebApiUtils.MIME_TYPE_XML, _
       $"// XML format
       const root = $(response).find("${XmlRoot}")
       ${IIf(Verbose, _
@@ -447,7 +450,7 @@ Private Sub script10 As String
     },
     submitHandler: function (form) {
       e.preventDefault()
-      ${IIf(PayloadType = "xml", _
+      ${IIf(dataType = "xml", _
 	  $"const data = convertFormToXML(form[0])"$, _
 	  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
@@ -486,7 +489,7 @@ Private Sub script11 As String
     },
     submitHandler: function (form) {
       e.preventDefault()
-      ${IIf(PayloadType = "xml", _
+      ${IIf(dataType = "xml", _
 	  $"const data = convertFormToXML(form[0])"$, _
 	  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
@@ -525,7 +528,7 @@ Private Sub script12 As String
 End Sub
 
 Private Sub script13 As String
-	Select PayloadType
+	Select dataType
 		Case "xml"
 			Return $"function convertFormToXML(form) {
   const formData = new FormData(form)
@@ -572,7 +575,7 @@ Private Sub script14 As String
       $category1.empty()
       $category2.empty()
       let data = []
-      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
+      ${IIf(ContentType = WebApiUtils.MIME_TYPE_XML, _
 	  $"const root = $(response).find("${XmlRoot}")
 	  ${IIf(Verbose, _
 	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
@@ -609,7 +612,7 @@ Private Sub script15 (Verb As String) As String
     url: "/${Api.Name}/find",
     success: function (response, status, xhr) {
       let rows = []
-      ${IIf(ContentType = WebApiUtils.CONTENT_TYPE_XML, _
+      ${IIf(ContentType = WebApiUtils.MIME_TYPE_XML, _
       $"// XML format
       const root = $(response).find("${XmlRoot}")
       ${IIf(Verbose, _
@@ -692,9 +695,7 @@ Private Sub script15 (Verb As String) As String
 End Sub
 
 Private Sub script16 As String
-	Select ContentType
-		Case WebApiUtils.CONTENT_TYPE_XML
-			Return $"$(document).on("click", ".edit", function (e) {
+	Return $"$(document).on("click", ".edit", function (e) {
   const id = $(this).attr("data-id")
   const code = $(this).attr("data-code")
   const name = $(this).attr("data-name")
@@ -706,20 +707,6 @@ Private Sub script16 As String
   $("#category2").val(category)
   $("#price1").val(price)
 })"$
-		Case Else
-			Return $"$(document).on("click", ".edit", function (e) {
-  const id = $(this).attr("data-id")
-  const category = $(this).attr("data-category")
-  const code = $(this).attr("data-code")
-  const name = $(this).attr("data-name")
-  const price = $(this).attr("data-price").replace(",", "")
-  $("#id1").val(id)
-  $("#code1").val(code)
-  $("#name1").val(name)
-  $("#category2").val(category)
-  $("#price1").val(price)
-})"$
-	End Select
 End Sub
 
 Private Sub script17 As String
@@ -759,7 +746,7 @@ Private Sub script18 As String
     },
     submitHandler: function (form) {
       e.preventDefault()
-      ${IIf(PayloadType = "xml", _
+      ${IIf(dataType = "xml", _
       $"const data = convertFormToXML(form[0])"$, _
       $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
@@ -806,7 +793,7 @@ Private Sub script19 As String
     },
     submitHandler: function (form) {
       e.preventDefault()
-      ${IIf(PayloadType = "xml", _
+      ${IIf(dataType = "xml", _
       $"const data = convertFormToXML(form[0])"$, _
       $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
       $.ajax({
@@ -844,8 +831,9 @@ Private Sub script20 As String
 })"$
 End Sub
 
-Public Sub GenerateJSFileForHelp (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
+Public Sub GenerateJSFileForHelp (DirName As String, FileName As String, StrPayloadType As String, StrContentType As String, BlnVerbose As Boolean)
 	Verbose = BlnVerbose
+	PayloadType = StrPayloadType
 	ContentType = StrContentType
 	Dim Script As String = $"${script01}
 ${script02}
@@ -856,10 +844,11 @@ ${script06}"$
 	File.WriteString(DirName, FileName, Script)
 End Sub
 
-Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
+Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, StrPayloadType As String, StrContentType As String, BlnVerbose As Boolean)
 	Verbose = BlnVerbose
+	PayloadType = StrPayloadType
 	ContentType = StrContentType
-		Dim Script As String = $"$(document).ready(function () {
+	Dim Script As String = $"$(document).ready(function () {
   ${script07}
 })
 ${script08}
@@ -871,8 +860,9 @@ ${script13}"$
 	File.WriteString(DirName, FileName, Script)
 End Sub
 
-Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
+Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, StrPayloadType As String, StrContentType As String, BlnVerbose As Boolean)
 	Verbose = BlnVerbose
+	PayloadType = StrPayloadType
 	ContentType = StrContentType
 	Dim Script As String = $"$(document).ready(function () {
 ${script14}
@@ -881,7 +871,7 @@ ${script15("get")}
 $("#btnsearch").click(function (e) {
   e.preventDefault()
   const form = $("#search_form")
-  ${IIf(PayloadType = "xml", _
+  ${IIf(dataType = "xml", _
   $"const data = convertFormToXML(form[0])"$, _
   $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
 ${script15("post")}

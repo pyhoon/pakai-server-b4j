@@ -9,7 +9,6 @@ Version=10.2
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
-	Private Api As ApiSettings	
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private HRM As HttpResponseMessage
@@ -21,10 +20,8 @@ End Sub
 
 Public Sub Initialize
 	App = Main.app
-	Api = App.api
 	HRM.Initialize
-	HRM.VerboseMode = Api.VerboseMode
-	HRM.OrderedKeys = Api.OrderedKeys
+	HRM = WebApiUtils.SetApiMessage(HRM, App.api)
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -109,6 +106,7 @@ Public Sub GetAllProducts
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -125,6 +123,7 @@ Public Sub GetProductsByCategoryId (id As Int)
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -160,6 +159,7 @@ Public Sub SearchByKeywords
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
+	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub

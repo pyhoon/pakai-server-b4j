@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Database class module
-'Version 5.10
+'Version 5.20
 Sub Class_Globals
 	Private DB 		As MiniORM
 	Private conn 	As ORMConnector
@@ -45,7 +45,7 @@ Public Sub ConnectDatabase
 		#Else If MariaDB
 		If File.Exists(File.DirApp, "mariadb.ini") = False Then
 			File.Copy(File.DirAssets, "mariadb.example", File.DirApp, "mariadb.ini")
-		End If
+		End If	
 		Dim ctx As Map = File.ReadMap(File.DirApp, "mariadb.ini")
 		#End If
 		info.Initialize
