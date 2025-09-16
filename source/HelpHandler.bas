@@ -124,6 +124,10 @@ Private Sub BuildMethods
 	Dim FormatMap As Map = CreateMap("category_name": "category_name")
 	Method.Put("Format", FormatMap.As(JSON).ToString)
 	Method.Put("Body", FormatMap.As(JSON).ToString)
+	'Dim xm As Map2Xml
+	'xm.Initialize
+	'Method.Put("Format", xm.MapToXml(FormatMap))
+	'Method.Put("Body", xm.MapToXml(FormatMap))
 	ReplaceMethod(Method)
 
 	Dim Method As Map = RetrieveMethod("Categories", "UpdateCategoryById (id As Int) '#PUT")

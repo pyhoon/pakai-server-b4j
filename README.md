@@ -1,6 +1,6 @@
 # Pakai - Web API Server framework
 
-Version: 5.10
+Version: 5.20
 
 Create REST API Backend using B4J project template
 
@@ -11,7 +11,7 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai Server (5.10).b4xtemplate
+- Pakai Server (5.20).b4xtemplate
 
 ## Depends on:
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
@@ -36,17 +36,20 @@ Create REST API Backend using B4J project template
 ### Code Example
 ```b4x
 Sub AppStart (Args() As String)
-	app.Initialize
-	app.api.VerboseMode = True
-	app.api.OrderedKeys = True
-	app.Get("", "IndexWebHandler")
-	app.Get("/api/products", "ProductsApiHandler")
-	app.Get("/api/products/*", "ProductsApiHandler")
-	app.Post("/api/products", "ProductsApiHandler")
-	app.Put("/api/products/*", "ProductsApiHandler")
-	app.Delete("/api/products/*", "ProductsApiHandler")
-	app.UseConfigFile = True
-	app.Start
+	App.Initialize
+	App.LoadConfig
+
+	Dim Api As ApiSettings = App.api
+	Api.EnableHelp = True
+
+	App.Get("", "IndexWebHandler")
+	App.Get("/api/products", "ProductsApiHandler")
+	App.Get("/api/products/*", "ProductsApiHandler")
+	App.Post("/api/products", "ProductsApiHandler")
+	App.Put("/api/products/*", "ProductsApiHandler")
+	App.Delete("/api/products/*", "ProductsApiHandler")
+
+	App.Start
 	StartMessageLoop
 End Sub
 ```

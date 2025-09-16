@@ -137,7 +137,11 @@ Public Sub SearchByKeywords
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	If data.ContainsKey("keyword") = False Then
 		HRM.ResponseCode = 400

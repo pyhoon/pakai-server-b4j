@@ -13,7 +13,7 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
-	ConnectDatabase
+
 End Sub
 
 Public Sub Open As SQL

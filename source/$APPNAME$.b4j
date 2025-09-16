@@ -97,8 +97,8 @@ Sub AppStart (Args() As String)
 
 	' *** Api Settings ***
 	Dim Api As ApiSettings = App.api
-	Api.PayloadType = WebApiUtils.MIME_TYPE_JSON
-	Api.ContentType = WebApiUtils.MIME_TYPE_JSON
+	'Api.PayloadType = WebApiUtils.MIME_TYPE_XML
+	Api.ContentType = WebApiUtils.MIME_TYPE_XML
 	Api.EnableHelp = True
 	Api.VerboseMode = True
 	Api.OrderedKeys = True

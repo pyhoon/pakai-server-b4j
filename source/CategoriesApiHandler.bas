@@ -21,6 +21,7 @@ Public Sub Initialize
 	App = Main.app
 	HRM.Initialize
 	HRM = WebApiUtils.SetApiMessage(HRM, App.api)
+	HRM.XmlElement = "item"
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -128,7 +129,11 @@ Private Sub CreateNewCategory
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_name") 
 	For Each requiredkey As String In RequiredKeys
@@ -176,7 +181,11 @@ Private Sub UpdateCategoryById (id As Int)
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	If data.ContainsKey("category_name") = False Then
 		HRM.ResponseCode = 400
