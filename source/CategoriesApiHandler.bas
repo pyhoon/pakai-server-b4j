@@ -21,7 +21,6 @@ Public Sub Initialize
 	App = Main.app
 	HRM.Initialize
 	HRM = WebApiUtils.SetApiMessage(HRM, App.api)
-	HRM.XmlElement = "item"
 	DB.Initialize(Main.DBType, Null)
 End Sub
 

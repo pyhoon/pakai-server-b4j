@@ -8,7 +8,6 @@ Version=10.3
 'Version 5.20
 Sub Class_Globals
 	Private ContentType As String
-	Private PayloadType As String
 	Private XmlRoot 	As String = "root"
 	Private XmlElement 	As String = "item"
 	Private Verbose 	As Boolean
@@ -40,9 +39,9 @@ Public Sub CreateJSFiles
 	#End If
 	End If
 	If skip = False Then
-		GenerateJSFileForHelp(DirName, "help.js", Api.PayloadType, Api.ContentType, Api.VerboseMode)
-		GenerateJSFileForSearch(DirName, "search.js", Api.PayloadType, Api.ContentType, Api.VerboseMode)
-		GenerateJSFileForCategory(DirName, "category.js", Api.PayloadType, Api.ContentType, Api.VerboseMode)
+		GenerateJSFileForHelp(DirName, "help.js", Api.ContentType, Api.VerboseMode)
+		GenerateJSFileForSearch(DirName, "search.js", Api.ContentType, Api.VerboseMode)
+		GenerateJSFileForCategory(DirName, "category.js", Api.ContentType, Api.VerboseMode)
 	End If
 End Sub
 
@@ -125,16 +124,13 @@ Private Sub HelpResponsePart (Verb As String) As String
 End Sub
 
 Private Sub AccessTokenPart As String
+	' Becareful of "if" -> "If"
 	Return $"// Access Token
           let access_token = ""
           ${IIf(dataType = "xml", _
-          $"const result = ${IIf(Verbose, _
-		  $"$(response).children("${RESPONSE_ELEMENT_RESULT}")"$, _
-		  $"response"$)}
+          $"const result = ${IIf(Verbose, $"$(response).children("${RESPONSE_ELEMENT_RESULT}")"$, $"response"$)}
           access_token = $(result).find("token").text()"$, _
-          $"const result = ${IIf(Verbose, _
-		  $"response.${RESPONSE_ELEMENT_RESULT}"$, _
-		  $"response"$)}"$)}
+          $"const result = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, $"response"$)}"$)}
           if (result.length > 0) {
             if ("access_token" in result[0]) {
               access_token = result[0]["access_token"]
@@ -151,7 +147,7 @@ End Sub
 
 ' For jQuery Ajax
 Private Sub dataType As String
-	Select PayloadType
+	Select ContentType
 		Case WebApiUtils.MIME_TYPE_XML
 			Return "xml"
 		Case WebApiUtils.MIME_TYPE_JSON
@@ -258,10 +254,10 @@ Private Sub script05 As String
   const code = $(root).children("${RESPONSE_ELEMENT_CODE}").text()
   const error = $(root).children("${RESPONSE_ELEMENT_ERROR}").text()
   const message = $(root).children("${RESPONSE_ELEMENT_MESSAGE}").text()
-  //const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")			
+  const content = xhr.responseText
   if (status == "ok" || status == "success") {
     $("#alert" + id).fadeOut("fast", function () {
-      $("#response" + id).val(xhr.responseText)
+      $("#response" + id).val(content)
       $("#alert" + id).html(code + " " + message)
       $("#alert" + id).removeClass("bg-danger")
       $("#alert" + id).addClass("bg-success")
@@ -270,7 +266,7 @@ Private Sub script05 As String
   }
   else {
     $("#alert" + id).fadeOut("fast", function () {
-      $("#response" + id).val(xhr.responseText)
+      $("#response" + id).val(content)
       $("#alert" + id).html(code + " " + error)
       $("#alert" + id).removeClass("bg-success")
       $("#alert" + id).addClass("bg-danger")
@@ -280,9 +276,12 @@ Private Sub script05 As String
 }"$
 			Else
 				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
+  const code = xhr.status
+  const message = textStatus
+  const content = xhr.responseText
   $("#alert" + id).fadeOut("fast", function () {
-    $("#response" + id).val(xhr.responseText)
-    $("#alert" + id).html(xhr.status + " " + textStatus)
+    $("#response" + id).val(content)
+    $("#alert" + id).html(code + " " + message)
     $("#alert" + id).removeClass("bg-danger")
     $("#alert" + id).addClass("bg-success")
     $("#alert" + id).fadeIn()
@@ -292,33 +291,38 @@ Private Sub script05 As String
 		Case Else
 			If Verbose Then
 				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
-  if (response.${RESPONSE_ELEMENT_STATUS} == "ok" || response.${RESPONSE_ELEMENT_STATUS} == "success") {
-    const content = JSON.stringify(response, undefined, 2)
+  const code = response.${RESPONSE_ELEMENT_CODE}
+  const error = response.${RESPONSE_ELEMENT_ERROR}
+  const message = response.${RESPONSE_ELEMENT_MESSAGE}
+  const status = response.${RESPONSE_ELEMENT_STATUS}
+  const content = JSON.stringify(response, undefined, 2)
+  if (status == "ok" || status == "success") {
     $("#alert" + id).fadeOut("fast", function () {
       $("#response" + id).val(content)
-      $("#alert" + id).html(response.${RESPONSE_ELEMENT_CODE} + " " + response.${RESPONSE_ELEMENT_MESSAGE})
+      $("#alert" + id).html(code + " " + message)
       $("#alert" + id).removeClass("bg-danger")
       $("#alert" + id).addClass("bg-success")
       $("#alert" + id).fadeIn()
     })
   }
   else {
-    const content = JSON.stringify(response, undefined, 2)
     $("#alert" + id).fadeOut("fast", function () {
       $("#response" + id).val(content)
-      $("#alert" + id).html(response.${RESPONSE_ELEMENT_CODE} + " " + response.${RESPONSE_ELEMENT_ERROR})
+      $("#alert" + id).html(code + " " + error)
       $("#alert" + id).removeClass("bg-success")
       $("#alert" + id).addClass("bg-danger")
       $("#alert" + id).fadeIn()
     })
-  }				
+  }
 }"$
 			Else
 				Return $"function showFadeAlertSuccess (id, xhr, textStatus, response) {
+  const code = xhr.status
+  const message = textStatus
+  const content = xhr.responseText	
   $("#alert" + id).fadeOut("fast", function () {
-    const content = JSON.stringify(response, undefined, 2)
     $("#response" + id).val(content)
-    $("#alert" + id).html(xhr.status + " " + textStatus)
+    $("#alert" + id).html(code + " " + message)
     $("#alert" + id).removeClass("bg-danger")
     $("#alert" + id).addClass("bg-success")
     $("#alert" + id).fadeIn()
@@ -330,10 +334,12 @@ End Sub
 
 Private Sub script06 As String
 	Return $"function showFadeAlertError (id, xhr, errorThrown) {
+  const code = xhr.status
+  const error = errorThrown
+  const content = xhr.responseText
   $("#alert" + id).fadeOut("fast", function () {
-    const content = xhr.responseText
     $("#response" + id).val(content)
-    $("#alert" + id).html(xhr.status + " " + errorThrown)
+    $("#alert" + id).html(code + " " + error)
     $("#alert" + id).removeClass("bg-success")
     $("#alert" + id).addClass("bg-danger")
     $("#alert" + id).fadeIn()
@@ -576,10 +582,10 @@ Private Sub script14 As String
       $category2.empty()
       let data = []
       ${IIf(ContentType = WebApiUtils.MIME_TYPE_XML, _
-	  $"const root = $(response).find("${XmlRoot}")
-	  ${IIf(Verbose, _
-	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
-	  $"const result = $(root)"$)}
+      $"const root = $(response).find("${XmlRoot}")
+      ${IIf(Verbose, _
+      $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+      $"const result = $(root)"$)}
       const $items = $(result).children("${XmlElement}")
       $items.each(function () {
         const $item = $(this)
@@ -616,8 +622,8 @@ Private Sub script15 (Verb As String) As String
       $"// XML format
       const root = $(response).find("${XmlRoot}")
       ${IIf(Verbose, _
-	  $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
-	  $"const result = $(root)"$)}
+      $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+      $"const result = $(root)"$)}
       const $items = $(result).children("${XmlElement}")
       $items.each(function () {
         const $item = $(this)
@@ -831,9 +837,8 @@ Private Sub script20 As String
 })"$
 End Sub
 
-Public Sub GenerateJSFileForHelp (DirName As String, FileName As String, StrPayloadType As String, StrContentType As String, BlnVerbose As Boolean)
+Public Sub GenerateJSFileForHelp (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
 	Verbose = BlnVerbose
-	PayloadType = StrPayloadType
 	ContentType = StrContentType
 	Dim Script As String = $"${script01}
 ${script02}
@@ -844,9 +849,8 @@ ${script06}"$
 	File.WriteString(DirName, FileName, Script)
 End Sub
 
-Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, StrPayloadType As String, StrContentType As String, BlnVerbose As Boolean)
+Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
 	Verbose = BlnVerbose
-	PayloadType = StrPayloadType
 	ContentType = StrContentType
 	Dim Script As String = $"$(document).ready(function () {
   ${script07}
@@ -860,9 +864,8 @@ ${script13}"$
 	File.WriteString(DirName, FileName, Script)
 End Sub
 
-Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, StrPayloadType As String, StrContentType As String, BlnVerbose As Boolean)
+Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
 	Verbose = BlnVerbose
-	PayloadType = StrPayloadType
 	ContentType = StrContentType
 	Dim Script As String = $"$(document).ready(function () {
 ${script14}
