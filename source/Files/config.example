@@ -14,7 +14,7 @@
 # Lines starting with ';' are disabled.
 # Backslash character at the end of line means that the command continues in the next line.
 
-# Define App Constants
+# App Constants
 HOME_TITLE=PAKAI FRAMEWORK
 APP_TITLE=Pakai
 APP_TRADEMARK=PAKAI
