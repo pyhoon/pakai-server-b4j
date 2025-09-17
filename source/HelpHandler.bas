@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Help Handler class
-'Version 5.10
+'Version 5.20
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
@@ -25,7 +25,6 @@ Public Sub Initialize
 	Handlers.Initialize
 	Handlers.Add("CategoriesApiHandler")
 	Handlers.Add("ProductsApiHandler")
-	Handlers.Add("UsersApiHandler")
 	Handlers.Add("FindApiHandler")
 End Sub
 
@@ -124,10 +123,6 @@ Private Sub BuildMethods
 	Dim FormatMap As Map = CreateMap("category_name": "category_name")
 	Method.Put("Format", FormatMap.As(JSON).ToString)
 	Method.Put("Body", FormatMap.As(JSON).ToString)
-	'Dim xm As Map2Xml
-	'xm.Initialize
-	'Method.Put("Format", xm.MapToXml(FormatMap))
-	'Method.Put("Body", xm.MapToXml(FormatMap))
 	ReplaceMethod(Method)
 
 	Dim Method As Map = RetrieveMethod("Categories", "UpdateCategoryById (id As Int) '#PUT")
@@ -217,35 +212,6 @@ Private Sub BuildMethods
 	Expected.Append("<br/>422 Error execute query")
 	Method.Put("Expected", Expected.ToString)
 	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Users", "GetUsers")
-	Method.Put("Desc", "Read all Users")
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Users", "GetUserById (id As Int)")
-	Method.Put("Desc", "Read one User by id")
-	Method.Put("Elements", $"["{id}"]"$)
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Users", "PostUser '#POST")
-	Method.Put("Desc", "Add new User")
-	Dim FormatMap As Map = CreateMap("user_name": "user_name")
-	Method.Put("Format", FormatMap.As(JSON).ToString)
-	Method.Put("Body", FormatMap.As(JSON).ToString)
-	ReplaceMethod(Method)
-
-	Dim Method As Map = RetrieveMethod("Users", "UpdateUserById (id As Int) '#PUT")
-	Method.Put("Desc", "Update User by id")
-	Method.Put("Elements", $"["{id}"]"$)
-	Dim FormatMap As Map = CreateMap("user_name": "user_name")
-	Method.Put("Format", FormatMap.As(JSON).ToString)
-	Method.Put("Body", FormatMap.As(JSON).ToString)
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Users", "DeleteUserById (id As Int)")
-	Method.Put("Desc", "Delete User by id")
-	Method.Put("Elements", $"["{id}"]"$)
-	RemoveMethodAndReAdd(Method)
 End Sub
 
 Private Sub ReadHandlers 'ignore

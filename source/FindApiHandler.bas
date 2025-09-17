@@ -5,7 +5,7 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 5.10
+'Version 5.20
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -106,7 +106,6 @@ Public Sub GetAllProducts
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
-	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -123,7 +122,6 @@ Public Sub GetProductsByCategoryId (id As Int)
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
-	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -163,7 +161,6 @@ Public Sub SearchByKeywords
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
-	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub

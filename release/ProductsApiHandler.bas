@@ -5,11 +5,10 @@ Type=Class
 Version=10.2
 @EndOfDesignText@
 'Api Handler class
-'Version 5.10
+'Version 5.20
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
-	Private Api As ApiSettings
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private HRM As HttpResponseMessage
@@ -20,10 +19,8 @@ End Sub
 
 Public Sub Initialize
 	App = Main.app
-	Api = App.api
 	HRM.Initialize
-	HRM.VerboseMode = Api.VerboseMode
-	HRM.OrderedKeys = Api.OrderedKeys
+	HRM = WebApiUtils.SetApiMessage(HRM, App.Api)
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -131,7 +128,11 @@ Private Sub PostProduct
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys
@@ -185,7 +186,11 @@ Private Sub PutProductById (id As Int)
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys
