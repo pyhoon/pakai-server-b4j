@@ -23,13 +23,15 @@ APP_COPYRIGHT=Copyright Computerise System Solutions 2025
 # Server Path
 ROOT_URL=http://127.0.0.1
 ROOT_PATH=
-API_NAME=api
-#API_VERSIONING=False
-#API_VERBOSE_MODE=True
-#API_ORDERED_KEYS=True
 
 # Java server port
 PORT=8080
+
+# Api Settings
+#API_NAME=api
+#API_VERSIONING=False
+#API_VERBOSE_MODE=True
+#API_ORDERED_KEYS=True
 
 # SSL Settings
 # Generate a keystore from Windows CMD
@@ -40,7 +42,7 @@ SSL_KEYSTORE_DIR=/etc/letsencrypt/live/mydomain.com
 SSL_KEYSTORE_FILE=keystore.jks
 SSL_KEYSTORE_PASSWORD=xxxxxxxxx
 
-# Define Email Settings
+# Email Settings
 SMTP_SERVER=xxxxxxxxx
 SMTP_USERNAME=xxxxxxxxx
 SMTP_PASSWORD=xxxxxxxxx
