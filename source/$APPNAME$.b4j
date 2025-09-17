@@ -101,7 +101,6 @@ Sub AppStart (Args() As String)
 	' *** Api Settings ***
 	Dim Api As ApiSettings = App.api
 	Api.EnableHelp = True
-	Api.VerboseMode = True
 	Api.OrderedKeys = True
 
 	' *** Misc Settings ***
