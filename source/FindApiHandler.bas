@@ -2,10 +2,10 @@
 Group=Handlers
 ModulesStructureVersion=1
 Type=Class
-Version=10.2
+Version=10.3
 @EndOfDesignText@
 'Api Handler class
-'Version 5.20
+'Version 5.30
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -21,7 +21,7 @@ End Sub
 Public Sub Initialize
 	App = Main.app
 	HRM.Initialize
-	HRM = WebApiUtils.SetApiMessage(HRM, App.api)
+	HRM = App.SetApiMessage(HRM, App.api)
 	DB.Initialize(Main.DBType, Null)
 End Sub
 

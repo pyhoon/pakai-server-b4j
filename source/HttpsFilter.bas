@@ -2,10 +2,10 @@
 Group=Filters
 ModulesStructureVersion=1
 Type=Class
-Version=10.2
+Version=10.3
 @EndOfDesignText@
 'Https Filter class
-'Version 5.20
+'Version 5.30
 Sub Class_Globals
 
 End Sub

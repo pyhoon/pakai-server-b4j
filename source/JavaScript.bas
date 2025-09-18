@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'JavaScript class module
-'Version 5.20
+'Version 5.30
 Sub Class_Globals
 	Private ContentType As String
 	Private XmlRoot 	As String = "root"
