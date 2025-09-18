@@ -1,6 +1,7 @@
 # ignore files
 Objects/config.ini
 Objects/help.html
+Objects/*.log
 Objects/*.jar
 Objects/*.db*
 Objects/keystore*

@@ -455,7 +455,6 @@ Private Sub script10 As String
       action: "Please provide some data"
     },
     submitHandler: function (form) {
-      e.preventDefault()
       ${IIf(dataType = "xml", _
 	  $"const data = convertFormToXML(form[0])"$, _
 	  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
@@ -494,7 +493,6 @@ Private Sub script11 As String
       action: "Please provide some data"
     },
     submitHandler: function (form) {
-      e.preventDefault()
       ${IIf(dataType = "xml", _
 	  $"const data = convertFormToXML(form[0])"$, _
 	  $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
@@ -571,55 +569,12 @@ function escapeXml(unsafe) {
 End Sub
 
 Private Sub script14 As String
-	Return $"  $.ajax({
-    type: "get",
-    dataType: "${dataType}",
-    url: "/${Api.Name}/categories",
-    success: function (response) {
-      const $category1 = $("#category1")
-      const $category2 = $("#category2")
-      $category1.empty()
-      $category2.empty()
-      let data = []
-      ${IIf(ContentType = WebApiUtils.MIME_TYPE_XML, _
-      $"const root = $(response).find("${XmlRoot}")
-      ${IIf(Verbose, _
-      $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
-      $"const result = $(root)"$)}
-      const $items = $(result).children("${XmlElement}")
-      $items.each(function () {
-        const $item = $(this)
-        data.push({
-          id: $item.children("id").text(),
-          category_name: $item.children("category_name").text()
-        })
-      })"$, _
-	  $"data = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, "response")}"$)}
-      // Append to both dropdowns
-      data.forEach(function (item) {
-        const option = $("<option />").val(item.id).text(item.category_name)
-        $category1.append(option.clone())
-        $category2.append(option)
-      })
-    },
-    error: function (xhr, ajaxOptions, errorThrown) {
-      alert(errorThrown)
-    }
-  })"$
-End Sub
-
-Private Sub script15 (Verb As String) As String
-	Return $"  $.ajax({
-	${IIf(Verb = "post", _
-    $"  type: "post",
-    data: data,"$, _
-    $"  type: "get","$)}
-    dataType: "${dataType}",
+	Return $"dataType: "${dataType}",
     url: "/${Api.Name}/find",
     success: function (response, status, xhr) {
-      let rows = []
       ${IIf(ContentType = WebApiUtils.MIME_TYPE_XML, _
       $"// XML format
+	  let rows = []
       const root = $(response).find("${XmlRoot}")
       ${IIf(Verbose, _
       $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
@@ -638,66 +593,35 @@ Private Sub script15 (Verb As String) As String
       })"$, _
       $"// JSON format
       ${IIf(Verbose, _
-	  $"rows = response.${RESPONSE_ELEMENT_STATUS} === "ok" ? response.${RESPONSE_ELEMENT_RESULT} : []"$, _
-	  $"rows = response"$)}"$)}
-      let tblHead = ""
-      let tblBody = ""
-      if (rows.length) {
-        tblHead = `
-  <thead class="bg-light">
-    <th style="text-align: right; width: 50px">#</th>
-    <th>Code</th>
-    <th>Name</th>
-    <th>Category</th>
-    <th style="text-align: right">Price</th>
-    <th style="text-align: center; width: 90px">Actions</th>
-  </thead>`
-        tblBody = `
-  <tbody>`
-        $.each(rows, function (i, item) {
-          const id = item.id || ""
-          const code = item.code || ""
-          const name = item.name || ""
-          const catid = item.catid || ""
-          const category = item.category || ""
-          const price = item.price || ""
-		  //console.log(id, code, name, category, price)
-          tblBody += `
-    <tr>
-      <td class="align-middle" style="text-align: right">${"$"}{id}</td>
-      <td class="align-middle">${"$"}{code}</td>
-      <td class="align-middle">${"$"}{name}</td>
-      <td class="align-middle">${"$"}{category}</td>
-      <td class="align-middle" style="text-align: right">${"$"}{price}</td>
-      <td>
-        <a href="#edit" class="text-primary mx-2" data-toggle="modal">
-          <i class="edit fa fa-pen" data-toggle="tooltip"
-          data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
-          data-name="${"$"}{name}" data-price="${"$"}{price}" title="Edit"></i></a>
-        <a href="#delete" class="text-danger mx-2" data-toggle="modal">
-          <i class="delete fa fa-trash" data-toggle="tooltip"
-          data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
-          data-name="${"$"}{name}" title="Delete"></i></a>
-      </td>
-    </tr>`
-        })
-        tblBody += `
-  </tbody>`
-      }
-      else {
-        tblBody = `
-  <tbody>
-    <tr>
-      <td class="text-center">No results</td>
-    </tr>
-  </tbody>`
-      }
-      $("#results table").html(tblHead + tblBody)
+	  $"const rows = response.${RESPONSE_ELEMENT_STATUS} === "ok" ? response.${RESPONSE_ELEMENT_RESULT} : []"$, _
+	  $"const rows = response"$)}"$)}
+	  renderTable(rows)
     },
     error: function (xhr, ajaxOptions, errorThrown) {
       $(".alert").html("Error: " + errorThrown).fadeIn()
-    }
-  })"$
+    }"$
+End Sub
+
+Private Sub script15 (functionName As String) As String
+	Select functionName
+		Case "getFind"
+			Return $"function getFind() {
+  $.ajax({
+    type: "get",
+    ${script14}
+  })
+}"$
+		Case "callFindApi"
+			Return $"function callFindApi(data) {
+  $.ajax({
+    type: "post",
+    data: data,
+    ${script14}
+  })
+}"$
+		Case Else
+			Return ""
+	End Select
 End Sub
 
 Private Sub script16 As String
@@ -751,7 +675,6 @@ Private Sub script18 As String
       action: "Please provide some data"
     },
     submitHandler: function (form) {
-      e.preventDefault()
       ${IIf(dataType = "xml", _
       $"const data = convertFormToXML(form[0])"$, _
       $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
@@ -798,7 +721,6 @@ Private Sub script19 As String
       action: "Please provide some data"
     },
     submitHandler: function (form) {
-      e.preventDefault()
       ${IIf(dataType = "xml", _
       $"const data = convertFormToXML(form[0])"$, _
       $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
@@ -837,6 +759,103 @@ Private Sub script20 As String
 })"$
 End Sub
 
+Private Sub script21 As String
+	Return $"function populateCategories() {
+  return $.ajax({
+    type: "get",
+    dataType: "${dataType}",
+    url: "/${Api.Name}/categories",
+    success: function (response) {
+      const $category1 = $("#category1")
+      const $category2 = $("#category2")
+      $category1.empty()
+      $category2.empty()
+      let data = []
+      ${IIf(ContentType = WebApiUtils.MIME_TYPE_XML, _
+      $"const root = $(response).find("${XmlRoot}")
+      ${IIf(Verbose, _
+      $"const result = $(root).children("${RESPONSE_ELEMENT_RESULT}")"$, _
+      $"const result = $(root)"$)}
+      const $items = $(result).children("${XmlElement}")
+      $items.each(function () {
+        const $item = $(this)
+        data.push({
+          id: $item.children("id").text(),
+          category_name: $item.children("category_name").text()
+        })
+      })"$, _
+	  $"data = ${IIf(Verbose, $"response.${RESPONSE_ELEMENT_RESULT}"$, "response")}"$)}
+      // Append to both dropdowns
+      data.forEach(function (item) {
+        const option = $("<option />").val(item.id).text(item.category_name)
+        $category1.append(option.clone())
+        $category2.append(option)
+      })
+    },
+    error: function (xhr, ajaxOptions, errorThrown) {
+      alert(errorThrown)
+    }
+  })
+}"$
+End Sub
+
+Private Sub script22 As String
+	Return $"function renderTable(rows) {
+  let tblHead = ""
+  let tblBody = ""
+
+  if (rows.length) {
+    tblHead = `
+      <thead class="bg-light">
+        <th style="text-align: right; width: 50px">#</th>
+        <th>Code</th>
+        <th>Name</th>
+        <th>Category</th>
+        <th style="text-align: right">Price</th>
+        <th style="text-align: center; width: 90px">Actions</th>
+      </thead>`
+    tblBody = "<tbody>"
+
+    rows.forEach(item => {
+      const id = item.id || ""
+      const code = item.code || ""
+      const name = item.name || ""
+      const catid = item.catid || ""
+      const category = item.category || ""
+      const price = item.price || ""
+      tblBody += `
+        <tr>
+          <td class="align-middle" style="text-align: right">${"$"}{id}</td>
+          <td class="align-middle">${"$"}{code}</td>
+          <td class="align-middle">${"$"}{name}</td>
+          <td class="align-middle">${"$"}{category}</td>
+          <td class="align-middle" style="text-align: right">${"$"}{price}</td>
+          <td>
+            <a href="#edit" class="text-primary mx-2" data-toggle="modal">
+              <i class="edit fa fa-pen"
+                 data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
+                 data-name="${"$"}{name}" data-price="${"$"}{price}" title="Edit"></i></a>
+            <a href="#delete" class="text-danger mx-2" data-toggle="modal">
+              <i class="delete fa fa-trash"
+                 data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
+                 data-name="${"$"}{name}" title="Delete"></i></a>
+          </td>
+        </tr>`
+    })
+    tblBody += "</tbody>"
+  } else {
+    tblBody = `
+      <tbody>
+        <tr>
+          <td class="text-center" colspan="6">No results</td>
+        </tr>
+      </tbody>`
+  }
+
+  $("#results table").html(tblHead + tblBody)
+}"$
+End Sub
+
 Public Sub GenerateJSFileForHelp (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
 	Verbose = BlnVerbose
 	ContentType = StrContentType
@@ -868,8 +887,10 @@ Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, StrCo
 	Verbose = BlnVerbose
 	ContentType = StrContentType
 	Dim Script As String = $"$(document).ready(function () {
-${script14}
-${script15("get")}
+  $.when(populateCategories())
+    .done(function () {
+      getFind()
+    })
 })
 $("#btnsearch").click(function (e) {
   e.preventDefault()
@@ -877,8 +898,12 @@ $("#btnsearch").click(function (e) {
   ${IIf(dataType = "xml", _
   $"const data = convertFormToXML(form[0])"$, _
   $"const data = JSON.stringify(convertFormToJSON(form), undefined, 2)"$)}
-${script15("post")}
+  callFindApi(data)
 })
+${script21}
+${script22}
+${script15("getFind")}
+${script15("callFindApi")}
 ${script16}
 ${script17}
 ${script18}
