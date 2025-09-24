@@ -1,5 +1,5 @@
 # Product: 		Pakai Server (formerly known as Web API Server)
-# Version: 		5.30
+# Version: 		5.40
 # License:		MIT License
 # Developer:	Poon Yip Hoon (Aeric)
 # Description: 	B4J project template for building JSON and XML formats API backend
@@ -30,8 +30,8 @@ PORT=8080
 # Api Settings
 #API_NAME=api
 #API_VERSIONING=False
-#API_VERBOSE_MODE=True
-#API_ORDERED_KEYS=True
+#API_VERBOSE_MODE=False
+#API_ORDERED_KEYS=False
 
 # SSL Settings
 # Generate a keystore from Windows CMD

@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Database class module
-'Version 5.30
+'Version 5.40
 Sub Class_Globals
 	Private DB 		As MiniORM
 	Private conn 	As ORMConnector
