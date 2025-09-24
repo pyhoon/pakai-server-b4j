@@ -42,20 +42,9 @@ Version=10.3
 ' Version: 5.40
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
-'For source
-' After Copy, edit $APPNAME$.b4j: delete 'for source' macro, uncomment 'for release' macro
-#Macro: Title, Update, ide://run?file=%WINDIR%\System32\Robocopy.exe&args=%PROJECT%&args=%PROJECT%\..\release\&args=*.bas&args=*.json&args=*.b4j&args=*.html&args=*.example&args=help.css&args=main.css&args=main.js&args=/S
-#Macro: Title, Release, ide://run?file=%WINDIR%\explorer.exe&args=%PROJECT%\..\release
-#Macro: Title, Publish, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..\..\release&args=-cMf&args=%ADDITIONAL%\Pakai Server%20(5.40).b4xtemplate&args=*
-'For release
-#Macro: Title, Objects, ide://run?file=%WINDIR%\explorer.exe&args=%PROJECT%\Objects
-'#Macro: Title, AddLibs, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget-non-ui.jar&args=%PROJECT%&args=False
-'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-09-17_1821.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
-'#Macro: Title, Deploy, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Publish.zip&args=www&args=*.jar&args=*.ini
-'#Macro: After Save, Sync Files, ide://run?file=%COMSPEC%&args=/c&args=echo&args=now&args=>&args=%PROJECT%\Files\sync.txt&FilesSync=True
-'#Macro: After Save, Sync Files, ide://run?file=%COMSPEC%&args=/c&args=exit&FilesSync=True
 #CommandLineArgs:
 #MergeLibraries: True
+#End Region
 #If SQLite
 #AdditionalJar: sqlite-jdbc-3.7.2
 #Else If MySQL
@@ -63,8 +52,12 @@ Version=10.3
 #Else If MariaDB
 #AdditionalJar: mariadb-java-client-3.5.6
 #End If
+#Region Macros
+#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
+'#Macro: Title, AddLibs, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget-non-ui.jar&args=%PROJECT%&args=False
+'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-09-17_1821.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+'#Macro: Title, Deploy, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Publish.zip&args=www&args=*.jar&args=*.ini
 #End Region
-
 Sub Process_Globals
 	Public App 					As EndsMeet
 	Public DB 					As Database
