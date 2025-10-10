@@ -1,18 +1,17 @@
 ﻿B4J=true
-Group=Classes
+Group=Modules
 ModulesStructureVersion=1
-Type=Class
+Type=StaticCode
 Version=10.3
 @EndOfDesignText@
-'JavaScript class module
-'Version 5.40
-Sub Class_Globals
+'JavaScript Code Module
+'Version 5.50
+Sub Process_Globals
+	Private Api	As ApiSettings
+	Private XmlRoot As String = "root"
+	Private XmlElement As String = "item"
 	Private ContentType As String
-	Private XmlRoot 	As String = "root"
-	Private XmlElement 	As String = "item"
-	Private Verbose 	As Boolean
-	Private App 		As EndsMeet
-	Private Api 		As ApiSettings
+	Private Verbose As Boolean
 	Private Const RESPONSE_ELEMENT_MESSAGE 	As String = "m"
 	Private Const RESPONSE_ELEMENT_CODE 	As String = "a"
 	Private Const RESPONSE_ELEMENT_STATUS 	As String = "s"
@@ -21,15 +20,11 @@ Sub Class_Globals
 	Private Const RESPONSE_ELEMENT_RESULT 	As String = "r"
 End Sub
 
-Public Sub Initialize
-	App = Main.app
-	Api = App.api
-End Sub
-
 ' Generate JS files from code to save some file size
 Public Sub CreateJSFiles
 	Dim skip As Boolean
-	Dim Parent As String = File.Combine(App.staticfiles.Folder, "assets")
+	Dim StaticFilesFolder As String = Main.App.staticfiles.Folder
+	Dim Parent As String = File.Combine(StaticFilesFolder, "assets")
 	Dim DirName As String = File.Combine(Parent, "scripts")
 	If File.Exists(DirName, "") = False Then
 		File.MakeDir(Parent, "scripts")
@@ -39,9 +34,12 @@ Public Sub CreateJSFiles
 	#End If
 	End If
 	If skip = False Then
-		GenerateJSFileForHelp(DirName, "help.js", Api.ContentType, Api.VerboseMode)
-		GenerateJSFileForSearch(DirName, "search.js", Api.ContentType, Api.VerboseMode)
-		GenerateJSFileForCategory(DirName, "category.js", Api.ContentType, Api.VerboseMode)
+		Api = Main.App.api
+		Verbose = Api.VerboseMode
+		ContentType = Api.ContentType
+		GenerateJSFileForHelp(DirName, "help.js")
+		GenerateJSFileForSearch(DirName, "search.js")
+		GenerateJSFileForCategory(DirName, "category.js")
 	End If
 End Sub
 
@@ -856,9 +854,7 @@ Private Sub script22 As String
 }"$
 End Sub
 
-Public Sub GenerateJSFileForHelp (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
-	Verbose = BlnVerbose
-	ContentType = StrContentType
+Public Sub GenerateJSFileForHelp (DirName As String, FileName As String)
 	Dim Script As String = $"${script01}
 ${script02}
 ${script03}
@@ -868,9 +864,7 @@ ${script06}"$
 	File.WriteString(DirName, FileName, Script)
 End Sub
 
-Public Sub GenerateJSFileForCategory (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
-	Verbose = BlnVerbose
-	ContentType = StrContentType
+Public Sub GenerateJSFileForCategory (DirName As String, FileName As String)
 	Dim Script As String = $"$(document).ready(function () {
   ${script07}
 })
@@ -883,9 +877,7 @@ ${script13}"$
 	File.WriteString(DirName, FileName, Script)
 End Sub
 
-Public Sub GenerateJSFileForSearch (DirName As String, FileName As String, StrContentType As String, BlnVerbose As Boolean)
-	Verbose = BlnVerbose
-	ContentType = StrContentType
+Public Sub GenerateJSFileForSearch (DirName As String, FileName As String)
 	Dim Script As String = $"$(document).ready(function () {
   $.when(populateCategories())
     .done(function () {

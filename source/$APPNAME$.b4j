@@ -39,7 +39,7 @@ Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 5.40
+' Version: 5.50
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -57,7 +57,7 @@ Version=10.3
 ' After Copy, edit $APPNAME$.b4j: delete 'for source' macro, uncomment 'for release' macro
 #Macro: Title, Update, ide://run?file=%WINDIR%\System32\Robocopy.exe&args=%PROJECT%&args=%PROJECT%\..\release\&args=*.bas&args=*.json&args=*.b4j&args=*.html&args=*.example&args=help.css&args=main.css&args=main.js&args=/S
 #Macro: Title, Release, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
-#Macro: Title, Publish, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..\..\release&args=-cMf&args=%ADDITIONAL%\Pakai Server%20(5.40).b4xtemplate&args=*
+#Macro: Title, Publish, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..\..\release&args=-cMf&args=%ADDITIONAL%\Pakai Server%20(5.50).b4xtemplate&args=*
 'For release
 #Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
 '#Macro: Title, AddLibs, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget-non-ui.jar&args=%PROJECT%&args=False
@@ -65,13 +65,12 @@ Version=10.3
 '#Macro: Title, Deploy, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Publish.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
-	Public App 					As EndsMeet
 	Public DB 					As Database
-	Private JS 					As JavaScript
-	Private Api 				As ApiSettings
+	Public App 					As EndsMeet
+	Public Api 					As ApiSettings
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "5.40"
+	Public Const VERSION 		As String = "5.50"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -80,9 +79,10 @@ Sub AppStart (Args() As String)
 	App.Initialize
 	App.LoadConfig
 	App.LogEnabled = True
-	#If Release
-	App.RedirectToHttps = True
-	#End If
+	'#If Release
+	'App.ssl.Enabled = True
+	'App.RedirectToHttps = True
+	'#End If
 	
 	' *** Api Settings ***
 	Api = App.api
@@ -117,11 +117,9 @@ Sub AppStart (Args() As String)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
 
-	JS.Initialize
-	JS.CreateJSFiles
-	
 	DB.Initialize
 	DB.ConnectDatabase
+	JavaScript.CreateJSFiles
 	StartMessageLoop
 End Sub
 

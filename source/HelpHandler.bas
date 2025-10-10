@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Help Handler class
-'Version 5.40
+'Version 5.50
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
@@ -18,7 +18,7 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
-	App = Main.app
+	App = Main.App
 	Api = App.api
 	AllMethods.Initialize
 	AllGroups.Initialize

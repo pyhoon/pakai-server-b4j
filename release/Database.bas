@@ -5,15 +5,55 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Database class module
-'Version 5.40
+'Version 5.50
 Sub Class_Globals
-	Private DB 		As MiniORM
 	Private conn 	As ORMConnector
 	Private info 	As ConnectionInfo
 End Sub
 
 Public Sub Initialize
+	#If SQLite
+	If File.Exists(File.DirApp, "sqlite.ini") = False Then
+		File.Copy(File.DirAssets, "sqlite.example", File.DirApp, "sqlite.ini")
+	End If
+	Dim ctx As Map = File.ReadMap(File.DirApp, "sqlite.ini")
+	#Else If MySQL
+	If File.Exists(File.DirApp, "mysql.ini") = False Then
+		File.Copy(File.DirAssets, "mysql.example", File.DirApp, "mysql.ini")
+	End If
+	Dim ctx As Map = File.ReadMap(File.DirApp, "mysql.ini")
+	#Else If MariaDB
+	If File.Exists(File.DirApp, "mariadb.ini") = False Then
+		File.Copy(File.DirAssets, "mariadb.example", File.DirApp, "mariadb.ini")
+	End If	
+	Dim ctx As Map = File.ReadMap(File.DirApp, "mariadb.ini")
+	#End If
+	info.Initialize
+	info.DBType = ctx.GetDefault("DbType", "")
+	Select info.DBType.ToUpperCase
+		Case MiniORMUtils.SQLITE
+			info.DBDir = ctx.GetDefault("DbDir", "")
+			info.DBFile = ctx.GetDefault("DbFile", "")
+			info.JournalMode = "WAL"		
+		Case MiniORMUtils.MYSQL, MiniORMUtils.MARIADB
+			info.DBHost = ctx.GetDefault("DbHost", "")
+			info.DBPort = ctx.GetDefault("DbPort", "")
+			info.DBName = ctx.GetDefault("DbName", "")
+			info.DriverClass = ctx.GetDefault("DriverClass", "")
+			info.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
+			info.User = ctx.GetDefault("User", "")
+			info.Password = ctx.GetDefault("Password", "")
+			info.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
+		Case Else
+			LogColor($"${info.DBType} not supported!"$, Main.COLOR_RED)
+			Log("Application is terminated.")
+			ExitApplication
+	End Select
+	conn.Initialize(info)
+End Sub
 
+Public Sub Engine As String
+	Return conn.DBType
 End Sub
 
 Public Sub Open As SQL
@@ -24,43 +64,15 @@ Public Sub Close
 	conn.DBClose
 End Sub
 
-Public Sub Engine As String
-	Return conn.DBType
-End Sub
-
 ' Make Connection to Database
 Public Sub ConnectDatabase
 	Try
-		LogColor("Checking database...", Main.COLOR_BLUE)
-		#If SQLite
-		If File.Exists(File.DirApp, "sqlite.ini") = False Then
-			File.Copy(File.DirAssets, "sqlite.example", File.DirApp, "sqlite.ini")
-		End If
-		Dim ctx As Map = File.ReadMap(File.DirApp, "sqlite.ini")
-		#Else If MySQL
-		If File.Exists(File.DirApp, "mysql.ini") = False Then
-			File.Copy(File.DirAssets, "mysql.example", File.DirApp, "mysql.ini")
-		End If
-		Dim ctx As Map = File.ReadMap(File.DirApp, "mysql.ini")
-		#Else If MariaDB
-		If File.Exists(File.DirApp, "mariadb.ini") = False Then
-			File.Copy(File.DirAssets, "mariadb.example", File.DirApp, "mariadb.ini")
-		End If	
-		Dim ctx As Map = File.ReadMap(File.DirApp, "mariadb.ini")
-		#End If
-		info.Initialize
-		info.DBType = ctx.GetDefault("DbType", "")
-		Select info.DBType
-			Case "MySQL", "MariaDB"
-				info.DBHost = ctx.GetDefault("DbHost", "")
-				info.DBPort = ctx.GetDefault("DbPort", "")
-				info.DBName = ctx.GetDefault("DbName", "")
-				info.DriverClass = ctx.GetDefault("DriverClass", "")
-				info.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
-				info.User = ctx.GetDefault("User", "")
-				info.Password = ctx.GetDefault("Password", "")
-				info.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
-				conn.Initialize(info)
+		If conn.IsInitialized = False Then Return
+		LogColor("Checking database...", Main.COLOR_BLUE)		
+		Select Engine
+			Case MiniORMUtils.SQLITE
+				Dim DBFound As Boolean = conn.DBExist			
+			Case MiniORMUtils.MYSQL, MiniORMUtils.MARIADB
 				Wait For (conn.InitSchema) Complete (Success As Boolean)
 				If Success = False Then
 					LogColor("Database initilialization failed!", Main.COLOR_RED)
@@ -73,26 +85,17 @@ Public Sub ConnectDatabase
 					ExitApplication
 				End If
 				Wait For (conn.DBExist2) Complete (DBFound As Boolean)
-			Case "SQLite"
-				info.DBDir = ctx.GetDefault("DbDir", "")
-				info.DBFile = ctx.GetDefault("DbFile", "")
-				info.JournalMode = "WAL"
-				conn.Initialize(info)
-				Dim DBFound As Boolean = conn.DBExist
 			Case Else
-				LogColor($"DBType '${info.DBType}' not supported!"$, Main.COLOR_RED)
-				Log("Application is terminated.")
-				ExitApplication
+				Return
 		End Select
 		If DBFound Then
-			LogColor($"${info.DBType} database found!"$, Main.COLOR_BLUE)
-			#If MySQL Or MariaDB
-			conn.InitPool
-			#End If
-			DB.Initialize(conn.DBType, conn.DBOpen)
+			LogColor($"${Engine} database found!"$, Main.COLOR_BLUE)
+			If Engine = MiniORMUtils.MYSQL Or Engine = MiniORMUtils.MARIADB Then
+				conn.InitPool
+			End If
 			Return
 		End If
-		LogColor($"${info.DBType} database not found!"$, Main.COLOR_RED)
+		LogColor($"${Engine} database not found!"$, Main.COLOR_RED)
 		CreateDatabase
 	Catch
 		LogError(LastException.Message)
@@ -110,11 +113,14 @@ Private Sub CreateDatabase
 		LogColor("Database creation failed!", Main.COLOR_RED)
 		Return
 	End If
+	
 	LogColor("Creating tables...", Main.COLOR_BLUE)
-	#If MySQL Or MariaDB
-	conn.InitPool
-	#End If
-	DB.Initialize(conn.DBType, conn.DBOpen)
+	If Engine = MiniORMUtils.MYSQL Or Engine = MiniORMUtils.MARIADB Then
+		conn.InitPool
+	End If
+	
+	Dim DB As MiniORM
+	DB.Initialize(Engine, Open)
 	DB.ShowExtraLogs = True
 	DB.UseTimestamps = True
 	DB.QueryAddToBatch = True
@@ -147,35 +153,26 @@ Private Sub CreateDatabase
 	Else
 		LogColor("Database creation failed!", Main.COLOR_RED)
 	End If
-	
-	'' Adding an image to blob field
-	'Dim b() As Byte = File.ReadBytes(File.DirAssets, "icon.png")
-	'DB.Table = "tbl_products"
-	'DB.Columns = Array("product_image")
-	'DB.Parameters = Array(b)
-	'DB.Id = 3 ' after setting Columns and Parameters
-	'DB.Save
-	
 	DB.Close
 End Sub
 
 Public Sub CurrentTimeStamp As String
-	Select DB.DBType.ToUpperCase
-		Case "MYSQL"
+	Select Engine
+		Case MiniORMUtils.SQLITE
+			Return "datetime('Now')"		
+		Case MiniORMUtils.MYSQL, MiniORMUtils.MARIADB
 			Return "NOW()"
-		Case "SQLITE"
-			Return "datetime('Now')"
 		Case Else
 			Return ""
 	End Select
 End Sub
 
 Public Sub CurrentTimeStampAddMinute (Value As Int) As String
-	Select DB.DBType.ToUpperCase
-		Case "MYSQL"
+	Select Engine
+		Case MiniORMUtils.SQLITE
+			Return $"datetime('Now', '+${Value} minute')"$		
+		Case MiniORMUtils.MYSQL, MiniORMUtils.MARIADB
 			Return $"DATE_ADD(NOW(), INTERVAL ${Value} MINUTE)"$
-		Case "SQLITE"
-			Return $"datetime('Now', '+${Value} minute')"$
 		Case Else
 			Return ""
 	End Select

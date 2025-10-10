@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Api Handler class
-'Version 5.40
+'Version 5.50
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -19,7 +19,7 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
-	App = Main.app
+	App = Main.App
 	HRM.Initialize
 	Main.SetApiMessage(HRM)
 	DB.Initialize(Main.DBType, Null)
@@ -128,6 +128,7 @@ End Sub
 
 Public Sub SearchByKeywords
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
+	
 	Dim str As String = WebApiUtils.RequestDataText(Request)
 	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422

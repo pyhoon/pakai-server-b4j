@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Web Handler class
-'Version 5.40
+'Version 5.50
 Sub Class_Globals
 	Private App As EndsMeet
 	Private Request As ServletRequest
@@ -15,7 +15,7 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
-	App = Main.app
+	App = Main.App
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
