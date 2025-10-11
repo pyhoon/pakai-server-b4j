@@ -1,5 +1,0 @@
-## SQLite configuration:
-
-DbType=SQLite
-DbDir=
-DbFile=pakai.db
