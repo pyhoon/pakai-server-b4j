@@ -53,6 +53,12 @@ Version=10.3
 #AdditionalJar: mariadb-java-client-3.5.6
 #End If
 #Region Macros
+'For source
+' After Copy, edit $APPNAME$.b4j: delete 'for source' macro, uncomment 'for release' macro
+#Macro: Title, Update, ide://run?file=%WINDIR%\System32\Robocopy.exe&args=%PROJECT%&args=%PROJECT%\..\release\&args=*.bas&args=*.json&args=*.b4j&args=*.html&args=*.example&args=/S
+#Macro: Title, Release, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
+#Macro: Title, Publish, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..\..\release&args=-cMf&args=%ADDITIONAL%\Pakai Server%20(5.50).b4xtemplate&args=*
+'For release
 #Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
 '#Macro: Title, AddLibs, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget-non-ui.jar&args=%PROJECT%&args=False
 '#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-09-17_1821.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
