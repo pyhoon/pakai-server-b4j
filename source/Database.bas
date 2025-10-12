@@ -30,7 +30,7 @@ Public Sub Initialize
 	#End If
 	info.Initialize
 	info.DBType = ctx.GetDefault("DbType", "")
-	Select info.DBType.ToUpperCase
+	Select info.DBType
 		Case MiniORMUtils.SQLITE
 			info.DBDir = ctx.GetDefault("DbDir", "")
 			info.DBFile = ctx.GetDefault("DbFile", "")
