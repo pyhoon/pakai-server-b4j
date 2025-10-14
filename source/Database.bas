@@ -31,11 +31,11 @@ Public Sub Initialize
 	info.Initialize
 	info.DBType = ctx.GetDefault("DbType", "")
 	Select info.DBType
-		Case MiniORMUtils.SQLITE
+		Case "SQLite"
 			info.DBDir = ctx.GetDefault("DbDir", "")
 			info.DBFile = ctx.GetDefault("DbFile", "")
 			info.JournalMode = "WAL"		
-		Case MiniORMUtils.MYSQL, MiniORMUtils.MARIADB
+		Case "MySQL", "MariaDB"
 			info.DBHost = ctx.GetDefault("DbHost", "")
 			info.DBPort = ctx.GetDefault("DbPort", "")
 			info.DBName = ctx.GetDefault("DbName", "")
@@ -70,9 +70,9 @@ Public Sub ConnectDatabase
 		If conn.IsInitialized = False Then Return
 		LogColor("Checking database...", Main.COLOR_BLUE)		
 		Select Engine
-			Case MiniORMUtils.SQLITE
+			Case "SQLite"
 				Dim DBFound As Boolean = conn.DBExist			
-			Case MiniORMUtils.MYSQL, MiniORMUtils.MARIADB
+			Case "MySQL", "MariaDB"
 				Wait For (conn.InitSchema) Complete (Success As Boolean)
 				If Success = False Then
 					LogColor("Database initilialization failed!", Main.COLOR_RED)
@@ -90,7 +90,7 @@ Public Sub ConnectDatabase
 		End Select
 		If DBFound Then
 			LogColor($"${Engine} database found!"$, Main.COLOR_BLUE)
-			If Engine = MiniORMUtils.MYSQL Or Engine = MiniORMUtils.MARIADB Then
+			If Engine = "MySQL" Or Engine = "MariaDB" Then
 				conn.InitPool
 			End If
 			Return
@@ -115,7 +115,7 @@ Private Sub CreateDatabase
 	End If
 	
 	LogColor("Creating tables...", Main.COLOR_BLUE)
-	If Engine = MiniORMUtils.MYSQL Or Engine = MiniORMUtils.MARIADB Then
+	If Engine = "MySQL" Or Engine = "MariaDB" Then
 		conn.InitPool
 	End If
 	
@@ -158,9 +158,9 @@ End Sub
 
 Public Sub CurrentTimeStamp As String
 	Select Engine
-		Case MiniORMUtils.SQLITE
+		Case "SQLite"
 			Return "datetime('Now')"		
-		Case MiniORMUtils.MYSQL, MiniORMUtils.MARIADB
+		Case "MySQL", "MariaDB"
 			Return "NOW()"
 		Case Else
 			Return ""
@@ -169,9 +169,9 @@ End Sub
 
 Public Sub CurrentTimeStampAddMinute (Value As Int) As String
 	Select Engine
-		Case MiniORMUtils.SQLITE
+		Case "SQLite"
 			Return $"datetime('Now', '+${Value} minute')"$		
-		Case MiniORMUtils.MYSQL, MiniORMUtils.MARIADB
+		Case "MySQL", "MariaDB"
 			Return $"DATE_ADD(NOW(), INTERVAL ${Value} MINUTE)"$
 		Case Else
 			Return ""
