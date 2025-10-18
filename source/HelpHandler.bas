@@ -52,19 +52,19 @@ Private Sub GenerateHtml As String
 	For Each method As Map In AllMethods ' Avoid duplicate groups
 		AllGroups.Put(method.Get("Group"), "unused")
 	Next
-	Dim Html As StringBuilder
-	Html.Initialize
+	Dim SB As StringBuilder
+	SB.Initialize
 	For Each GroupName As String In AllGroups.Keys
-		Html.Append(GenerateHeaderByGroup(GroupName))
+		SB.Append(GenerateHeaderByGroup(GroupName))
 		For Each method As Map In AllMethods
 			If method.Get("Group") = GroupName Then
 				If method.ContainsKey("Hide") = False Then ' Skip Hidden sub
-					Html.Append(GenerateDocItem(method))
+					SB.Append(GenerateDocItem(method))
 				End If
 			End If
 		Next
 	Next
-	Return Html.ToString
+	Return SB.ToString
 End Sub
 
 Private Sub FindMethod (MethodName As String) As Int
@@ -155,14 +155,14 @@ Private Sub BuildMethods
   "product_name": "ProductName",
   "product_price": 0
 }"$
-	Dim Body As String = $"{
+	Dim Payload As String = $"{
   "category_id": 1,
   "product_code": "",
   "product_name": "",
   "product_price": 0
 }"$
 	Method.Put("Format", Format)
-	Method.Put("Body", Body)
+	Method.Put("Body", Payload)
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Products", "PutProductById (id As Int)")
@@ -173,14 +173,14 @@ Private Sub BuildMethods
   "product_name": "ProductName",
   "product_price": 10
 }"$
-	Dim Body As String = $"{
+	Dim Payload As String = $"{
   "category_id": 1,
   "product_code": "",
   "product_name": "",
   "product_price": 0
 }"$
 	Method.Put("Format", Format)
-	Method.Put("Body", Body)
+	Method.Put("Body", Payload)
 	Method.Put("Elements", $"["{id}"]"$)
 	ReplaceMethod(Method)
 	
