@@ -39,12 +39,18 @@ Private Sub ShowHelpPage
 	'ReadHandlers ' Read from source (optional) - comment hashtags are required
 	#End If
 	BuildMethods ' Build page programatically
-	Dim Contents As String = GenerateHtml
-	Dim strMain As String = WebApiUtils.ReadTextFile("help.html")
-	strMain = WebApiUtils.BuildDocView(strMain, Contents)
-	strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
+	'Dim Contents As String = GenerateHtml
+	'Dim strMain As String = WebApiUtils.ReadTextFile("help.html")
+	'strMain = WebApiUtils.BuildDocView(strMain, Contents)
+	'strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
+	'strMain = WebApiUtils.BuildHtml(strMain, App.ctx)
+	'strMain = WebApiUtils.BuildScript(strMain, $"<script src="${App.ServerUrl}/assets/scripts/help.js"></script>"$)
+	'WebApiUtils.ReturnHtml(strMain, Response)
+	Dim view1 As HelpView
+	view1.Initialize
+	view1.DocView = GenerateHtml
+	Dim strMain As String = view1.ReturnView
 	strMain = WebApiUtils.BuildHtml(strMain, App.ctx)
-	strMain = WebApiUtils.BuildScript(strMain, $"<script src="${App.ServerUrl}/assets/scripts/help.js"></script>"$)
 	WebApiUtils.ReturnHtml(strMain, Response)
 End Sub
 
@@ -429,13 +435,6 @@ Private Sub GenerateVerbSection (section As VerbSection) As String
 			$"<span style="width: 50px" class="badge rounded-pill pill-yellow pill-yellow-text px-2 py-1">${WebApiUtils.ProperCase(section.Authenticate)}</span>"$, "")}<span class="ml-1">${section.Description}</span>
 		</button>
         <div class="details mb-1">
-            <!--<div class="row">
-                <div class="col-md-6 pt-3">
-                    ${IIf(section.Authenticate.EqualsIgnoreCase("Basic") Or section.Authenticate.EqualsIgnoreCase("Token"), _
-                    $"<span class="badge rounded-pill bg-info text-white px-2 py-1">${WebApiUtils.ProperCase(section.Authenticate)} Authentication</span><br>"$, "")}
-                    ${section.Description}
-                </div>
-            </div>-->
             <div class="row">
                 <div class="col-md-3 p-3">
                     <p><strong>Parameters</strong><br/>
