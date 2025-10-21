@@ -8,6 +8,12 @@
             "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v1.50/EndsMeet.b4xlib"
         },
         {
+            "Name": "MiniHtml.b4xlib",
+            "Platform": "B4X",
+            "Version": 0.30,
+            "Link": "https://github.com/pyhoon/MiniHtml-B4X/blob/main/prerelease/MiniHtml.b4xlib"
+        },
+        {
             "Name": "MiniORMUtils.b4xlib",
             "Platform": "B4X",
             "Version": 3.80,
