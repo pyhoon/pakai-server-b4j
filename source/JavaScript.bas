@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.3
 @EndOfDesignText@
 'JavaScript Code Module
-'Version 5.50
+'Version 5.60
 Sub Process_Globals
 	Private Api	As ApiSettings
 	Private XmlRoot As String = "root"
@@ -38,6 +38,7 @@ Public Sub CreateJSFiles
 		Verbose = Api.VerboseMode
 		ContentType = Api.ContentType
 		GenerateJSFileForHelp(DirName, "help.js")
+		GenerateJSFileForMain(DirName, "main.js")
 		GenerateJSFileForSearch(DirName, "search.js")
 		GenerateJSFileForCategory(DirName, "category.js")
 	End If
@@ -156,7 +157,19 @@ Private Sub dataType As String
 End Sub
 
 Private Sub script01 As String
-	Return $"// Button click event for all verbs
+	Return $"var coll = document.getElementsByClassName("collapsible")
+for (let i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function () {
+    this.classList.toggle("active")
+    var details = this.nextElementSibling
+    if (details.style.maxHeight) {
+      details.style.maxHeight = null
+    } else {
+      details.style.maxHeight = details.scrollHeight + "px"
+    }
+  })
+}
+// Button click event for all verbs
 $(".get, .post, .put, .delete").click(function (e) {
   e.preventDefault()
   const element = $(this)
@@ -861,6 +874,22 @@ ${script03}
 ${script04}
 ${script05}
 ${script06}"$
+	File.WriteString(DirName, FileName, Script)
+End Sub
+
+Public Sub GenerateJSFileForMain (DirName As String, FileName As String)
+	Dim Script As String = $"var csrf_token = $('meta[name="csrf-token"]').attr('content')
+function csrfSafeMethod(method) {
+  // these HTTP methods do not require CSRF protection
+  return (/^(GET|HEAD|OPTIONS)$/.test(method))
+}
+$.ajaxSetup({
+  beforeSend: function (xhr, settings) {
+    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+      xhr.setRequestHeader("x-csrf-token", csrf_token)
+    }
+  }
+})"$
 	File.WriteString(DirName, FileName, Script)
 End Sub
 

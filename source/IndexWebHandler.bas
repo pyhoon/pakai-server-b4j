@@ -35,23 +35,42 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 End Sub
 
 Private Sub ReturnPage
-	Dim strScripts As String
-	Dim strMain As String = WebApiUtils.ReadTextFile("main.html")
-	Dim strView As String = WebApiUtils.ReadTextFile("index.html")
-	strMain = WebApiUtils.BuildDocView(strMain, strView)
-	strMain = WebApiUtils.BuildTag(strMain, "HELP", ReturnHelpElement)
+	'Dim strScripts As String
+	'Dim strMain As String = WebApiUtils.ReadTextFile("main.html")
+	'Dim strView As String = WebApiUtils.ReadTextFile("index.html")
+	'strMain = WebApiUtils.BuildDocView(strMain, strView)
+	''strMain = WebApiUtils.BuildTag(strMain, "HELP", ReturnHelpElement)
+	'strMain = WebApiUtils.BuildHtml(strMain, App.ctx)
+	'strScripts = $"<script src="${App.ServerUrl}/assets/scripts/search.js"></script>"$
+	'strMain = WebApiUtils.BuildScript(strMain, strScripts)
+	'WebApiUtils.ReturnHTML(strMain, Response)
+	
+	Dim main1 As MainView
+	main1.Initialize
+	Dim view1 As IndexView
+	view1.Initialize
+	main1.AddPlaceholder2(view1.ReturnTags)
+	
+	Dim page1 As Tag = main1.ReturnTag
+	Dim body1 As Tag = page1.ChildByTagName("body")
+	body1.script($"${App.ServerUrl}/assets/scripts/search.js"$)
+	
+	Dim doc As Document
+	doc.Initialize
+	doc.AppendDocType
+	doc.Append(page1.build)
+
+	Dim strMain As String = doc.ToString
 	strMain = WebApiUtils.BuildHtml(strMain, App.ctx)
-	strScripts = $"<script src="${App.ServerUrl}/assets/scripts/search.js"></script>"$
-	strMain = WebApiUtils.BuildScript(strMain, strScripts)
-	WebApiUtils.ReturnHTML(strMain, Response)
+	WebApiUtils.ReturnHtml(strMain, Response)
 End Sub
 
-Private Sub ReturnHelpElement As String
-	Dim Api As ApiSettings = App.api
-	If Api.EnableHelp = False Then
-		Return ""
-	End If
-	Return $"${CRLF & TAB & TAB}<li class="nav-item mt-1 ml-3">
-${TAB & TAB & TAB}<a class="nav-link font-weight-bold text-dark mr-3" href="${App.ServerUrl}/help"><i class="fas fa-cog mr-2" title="API"></i>API</a>
-${TAB & TAB}</li>"$
-End Sub
+'Private Sub ReturnHelpElement As String
+'	Dim Api As ApiSettings = App.api
+'	If Api.EnableHelp = False Then
+'		Return ""
+'	End If
+'	Return $"${CRLF & TAB & TAB}<li class="nav-item mt-1 ml-3">
+'${TAB & TAB & TAB}<a class="nav-link font-weight-bold text-dark mr-3" href="${App.ServerUrl}/help"><i class="fas fa-cog mr-2" title="API"></i>API</a>
+'${TAB & TAB}</li>"$
+'End Sub

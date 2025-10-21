@@ -5,34 +5,56 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 Sub Class_Globals
-	Private mView As String
+	'Private mView As String
+	Private mPlaceholders As List
 End Sub
 
 Public Sub Initialize
-	
+	mPlaceholders.Initialize
 End Sub
 
-Public Sub setDocView (View As String)
-	mView = View
+Public Sub AddPlaceholder (Tag1 As Tag)
+	'mView = View
+	mPlaceholders.Add(Tag1)
+End Sub
+
+Public Sub AddPlaceholder2 (Tags As List)
+	mPlaceholders.Add(Tags)
+End Sub
+
+Public Sub AddPlaceholder3 (View1 As String)
+	Dim parser As MiniHtmlParser
+	parser.Initialize
+	'parser.ShowParserLogs = True
+	Dim root As HtmlNode = parser.Parse(View1)
+	If root.IsInitialized Then
+		Dim newTag As Tag = parser.ConvertToTag(root)
+		mPlaceholders.Add(newTag)
+	End If
+End Sub
+
+Public Sub ReturnTag As Tag
+	Dim page1 As Tag = Html.lang("en")
+	page1.add(PageHeader)
+	page1.add(PageBody)
+	Dim body1 As Tag = page1.ChildByTagName("body")
+	body1.add(BodyFooter)
+	body1.script("$SERVER_URL$/assets/js/jquery.min.js")
+	body1.script("$SERVER_URL$/assets/js/jquery.validate.min.js")
+	body1.script("$SERVER_URL$/assets/js/bootstrap.bundle.min.js")
+	Return page1
 End Sub
 
 Public Sub ReturnView As String
 	Dim doc As Document
 	doc.Initialize
 	doc.AppendDocType
-	Dim html1 As Tag = Html.lang("en")
-	html1.add(PageHeader)
-	html1.add(PageBody)
-	Dim body1 As Tag = html1.ChildByTagName("body")
-	body1.add(BodyFooter)
-	body1.script("$SERVER_URL$/assets/js/jquery.min.js")
-	body1.script("$SERVER_URL$/assets/scripts/help.js")
-	doc.Append(html1.build)
+	doc.Append(ReturnTag.build)
 	Return doc.ToString
 End Sub
 
 Private Sub PageHeader As Tag
-	Dim header1 As Tag = Head.init 'html1.add(Head.init)
+	Dim header1 As Tag = Head.init
 	header1.add(Meta.attr("http-equiv", "content-type" ).attr("content", "text/html; charset=utf-8"))
 	header1.add(Meta.attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"))
 	'header1.add(Meta.attr("name", "csrf-token").attr("content", ""))
@@ -43,12 +65,12 @@ Private Sub PageHeader As Tag
 	header1.linkcss("$SERVER_URL$/assets/css/bootstrap.min.css")
 	header1.linkcss("$SERVER_URL$/assets/css/fontawesome.min.css")
 	header1.linkcss("$SERVER_URL$/assets/css/solid.min.css")
-	header1.linkcss("$SERVER_URL$/assets/css/help.css")
+	header1.linkcss("$SERVER_URL$/assets/css/main.css?v=$VERSION$")
 	Return header1
 End Sub
 
 Private Sub PageBody As Tag
-	Dim body1 As Tag = Body.cls("bg-dark text-light")
+	Dim body1 As Tag = Body.cls("bg-white")
 	Dim nav1 As Tag = body1.add(Nav.cls("navbar navbar-expand-lg fixed-top navbar-dark yellow pt-1 pb-1"))
 	nav1.add(Anchor.cls("text-dark h4 mt-2 mr-2").hrefOf("#")).add(Icon.cls("fas fa-cloud ml-3"))
 	nav1.add(Anchor.cls("navbar-brand font-weight-bold text-dark").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
@@ -60,13 +82,6 @@ Private Sub PageBody As Tag
 	.add(Span.cls("navbar-toggler-icon"))
 	Dim collapse1 As Tag = nav1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
 	Dim Ult1 As Tag = collapse1.add(Ul.cls("navbar-nav ml-auto"))
-	'If Main.Api.EnableHelp Then
-	'	Dim Lit1 As Tag = Ult1.add(Li.cls("nav-item mt-1 ml-3"))
-	'	Dim Anchor1 As Tag = Lit1.add(Anchor.cls("nav-link font-weight-bold text-dark mr-3"))
-	'	Anchor1.hrefOf($"${Main.App.ServerUrl}/help"$)
-	'	Anchor1.add(Icon.cls("fas fa-cog mr-2").attr("title", "API"))
-	'	Anchor1.text("API")
-	'End If
 	Dim Lit2 As Tag = Ult1.add(Li.cls("nav-item font-weight-bold d-none d-sm-none d-md-block"))
 	Dim Anchor2 As Tag = Lit2.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
 	Anchor2.add(Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px"))
@@ -77,39 +92,25 @@ Private Sub PageBody As Tag
 	
 	Dim content1 As Tag = body1.add(Div.cls("content m-3"))
 	Dim padding2 As Tag = content1.add(Div.cls("p-2"))
-	Dim row1 As Tag = padding2.add(Div.cls("row text-center text-light align-items-center justify-content-center"))
+	Dim row1 As Tag = padding2.add(Div.cls("row text-center text-dark align-items-center justify-content-center"))
 	row1.add(Div.cls("mx-3")) _
 	.add(Img.src("$SERVER_URL$/assets/img/loading.webp").width("60px").height("60px"))
 	Dim div1 As Tag = row1.add(Div.init)
 	div1.add(H3.cls("mb-0").sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")) _
 	.text("$HOME_TITLE$")
 	div1.add(Span.cls("small").text("Version: $VERSION$"))
-	
-	Dim parser As MiniHtmlParser
-	parser.Initialize
-	'parser.ShowParserLogs = True
-	'Log(mView)
-	Dim root As HtmlNode = parser.Parse(mView)
-	If root.IsInitialized Then
-		'File.WriteString(File.DirApp, "root.txt", root.Children.Get(0))
-		'Dim newTag As Tag = parser.ConvertToTag(root.Children.Get(0))
-		Dim newTag As Tag = parser.ConvertToTag(root)
-		'Log(newTag.Build)
-		'File.WriteString(File.DirApp, "newtag.html", newTag.Build)
-		'padding2.add(newTag.Child(0)) ' DocView
-		For Each child As Tag In newTag.Children
-			padding2.add(child) ' DocView
-		Next
-	End If
 
-	body1.add(Div.cls("bottom"))
+	'Dim newTag As Tag = mPlaceholders.Get(0)
+	'For Each child As Tag In newTag.Children
+	'	padding2.add(child) ' DocView
+	'Next
 	
-	'BodyFooter.up(body1)
-	'body1.script("$SERVER_URL$/assets/js/jquery.min.js")
-	'body1.script("$SERVER_URL$/assets/js/jquery.validate.min.js")
-	'body1.script("$SERVER_URL$/assets/js/bootstrap.bundle.min.js")
-	'body1.script("$SERVER_URL$/assets/js/main.js")
-	'body1.script("$SERVER_URL$/assets/scripts/help.js")
+	Dim newTags As List = mPlaceholders.Get(0)
+	For Each newTag As Tag In newTags
+		padding2.add(newTag) ' DocView
+	Next
+	
+	body1.add(Div.cls("bottom"))
 	Return body1
 End Sub
 
