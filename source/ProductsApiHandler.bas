@@ -2,23 +2,26 @@
 Group=Handlers
 ModulesStructureVersion=1
 Type=Class
-Version=10.2
+Version=10.3
 @EndOfDesignText@
 'Api Handler class
-'Version 5.00
+'Version 5.50
 Sub Class_Globals
+	Private DB As MiniORM
+	Private App As EndsMeet
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private HRM As HttpResponseMessage
-	Private DB As MiniORM
 	Private Method As String
 	Private Elements() As String
 	Private ElementId As Int
 End Sub
 
 Public Sub Initialize
+	App = Main.App
 	HRM.Initialize
-	HRM.VerboseMode = Main.app.api.VerboseMode
+	Main.SetApiMessage(HRM)
+	DB.Initialize(Main.DBType, Null)
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -27,8 +30,8 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Method = Request.Method.ToUpperCase
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3) ' 3 For Api handler
-		If ElementMatch("") Then
-		If Main.app.MethodAvailable2(Method, "/api/products", Me) Then
+	If ElementMatch("") Then
+		If App.MethodAvailable2(Method, "/api/products", Me) Then
 			Select Method
 				Case "GET"
 					GetProducts
@@ -41,7 +44,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 		ReturnMethodNotAllow
 		Return
 	Else If ElementMatch("id") Then
-		If Main.app.MethodAvailable2(Method, "/api/products/*", Me) Then
+		If App.MethodAvailable2(Method, "/api/products/*", Me) Then
 			Select Method
 				Case "GET"
 					GetProductById(ElementId)
@@ -91,23 +94,23 @@ End Sub
 
 Private Sub GetProducts
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products"
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
 	ReturnApiResponse
 	DB.Close
 End Sub
 
 Private Sub GetProductById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products"
 	DB.Find(id)
 	If DB.Found Then
 		HRM.ResponseCode = 200
-		HRM.ResponseObject = DB.First
+		HRM.ResponseObject = DB.First2
 	Else
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
@@ -125,7 +128,11 @@ Private Sub PostProduct
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys
@@ -137,7 +144,7 @@ Private Sub PostProduct
 		End If
 	Next
 	' Check conflict product code
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products"
 	DB.Where = Array("product_code = ?")
 	DB.Parameters = Array(data.Get("product_code"))
@@ -164,7 +171,7 @@ Private Sub PostProduct
 	DB.Save
 	' Retrieve new row
 	HRM.ResponseCode = 201
-	HRM.ResponseObject = DB.First
+	HRM.ResponseObject = DB.First2
 	HRM.ResponseMessage = "Product created successfully"
 	ReturnApiResponse
 	DB.Close
@@ -179,7 +186,11 @@ Private Sub PutProductById (id As Int)
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys
@@ -191,7 +202,7 @@ Private Sub PutProductById (id As Int)
 		End If
 	Next
 	' Check conflict product code
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products"
 	DB.Where = Array("product_code = ?", "id <> ?")
 	DB.Parameters = Array(data.Get("product_code"), id)
@@ -229,14 +240,14 @@ Private Sub PutProductById (id As Int)
 	' Return updated row
 	HRM.ResponseCode = 200
 	HRM.ResponseMessage = "Product updated successfully"
-	HRM.ResponseObject = DB.First
+	HRM.ResponseObject = DB.First2
 	ReturnApiResponse
 	DB.Close
 End Sub
 
 Private Sub DeleteProductById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products"
 	' Find row by id
 	DB.Find(id)

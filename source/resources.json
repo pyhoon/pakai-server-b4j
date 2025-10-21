@@ -1,0 +1,69 @@
+{
+    "Version": "5.50",
+    "Resources": [
+        {
+            "File": "www\\assets\\css\\bootstrap.min.css",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/bootstrap.min.css"
+        },
+        {
+            "File": "www\\assets\\css\\fontawesome.min.css",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/fontawesome.min.css"
+        },
+        {
+            "File": "www\\assets\\css\\help.css",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/help.css"
+        },
+        {
+            "File": "www\\assets\\css\\main.css",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/main.css"
+        },
+        {
+            "File": "www\\assets\\css\\solid.min.css",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/solid.min.css"
+        },
+        {
+            "File": "www\\assets\\img\\coffee.png",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/coffee.png"
+        },
+        {
+            "File": "www\\assets\\img\\favicon.png",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/favicon.png"
+        },
+        {
+            "File": "www\\assets\\img\\loading.webp",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/loading.webp"
+        },
+        {
+            "File": "www\\assets\\img\\sponsor.png",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/sponsor.png"
+        },
+        {
+            "File": "www\\assets\\js\\bootstrap.bundle.min.js",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/bootstrap.bundle.min.js"
+        },
+        {
+            "File": "www\\assets\\js\\jquery.min.js",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/jquery.min.js"
+        },
+        {
+            "File": "www\\assets\\js\\jquery.validate.min.js",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/jquery.validate.min.js"
+        },
+        {
+            "File": "www\\assets\\js\\main.js",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/main.js"
+        },               
+        {
+            "File": "www\\assets\\webfonts\\fa-solid-900.ttf",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/webfonts/fa-solid-900.ttf"
+        },
+        {
+            "File": "www\\assets\\webfonts\\fa-solid-900.woff",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/webfonts/fa-solid-900.woff"
+        },
+        {
+            "File": "www\\assets\\webfonts\\fa-solid-900.woff2",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/webfonts/fa-solid-900.woff2"
+        }
+    ]
+}

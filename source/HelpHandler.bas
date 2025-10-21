@@ -2,13 +2,15 @@
 Group=Handlers
 ModulesStructureVersion=1
 Type=Class
-Version=10.2
+Version=10.3
 @EndOfDesignText@
 'Help Handler class
-'Version 5.00
+'Version 5.50
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
+	Private App As EndsMeet
+	Private Api As ApiSettings
 	Private Handlers As List
 	Private AllMethods As List
 	Private AllGroups As Map
@@ -16,6 +18,8 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
+	App = Main.App
+	Api = App.api
 	AllMethods.Initialize
 	AllGroups.Initialize
 	Handlers.Initialize
@@ -39,8 +43,8 @@ Private Sub ShowHelpPage
 	Dim strMain As String = WebApiUtils.ReadTextFile("help.html")
 	strMain = WebApiUtils.BuildDocView(strMain, Contents)
 	strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
-	strMain = WebApiUtils.BuildHtml(strMain, Main.ctx)
-	strMain = WebApiUtils.BuildScript(strMain, $"<script src="${Main.app.ServerUrl}/assets/scripts/help.js"></script>"$)
+	strMain = WebApiUtils.BuildHtml(strMain, App.ctx)
+	strMain = WebApiUtils.BuildScript(strMain, $"<script src="${App.ServerUrl}/assets/scripts/help.js"></script>"$)
 	WebApiUtils.ReturnHtml(strMain, Response)
 End Sub
 
@@ -48,19 +52,19 @@ Private Sub GenerateHtml As String
 	For Each method As Map In AllMethods ' Avoid duplicate groups
 		AllGroups.Put(method.Get("Group"), "unused")
 	Next
-	Dim Html As StringBuilder
-	Html.Initialize
+	Dim SB As StringBuilder
+	SB.Initialize
 	For Each GroupName As String In AllGroups.Keys
-		Html.Append(GenerateHeaderByGroup(GroupName))
+		SB.Append(GenerateHeaderByGroup(GroupName))
 		For Each method As Map In AllMethods
 			If method.Get("Group") = GroupName Then
 				If method.ContainsKey("Hide") = False Then ' Skip Hidden sub
-					Html.Append(GenerateDocItem(method))
+					SB.Append(GenerateDocItem(method))
 				End If
 			End If
 		Next
 	Next
-	Return Html.ToString
+	Return SB.ToString
 End Sub
 
 Private Sub FindMethod (MethodName As String) As Int
@@ -151,14 +155,14 @@ Private Sub BuildMethods
   "product_name": "ProductName",
   "product_price": 0
 }"$
-	Dim Body As String = $"{
+	Dim Payload As String = $"{
   "category_id": 1,
   "product_code": "",
   "product_name": "",
   "product_price": 0
 }"$
 	Method.Put("Format", Format)
-	Method.Put("Body", Body)
+	Method.Put("Body", Payload)
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Products", "PutProductById (id As Int)")
@@ -169,14 +173,14 @@ Private Sub BuildMethods
   "product_name": "ProductName",
   "product_price": 10
 }"$
-	Dim Body As String = $"{
+	Dim Payload As String = $"{
   "category_id": 1,
   "product_code": "",
   "product_name": "",
   "product_price": 0
 }"$
 	Method.Put("Format", Format)
-	Method.Put("Body", Body)
+	Method.Put("Body", Payload)
 	Method.Put("Elements", $"["{id}"]"$)
 	ReplaceMethod(Method)
 	
@@ -386,10 +390,10 @@ Private Sub ExtractParams (methodLine As String) As String
 End Sub
 
 Private Sub GenerateLink (ApiVersion As String, Handler As String, Elements As List) As String
-	Dim Link As String = "$SERVER_URL$/" & Main.app.api.Name
+	Dim Link As String = "$SERVER_URL$/" & Api.Name
 	If Link.EndsWith("/") = False Then Link = Link & "/"
 	If ApiVersion.EqualsIgnoreCase("null") = False Then
-		If Main.app.api.Versioning Then Link = Link & ApiVersion
+		If Api.Versioning Then Link = Link & ApiVersion
 		If Link.EndsWith("/") = False Then Link = Link & "/"
 	End If
 	Link = Link & Handler.ToLowerCase

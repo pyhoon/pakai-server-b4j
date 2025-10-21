@@ -2,23 +2,26 @@
 Group=Handlers
 ModulesStructureVersion=1
 Type=Class
-Version=10.2
+Version=10.3
 @EndOfDesignText@
 'Api Handler class
-'Version 5.00
+'Version 5.50
 Sub Class_Globals
+	Private DB As MiniORM
+	Private App As EndsMeet
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private HRM As HttpResponseMessage
-	Private DB As MiniORM
 	Private Method As String
 	Private Elements() As String
 	Private ElementId As Int
 End Sub
 
 Public Sub Initialize
+	App = Main.App
 	HRM.Initialize
-	HRM.VerboseMode = Main.app.api.VerboseMode
+	Main.SetApiMessage(HRM)
+	DB.Initialize(Main.DBType, Null)
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -28,7 +31,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3) ' 3 For Api handler
 	If ElementMatch("") Then
-		If Main.app.MethodAvailable2(Method, "/api/categories", Me) Then
+		If App.MethodAvailable2(Method, "/api/categories", Me) Then
 			Select Method
 				Case "GET"
 					GetCategories
@@ -41,7 +44,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 		ReturnMethodNotAllow
 		Return
 	Else If ElementMatch("id") Then
-		If Main.app.MethodAvailable2(Method, "/api/categories/*", Me) Then
+		If App.MethodAvailable2(Method, "/api/categories/*", Me) Then
 			Select Method
 				Case "GET"
 					GetCategoryById(ElementId)
@@ -91,23 +94,23 @@ End Sub
 
 Private Sub GetCategories
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Query
 	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results
+	HRM.ResponseData = DB.Results2
 	ReturnApiResponse
 	DB.Close
 End Sub
 
 Private Sub GetCategoryById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Find(id)
 	If DB.Found Then
 		HRM.ResponseCode = 200
-		HRM.ResponseObject = DB.First
+		HRM.ResponseObject = DB.First2
 	Else
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Category not found"
@@ -125,7 +128,11 @@ Private Sub CreateNewCategory
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_name") 
 	For Each requiredkey As String In RequiredKeys
@@ -137,7 +144,7 @@ Private Sub CreateNewCategory
 		End If
 	Next
 	' Check conflict category name
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Where = Array("category_name = ?")
 	DB.Parameters = Array(data.Get("category_name"))
@@ -158,7 +165,7 @@ Private Sub CreateNewCategory
 	DB.Save
 	' Retrieve new row
 	HRM.ResponseCode = 201
-	HRM.ResponseObject = DB.First
+	HRM.ResponseObject = DB.First2
 	HRM.ResponseMessage = "Category created successfully"
 	ReturnApiResponse
 	DB.Close
@@ -173,7 +180,11 @@ Private Sub UpdateCategoryById (id As Int)
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	If data.ContainsKey("category_name") = False Then
 		HRM.ResponseCode = 400
@@ -182,7 +193,7 @@ Private Sub UpdateCategoryById (id As Int)
 		Return
 	End If
 	' Check conflict category name
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Where = Array("category_name = ?", "id <> ?")
 	DB.Parameters = Array(data.Get("category_name"), id)
@@ -214,14 +225,14 @@ Private Sub UpdateCategoryById (id As Int)
 	' Return updated row
 	HRM.ResponseCode = 200
 	HRM.ResponseMessage = "Category updated successfully"
-	HRM.ResponseObject = DB.First
+	HRM.ResponseObject = DB.First2
 	ReturnApiResponse
 	DB.Close
 End Sub
 
 Private Sub DeleteCategoryById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	' Find row by id
 	DB.Find(id)

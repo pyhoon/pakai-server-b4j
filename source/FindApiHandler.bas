@@ -2,15 +2,16 @@
 Group=Handlers
 ModulesStructureVersion=1
 Type=Class
-Version=10.2
+Version=10.3
 @EndOfDesignText@
 'Api Handler class
-'Version 5.00
+'Version 5.50
 Sub Class_Globals
+	Private DB As MiniORM
+	Private App As EndsMeet
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private HRM As HttpResponseMessage
-	Private DB As MiniORM
 	Private Method As String
 	Private Elements() As String
 	Private ElementId As Int
@@ -18,8 +19,10 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
+	App = Main.App
 	HRM.Initialize
-	HRM.VerboseMode = Main.app.api.VerboseMode
+	Main.SetApiMessage(HRM)
+	DB.Initialize(Main.DBType, Null)
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -29,7 +32,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
 	Elements = WebApiUtils.CropElements(FullElements, 3)
 	If ElementMatch("") Then
-		If Main.app.MethodAvailable2(Method, "/api/find", Me) Then
+		If App.MethodAvailable2(Method, "/api/find", Me) Then
 			Select Method
 				Case "GET"
 					GetAllProducts
@@ -43,7 +46,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 		Return
 	End If
 	If ElementMatch("key/id") Then
-		If Main.app.MethodAvailable2(Method, "/api/find/products-by-category_id/*", Me) Then
+		If App.MethodAvailable2(Method, "/api/find/products-by-category_id/*", Me) Then
 			If ElementKey = "products-by-category_id" Then
 				GetProductsByCategoryId(ElementId)
 				Return
@@ -94,39 +97,38 @@ End Sub
 
 Public Sub GetAllProducts
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products p"
 	' Construct results with new column name alias
-	DB.Select = Array("p.category_id catid", "c.category_name category", "p.id id", "p.product_code code", "p.product_name name", "p.product_price price")
+	DB.Select = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
-	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
 
 Public Sub GetProductsByCategoryId (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products p"
 	' Construct results with new column name alias
-	DB.Select = Array("p.category_id catid", "c.category_name category", "p.id id", "p.product_code code", "p.product_name name", "p.product_price price")
+	DB.Select = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.WhereParam("c.id = ?", id)
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
-	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
 
 Public Sub SearchByKeywords
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
+	
 	Dim str As String = WebApiUtils.RequestDataText(Request)
 	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
@@ -134,7 +136,11 @@ Public Sub SearchByKeywords
 		ReturnApiResponse
 		Return
 	End If
-	Dim data As Map = str.As(JSON).ToMap ' JSON payload
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
 	' Check whether required keys are provided
 	If data.ContainsKey("keyword") = False Then
 		HRM.ResponseCode = 400
@@ -143,10 +149,10 @@ Public Sub SearchByKeywords
 		Return
 	End If
 	Dim SearchForText As String = data.Get("keyword")
-	DB.Initialize(Main.DBType, Main.DBOpen)
+	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products p"
 	' Construct results with new column name alias
-	DB.Select = Array("p.id id", "p.product_code code", "p.product_name AS name", "p.category_id catid", "c.category_name category", "p.product_price price")
+	DB.Select = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	If SearchForText <> "" Then
 		DB.Where = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
@@ -156,7 +162,6 @@ Public Sub SearchByKeywords
 	DB.Query
 	HRM.ResponseCode = 200
 	HRM.ResponseData = DB.Results2
-	HRM.OrderedKeys = True
 	DB.Close
 	ReturnApiResponse
 End Sub
