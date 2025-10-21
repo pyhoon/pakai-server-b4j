@@ -20,9 +20,9 @@ Public Sub ReturnView As String
 	Dim doc As Document
 	doc.Initialize
 	doc.AppendDocType
-	doc.Append(Html.lang("en").build)
+	'doc.Append(Html.lang("en").build)
 	doc.Append(PageHeader.build)
-	doc.Append(PageBody.build)
+	'doc.Append(PageBody.build)
 	
 	'doc.Append2(HelpTemplate.build3(3, False))
 	'doc.Append(CRLF) ' blank line separator
@@ -35,7 +35,8 @@ Public Sub ReturnView As String
 End Sub
 
 Private Sub PageHeader As Tag
-	Dim header1 As Tag = Head.init
+	Dim html1 As Tag = Html.lang("en")
+	Dim header1 As Tag = html1.add(Head.init)
 	header1.add(Meta.attr("http-equiv", "content-type" ).attr("content", "text/html; charset=utf-8"))
 	header1.add(Meta.attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"))
 	header1.add(Meta.attr("name", "csrf-token").attr("content", ""))
@@ -47,7 +48,8 @@ Private Sub PageHeader As Tag
 	header1.linkcss("$SERVER_URL$/assets/css/fontawesome.min.css")
 	header1.linkcss("$SERVER_URL$/assets/css/solid.min.css")
 	header1.linkcss("$SERVER_URL$/assets/css/help.css")
-	Return header1
+	PageBody.up(html1)
+	Return html1
 End Sub
 
 Private Sub PageBody As Tag
@@ -90,14 +92,15 @@ Private Sub PageBody As Tag
 	
 	Dim parser As MiniHtmlParser
 	parser.Initialize
-	Log(mView)
+	'parser.ShowParserLogs = True
+	'Log(mView)
 	Dim root As HtmlNode = parser.Parse(mView)
 	If root.IsInitialized Then
 		'File.WriteString(File.DirApp, "root.txt", root.Children.Get(0))
 		'Dim newTag As Tag = parser.ConvertToTag(root.Children.Get(0))
 		Dim newTag As Tag = parser.ConvertToTag(root)
 		'Log(newTag.Build)
-		File.WriteString(File.DirApp, "newtag.html", newTag.Build)
+		'File.WriteString(File.DirApp, "newtag.html", newTag.Build)
 		'padding2.add(newTag.Child(0)) ' DocView
 		For Each child As Tag In newTag.Children
 			padding2.add(child) ' DocView
@@ -110,7 +113,7 @@ Private Sub PageBody As Tag
 	body1.script("$SERVER_URL$/assets/js/jquery.validate.min.js")
 	body1.script("$SERVER_URL$/assets/js/bootstrap.bundle.min.js")
 	body1.script("$SERVER_URL$/assets/js/main.js")
-	body1.script("$SERVER_URL$/assets/js/help.js")
+	body1.script("$SERVER_URL$/assets/scripts/help.js")
 	Return body1
 End Sub
 
