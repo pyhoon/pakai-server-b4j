@@ -2,22 +2,14 @@
 Build1=Default,b4j.webapi,SQLite,hu2_acceptall
 Build2=MariaDB,b4j.webapi,MariaDB,hu2_acceptall
 Build3=MySQL,b4j.webapi,MySQL,hu2_acceptall
-File1=category.html
-File2=config.example
-File3=help.html
-File4=index.html
-File5=main.html
-File6=mariadb.example
-File7=mysql.example
-File8=sqlite.example
+File1=config.example
+File2=mariadb.example
+File3=mysql.example
+File4=sqlite.example
 FileGroup1=Default Group
 FileGroup2=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
-FileGroup5=Default Group
-FileGroup6=Default Group
-FileGroup7=Default Group
-FileGroup8=Default Group
 Group=App
 Library1=endsmeet
 Library2=jcore
@@ -37,14 +29,14 @@ Module6=HelpHandler
 Module7=HelpView
 Module8=HttpsFilter
 Module9=IndexView
-NumberOfFiles=8
+NumberOfFiles=4
 NumberOfLibraries=5
 NumberOfModules=13
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 5.50
+' Version: 6.00alpha
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -59,7 +51,7 @@ Version=10.3
 #End If
 #Region Macros
 'For source
-#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(5.50).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\css&args=Objects\www\assets\img&args=Objects\www\assets\js&args=Objects\www\assets\webfonts
+#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00alpha).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\css&args=Objects\www\assets\img&args=Objects\www\assets\js&args=Objects\www\assets\webfonts
 #Macro: Title, Release folder, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 #Macro: Title, Copy to AddLibs, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
 'For release
@@ -74,7 +66,7 @@ Sub Process_Globals
 	Public Api 					As ApiSettings
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "5.50"
+	Public Const VERSION 		As String = "6.00alpha"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>

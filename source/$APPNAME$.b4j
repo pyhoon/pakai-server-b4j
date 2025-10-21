@@ -2,44 +2,41 @@
 Build1=Default,b4j.webapi,SQLite,hu2_acceptall
 Build2=MariaDB,b4j.webapi,MariaDB,hu2_acceptall
 Build3=MySQL,b4j.webapi,MySQL,hu2_acceptall
-File1=category.html
-File2=config.example
-File3=help.html
-File4=index.html
-File5=main.html
-File6=mariadb.example
-File7=mysql.example
-File8=sqlite.example
+File1=config.example
+File2=mariadb.example
+File3=mysql.example
+File4=sqlite.example
 FileGroup1=Default Group
 FileGroup2=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
-FileGroup5=Default Group
-FileGroup6=Default Group
-FileGroup7=Default Group
-FileGroup8=Default Group
 Group=App
 Library1=endsmeet
 Library2=jcore
-Library3=webapiutils
+Library3=minihtml
 Library4=miniormutils
+Library5=webapiutils
 Module1=CategoriesApiHandler
+Module10=IndexWebHandler
+Module11=JavaScript
+Module12=MainView
+Module13=ProductsApiHandler
 Module2=CategoriesWebHandler
-Module3=Database
-Module4=FindApiHandler
-Module5=HelpHandler
-Module6=HttpsFilter
-Module7=IndexWebHandler
-Module8=JavaScript
-Module9=ProductsApiHandler
-NumberOfFiles=8
-NumberOfLibraries=4
-NumberOfModules=9
+Module3=CategoryView
+Module4=Database
+Module5=FindApiHandler
+Module6=HelpHandler
+Module7=HelpView
+Module8=HttpsFilter
+Module9=IndexView
+NumberOfFiles=4
+NumberOfLibraries=5
+NumberOfModules=13
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 5.50
+' Version: 6.00alpha
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -64,7 +61,7 @@ Sub Process_Globals
 	Public Api 					As ApiSettings
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "5.50"
+	Public Const VERSION 		As String = "6.00alpha"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
