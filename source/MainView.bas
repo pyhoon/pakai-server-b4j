@@ -82,6 +82,13 @@ Private Sub PageBody As Tag
 	.add(Span.cls("navbar-toggler-icon"))
 	Dim collapse1 As Tag = nav1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
 	Dim Ult1 As Tag = collapse1.add(Ul.cls("navbar-nav ml-auto"))
+	If Main.Api.EnableHelp Then
+		Dim Lit1 As Tag = Ult1.add(Li.cls("nav-item mt-1 ml-3"))
+		Dim Anchor1 As Tag = Lit1.add(Anchor.cls("nav-link font-weight-bold text-dark mr-3"))
+		Anchor1.hrefOf($"${Main.App.ServerUrl}/help"$)
+		Anchor1.add(Icon.cls("fas fa-cog mr-2").attr("title", "API"))
+		Anchor1.text("API")
+	End If	
 	Dim Lit2 As Tag = Ult1.add(Li.cls("nav-item font-weight-bold d-none d-sm-none d-md-block"))
 	Dim Anchor2 As Tag = Lit2.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
 	Anchor2.add(Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px"))
@@ -92,9 +99,9 @@ Private Sub PageBody As Tag
 	
 	Dim content1 As Tag = body1.add(Div.cls("content m-3"))
 	Dim padding2 As Tag = content1.add(Div.cls("p-2"))
-	Dim row1 As Tag = padding2.add(Div.cls("row text-center text-dark align-items-center justify-content-center"))
-	row1.add(Div.cls("mx-3")) _
-	.add(Img.src("$SERVER_URL$/assets/img/loading.webp").width("60px").height("60px"))
+	Dim row1 As Tag = padding2.add(Div.cls("row text-center align-items-center justify-content-center"))
+	'row1.add(Div.cls("mx-3")) _
+	'.add(Img.src("$SERVER_URL$/assets/img/loading.webp").width("60px").height("60px"))
 	Dim div1 As Tag = row1.add(Div.init)
 	div1.add(H3.cls("mb-0").sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")) _
 	.text("$HOME_TITLE$")
