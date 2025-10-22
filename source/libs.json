@@ -5,19 +5,19 @@
             "Name": "EndsMeet.b4xlib",
             "Platform": "B4J",
             "Version": 1.50,
-            "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v1.50/EndsMeet.b4xlib"
+            "Link": "https://raw.githubusercontent.com/pyhoon/EndsMeet/refs/heads/main/release/EndsMeet.b4xlib"
         },
         {
             "Name": "MiniORMUtils.b4xlib",
             "Platform": "B4X",
             "Version": 3.80,
-            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v3.80/MiniORMUtils.b4xlib"
+            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/raw/refs/heads/main/release/MiniORMUtils.b4xlib"
         },
         {
             "Name": "WebApiUtils.b4xlib",
             "Platform": "B4J",
             "Version": 5.50,
-            "Link": "https://github.com/pyhoon/WebApiUtils-B4J/releases/download/v5.50/WebApiUtils.b4xlib"
+            "Link": "https://github.com/pyhoon/WebApiUtils-B4J/raw/refs/heads/main/release/WebApiUtils.b4xlib"
         },
         {
             "Name": "mysql-connector-j-9.3.0.jar",
