@@ -20,17 +20,20 @@ Public Sub ReturnTags As List
 	Dim col12 As Tag = content1.add(Div.cls("col-md-12"))
 	Dim form1 As Tag = col12.add(Form.cls("form mb-3").id("search_form").action(""))
 	Dim row1 As Tag = form1.add(Div.cls("row"))
+	
 	Dim col1 As Tag = Div.cls("col-md-6 col-lg-6").up(row1)
-	Dim input_group1 As Tag = col1.add(Div.cls("input-group input-group-sm"))
-	input_group1.add(Div.cls("input-group-prepend")).add(Span.cls("input-group-text mt-2").id("inputGroup-sizing-sm").text("Search"))
+	Dim input_group1 As Tag = col1.add(Div.cls("input-group mb-3"))
+	input_group1.add(Label.forId("keyword").cls("input-group-text mt-2").text("Search"))
 	input_group1.add(Input.cls("form-control col-md-6 mt-2").typeOf("text").id("keyword").name("keyword"))
-	input_group1.add(Button.cls("btn btn-danger btn-sm pl-3 pr-3 ml-3 mt-2").typeOf("button").id("btnsearch").text("Submit"))
+	input_group1.add(Button.cls("btn btn-danger btn-md pl-3 pr-3 ml-3 mt-2").typeOf("button").id("btnsearch").text("Submit"))
+	
 	Dim col2 As Tag = Div.cls("col-md-6 col-lg-6").up(row1)
-	Dim div2 As Tag = col2.add(Div.cls("text-right mt-2"))
-	div2.add(Anchor.href("$SERVER_URL$/categories").cls("btn btn-primary btn-sm mb-2").add2(Icon.cls("fa fa-bars")).text(" Show Category"))
-	div2.add(Anchor.href("#new").cls("btn btn-success btn-sm mb-2 ml-2").data("toggle", "modal").add2(Icon.cls("fa fa-plus")).text(" New Product"))
-	col12.add(Div.id("results").cls("table")).add(HtmlTable.cls("table table-bordered rounded small"))
+	Dim div2 As Tag = col2.add(Div.cls("float-end mt-2"))
+	div2.add(Anchor.href("$SERVER_URL$/categories").cls("btn btn-primary me-2").add2(Icon.cls("ti ti-menu me-2")).text("Show Category"))
+	div2.add(Anchor.href("#new").cls("btn btn-success").data("toggle", "modal").add2(Icon.cls("ti ti-plus me-2")).text("New Product"))
+	col12.add(Div.id("results").cls("table")).add(HtmlTable.cls("table table-bordered rounded-3"))
 	Tags.Add(content1)
+	
 	Dim github As Tag = Div.cls("text-center mb-3")
 	github.add(Anchor.href("https://github.com/pyhoon/pakai-server-b4j").cls("text-primary mr-1") _
 	.attr("aria-label", "github").title("GitHub").targetOf("_blank")) _

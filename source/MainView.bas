@@ -63,17 +63,18 @@ Private Sub PageHeader As Tag
 	header1.title("$APP_TITLE$")
 	header1.linkIcon("image/png", "$SERVER_URL$/assets/img/favicon.png")
 	header1.linkcss("$SERVER_URL$/assets/css/bootstrap.min.css")
-	header1.linkcss("$SERVER_URL$/assets/css/fontawesome.min.css")
-	header1.linkcss("$SERVER_URL$/assets/css/solid.min.css")
+	header1.linkcss("$SERVER_URL$/assets/css/themify-icons.css")
+	'header1.linkcss("$SERVER_URL$/assets/css/fontawesome.min.css")
+	'header1.linkcss("$SERVER_URL$/assets/css/solid.min.css")
 	header1.linkcss("$SERVER_URL$/assets/css/main.css?v=$VERSION$")
 	Return header1
 End Sub
 
 Private Sub PageBody As Tag
 	Dim body1 As Tag = Body.cls("bg-white")
-	Dim nav1 As Tag = body1.add(Nav.cls("navbar navbar-expand-lg fixed-top navbar-dark yellow pt-1 pb-1"))
-	nav1.add(Anchor.cls("text-dark h4 mt-2 mr-2").hrefOf("#")).add(Icon.cls("fas fa-cloud ml-3"))
-	nav1.add(Anchor.cls("navbar-brand font-weight-bold text-dark").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
+	Dim nav1 As Tag = body1.add(Html.create("nav").cls("navbar navbar-expand-lg bd-navbar sticky-top navbar-dark yellow"))
+	nav1.add(Anchor.cls("navbar-brand text-dark p-0 ms-3 me-0 me-lg-2").hrefOf("#")).add(Icon.cls("ti ti-cloud").sty("font-size: 2em"))
+	nav1.add(Anchor.cls("navbar-brand text-dark").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
 	Dim toggler1 As Tag = nav1.add(Button.cls("navbar-toggler custom-toggler"))
 	toggler1.typeOf("button") _
 	.attr("data-toggle", "collapse") _
@@ -81,12 +82,12 @@ Private Sub PageBody As Tag
 	.sty("border: none") _
 	.add(Span.cls("navbar-toggler-icon"))
 	Dim collapse1 As Tag = nav1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
-	Dim Ult1 As Tag = collapse1.add(Ul.cls("navbar-nav ml-auto"))
+	Dim Ult1 As Tag = collapse1.add(Ul.cls("navbar-nav navbar-brand ms-auto"))
 	If Main.Api.EnableHelp Then
-		Dim Lit1 As Tag = Ult1.add(Li.cls("nav-item mt-1 ml-3"))
-		Dim Anchor1 As Tag = Lit1.add(Anchor.cls("nav-link font-weight-bold text-dark mr-3"))
+		Dim Lit1 As Tag = Ult1.add(Li.cls("nav-item mt-1 ms-3"))
+		Dim Anchor1 As Tag = Lit1.add(Anchor.cls("nav-link text-dark me-3"))
 		Anchor1.hrefOf($"${Main.App.ServerUrl}/help"$)
-		Anchor1.add(Icon.cls("fas fa-cog mr-2").attr("title", "API"))
+		Anchor1.add(Icon.cls("ti ti-settings me-2").attr("title", "API"))
 		Anchor1.text("API")
 	End If	
 	Dim Lit2 As Tag = Ult1.add(Li.cls("nav-item font-weight-bold d-none d-sm-none d-md-block"))
@@ -122,8 +123,8 @@ Private Sub PageBody As Tag
 End Sub
 
 Private Sub BodyFooter As Tag
-	Dim footer1 As Tag = Footer.cls("footer footer-dark bg-secondary pl-4 pt-2 pb-2")
-	Dim small1 As Tag = footer1.add(Div.cls("footer small text-white text-center d-md-block") _
+	Dim footer1 As Tag = Footer.cls("footer mt-auto py-3 bg-body-tertiary")
+	Dim small1 As Tag = footer1.add(Div.cls("footer small text-center d-md-block") _
 	.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"))
 	Dim caption1 As Tag = small1.add(Caption.text("$APP_COPYRIGHT$").add2(Br.init))
 	caption1.text("Pakai with ").add2(Span.sty("color: red").text("❤")).text(" in B4X")

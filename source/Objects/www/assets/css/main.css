@@ -5,7 +5,7 @@
  */
 body {
     font-family: Arial, Helvetica, Tahoma, Times New Roman;
-    margin-top: 60px;
+    /* margin-top: 60px; */
 }
 
 button {
@@ -87,4 +87,10 @@ button:focus {
 .error {
     font-size: 0.8em;
     color: red;
+}
+
+.edit,
+.delete {
+    cursor: pointer;
+    text-decoration: none !important;
 }

@@ -387,7 +387,7 @@ Private Sub script07 As String
       let tblBody = ""
       if (data.length) {
         tblHead = `
-  <thead class="bg-light">
+  <thead class="bg-tertiary">
     <th style="text-align: right; width: 50px">#</th>
     <th>Name</th>
     <th style="text-align: center; width: 90px">Actions</th>
@@ -403,11 +403,11 @@ Private Sub script07 As String
       <td class="align-middle" style="text-align: right">${"$"}{id}</td>
       <td class="align-middle">${"$"}{name}</td>
       <td>
-        <a href="#edit" class="text-primary mx-2" data-toggle="modal">
-          <i class="edit fa fa-pen" data-toggle="tooltip"
+        <a href="#edit" class="edit text-primary mx-2" data-toggle="modal">
+          <i class="ti ti-pencil" data-toggle="tooltip"
           data-id="${"$"}{id}" data-name="${"$"}{name}" title="Edit"></i></a>
-        <a href="#delete" class="text-danger mx-2" data-toggle="modal">
-          <i class="delete fa fa-trash" data-toggle="tooltip"
+        <a href="#delete" class="delete text-danger mx-2" data-toggle="modal">
+          <i class="ti ti-trash" data-toggle="tooltip"
           data-id="${"$"}{id}" data-name="${"$"}{name}" title="Delete"></i></a>
       </td>
     </tr>`
@@ -817,13 +817,13 @@ Private Sub script22 As String
 
   if (rows.length) {
     tblHead = `
-      <thead class="bg-light">
-        <th style="text-align: right; width: 50px">#</th>
-        <th>Code</th>
-        <th>Name</th>
-        <th>Category</th>
-        <th style="text-align: right">Price</th>
-        <th style="text-align: center; width: 90px">Actions</th>
+      <thead class="table-secondary">
+        <th scope="col" style="text-align: right; width: 50px">#</th>
+        <th scope="col">Code</th>
+        <th scope="col">Name</th>
+        <th scope="col">Category</th>
+        <th scope="col" style="text-align: right">Price</th>
+        <th scope="col" style="text-align: center; width: 90px">Actions</th>
       </thead>`
     tblBody = "<tbody>"
 
@@ -842,12 +842,12 @@ Private Sub script22 As String
           <td class="align-middle">${"$"}{category}</td>
           <td class="align-middle" style="text-align: right">${"$"}{price}</td>
           <td>
-            <a href="#edit" class="text-primary mx-2" data-toggle="modal">
-              <i class="edit fa fa-pen"
+            <a href="#edit" class="edit text-primary mx-2" data-toggle="modal">
+              <i class="ti ti-pencil"
                  data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
                  data-name="${"$"}{name}" data-price="${"$"}{price}" title="Edit"></i></a>
-            <a href="#delete" class="text-danger mx-2" data-toggle="modal">
-              <i class="delete fa fa-trash"
+            <a href="#delete" class="delete text-danger mx-2" data-toggle="modal">
+              <i class="ti ti-trash"
                  data-id="${"$"}{id}" data-code="${"$"}{code}" data-category="${"$"}{catid}"
                  data-name="${"$"}{name}" title="Delete"></i></a>
           </td>
