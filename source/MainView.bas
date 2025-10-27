@@ -111,11 +111,6 @@ Private Sub PageBody As Tag
 	div1.add(H3.cls("mb-0").sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")) _
 	.text("$HOME_TITLE$")
 	div1.add(Span.cls("small").text("Version: $VERSION$"))
-
-	'Dim newTag As Tag = mPlaceholders.Get(0)
-	'For Each child As Tag In newTag.Children
-	'	padding2.add(child) ' DocView
-	'Next
 	
 	Dim newTags As List = mPlaceholders.Get(0)
 	For Each newTag As Tag In newTags
@@ -127,7 +122,7 @@ Private Sub PageBody As Tag
 End Sub
 
 Private Sub BodyFooter As Tag
-	Dim footer1 As Tag = Footer.cls("footer mt-auto py-3 bg-body-tertiary")
+	Dim footer1 As Tag = Footer.cls("footer mt-auto py-3 bg-body-tertiary border-top")
 	Dim small1 As Tag = footer1.add(Div.cls("footer small text-center d-md-block") _
 	.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"))
 	Dim caption1 As Tag = small1.add(Caption.text("$APP_COPYRIGHT$").add2(Br.init))

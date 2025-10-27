@@ -12,21 +12,8 @@ Public Sub Initialize
 	
 End Sub
 
-'Public Sub ReturnView As String
-'	Dim doc As Document
-'	doc.Initialize
-'	doc.Append2(TableCategories.build3(3, False))
-'	'doc.Append(CRLF) ' blank line separator
-'	'doc.Append("<!-- Modal -->") ' comment
-'	doc.Append2(Html.comment(" Modal ").build4(2))
-'	doc.Append2(ModalCategoryAdd.build3(3, True))
-'	doc.Append2(ModalCategoryEdit.build3(3, True))
-'	doc.Append2(ModalCategoryDelete.build3(3, True))
-'	Return doc.ToString
-'End Sub
-
 Public Sub Render As List
-Dim Tags As List
+	Dim Tags As List
 	Tags.Initialize
 	Tags.Add(Html.comment2(" Content Begin "))
 	Tags.Add(TableCategories)

@@ -88,11 +88,13 @@ Sub AppStart (Args() As String)
 
 	' *** Web handlers ***
 	App.Get("", "IndexWebHandler")
+	App.Get("/table", "IndexWebHandler")
 	#If Debug
 	App.Get("/help", "HelpHandler")
 	#End If
 	App.Get("/categories", "CategoriesWebHandler")
 	App.Get("/categories/table", "CategoriesWebHandler")
+	App.Get("/categories/list", "CategoriesWebHandler")
 	
 	' *** Api handlers ***
 	App.Get("/api/categories", "CategoriesApiHandler")

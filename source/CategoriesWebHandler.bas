@@ -11,9 +11,10 @@ Sub Class_Globals
 	Private App As EndsMeet
 	Private Request As ServletRequest
 	Private Response As ServletResponse
-	Private Method As String
-	Private Elements() As String
-	Private ElementKey As String
+'	Private Method As String
+	'Private Elements() As String
+	'Private ElementKey As String
+	'Private start As Long = DateTime.Now
 End Sub
 
 Public Sub Initialize
@@ -24,24 +25,38 @@ End Sub
 Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
-	Method = Request.Method.ToUpperCase
-	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
-	Elements = WebApiUtils.CropElements(FullElements, 2) ' 2 For Web handler
-	If App.MethodAvailable2(Method, "/categories", Me) = False Then
-		WebApiUtils.ReturnHtml("<h1>405 Method Not Allowed</h1>", Response)
-		Return
-	End If
-	If ElementMatch("key") Then
-		If ElementKey = "table" Then
-			WebApiUtils.ReturnHtml(ReturnTable, Response)
-			Return
-		End If
-	End If
-	If Elements.Length = 0 Then
-		ReturnPage
-		Return
-	End If
-	WebApiUtils.ReturnHtmlPageNotFound(Response)
+	
+	'Log(Request.RequestURI)
+	Select Request.RequestURI
+		Case "/categories"
+			ReturnPage
+			'Response.Write("It took: ").Write(DateTime.Now - start).Write(" ms to create this page.")
+		Case "/categories/table"
+			ReturnTable
+		Case "/categories/list"
+			ReturnList
+			'Response.Write("It took: ").Write(DateTime.Now - start).Write(" ms to create this page.")
+	End Select
+	
+'	Method = Request.Method.ToUpperCase
+'	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
+'	Elements = WebApiUtils.CropElements(FullElements, 2) ' 2 For Web handler
+'	If App.MethodAvailable2(Method, "/categories", Me) = False Then
+'		WebApiUtils.ReturnHtml("<h1>405 Method Not Allowed</h1>", Response)
+'		Return
+'	End If
+'	If ElementMatch("key") Then
+'		If ElementKey = "table" Then
+'			WebApiUtils.ReturnHtml(ReturnTable, Response)
+'			Return
+'		End If
+'	End If
+'	If Elements.Length = 0 Then
+'		ReturnPage
+'		Return
+'	End If
+'	WebApiUtils.ReturnHtmlPageNotFound(Response)
+
 End Sub
 
 Private Sub ReturnPage
@@ -65,7 +80,7 @@ Private Sub ReturnPage
 	WebApiUtils.ReturnHtml(strMain, Response)
 End Sub
 
-Private Sub ReturnTable As String
+Private Sub ReturnTable
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	Dim table1 As Tag = HtmlTable.cls("table table-bordered rounded small")
 	Dim thead1 As Tag = table1.add(Thead.cls("table-light"))
@@ -98,23 +113,37 @@ Private Sub ReturnTable As String
 		.attr("title", "Delete")
 	Next
 	DB.Close
-	Return table1.Build
+	WebApiUtils.ReturnHtml(table1.Build, Response)
 End Sub
 
-Private Sub ElementMatch (Pattern As String) As Boolean
-	Select Pattern
-		Case ""
-			If Elements.Length = 0 Then
-				Return True
-			End If
-		Case "key"
-			If Elements.Length = 1 Then
-				ElementKey = Elements(0)
-				Return True				
-			End If
-	End Select
-	Return False
+Private Sub ReturnList
+	Dim option1 As Tag = Option.attr("selected", "").attr("disabled", "").text("Select Category")
+	WebApiUtils.ReturnHtml(option1.Build, Response)
+	DB.SQL = Main.DBOpen
+	DB.Table = "tbl_categories"
+	DB.Columns = Array("id", "category_name AS name")
+	DB.Query
+	For Each row As Map In DB.Results2
+		Dim option1 As Tag = Option.valueOf(row.Get("id")).text(row.Get("name"))
+		WebApiUtils.ReturnHtml(option1.Build, Response)
+	Next
+	DB.Close
 End Sub
+
+'Private Sub ElementMatch (Pattern As String) As Boolean
+'	Select Pattern
+'		Case ""
+'			If Elements.Length = 0 Then
+'				Return True
+'			End If
+'		Case "key"
+'			If Elements.Length = 1 Then
+'				ElementKey = Elements(0)
+'				Return True				
+'			End If
+'	End Select
+'	Return False
+'End Sub
 
 'Private Sub ReturnHelpElement As String
 '	Dim Api As ApiSettings = App.api
