@@ -49,11 +49,11 @@ Private Sub ReturnPage
 	main1.Initialize
 	Dim view1 As IndexView
 	view1.Initialize
-	main1.AddPlaceholder2(view1.ReturnTags)
+	main1.LoadView2(view1.ReturnTags)
 	
-	Dim page1 As Tag = main1.ReturnTag
-	Dim body1 As Tag = page1.ChildByTagName("body")
-	body1.script($"${App.ServerUrl}/assets/scripts/search.js"$)
+	Dim page1 As Tag = main1.Render
+	'Dim body1 As Tag = page1.ChildByTagName("body")
+	'body1.script($"${App.ServerUrl}/assets/scripts/search.js"$)
 	
 	Dim doc As Document
 	doc.Initialize

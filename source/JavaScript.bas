@@ -37,7 +37,7 @@ Public Sub CreateJSFiles
 		Api = Main.App.api
 		Verbose = Api.VerboseMode
 		ContentType = Api.ContentType
-		GenerateJSFileForHelp(DirName, "help.js")
+		'GenerateJSFileForHelp(DirName, "help.js")
 		GenerateJSFileForMain(DirName, "main.js")
 		GenerateJSFileForSearch(DirName, "search.js")
 		GenerateJSFileForCategory(DirName, "category.js")
@@ -168,14 +168,14 @@ for (let i = 0; i < coll.length; i++) {
       details.style.maxHeight = details.scrollHeight + "px"
     }
   })
-}
-// Button click event for all verbs
-$(".get, .post, .put, .delete").click(function (e) {
-  e.preventDefault()
-  const element = $(this)
-  const id = element.attr("id").substring(3)
-  makeApiRequest(id)
-})"$
+}"$
+'// Button click event For all verbs
+'$(".get, .post, .put, .delete").click(function (e) {
+'  e.preventDefault()
+'  const element = $(this)
+'  const id = element.attr("id").substring(3)
+'  makeApiRequest(id)
+'})"$
 End Sub
 
 Private Sub script02 As String

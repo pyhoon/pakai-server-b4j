@@ -51,7 +51,7 @@ Version=10.3
 #End If
 #Region Macros
 'For source
-#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00alpha).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\css&args=Objects\www\assets\img&args=Objects\www\assets\js&args=Objects\www\assets\webfonts
+#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00alpha).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\css&args=Objects\www\assets\img&args=Objects\www\assets\js
 #Macro: Title, Release folder, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 #Macro: Title, Copy to AddLibs, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
 'For release
@@ -92,6 +92,7 @@ Sub AppStart (Args() As String)
 	App.Get("/help", "HelpHandler")
 	#End If
 	App.Get("/categories", "CategoriesWebHandler")
+	App.Get("/categories/table", "CategoriesWebHandler")
 	
 	' *** Api handlers ***
 	App.Get("/api/categories", "CategoriesApiHandler")
@@ -108,6 +109,8 @@ Sub AppStart (Args() As String)
 	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
 	App.Post("/api/find", "FindApiHandler")
 
+	'App.Port = 51042
+	
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", VERSION)

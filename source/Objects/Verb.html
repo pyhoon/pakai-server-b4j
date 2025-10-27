@@ -1,0 +1,29 @@
+<button class="collapsible collapsible-background-green"><span class="badge badge-green text-dark py-1 mr-1" style="width: 60px">GET</span><span class="ml-1">Read all Categories</span></button><div class="details mb-1">
+  <div class="row">
+    <div class="col-md-3 p-3">
+      <p><strong>Parameters</strong>
+        <br/>
+        <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #696969">Not required</label>
+      </p>
+      <div class="mt-3"><strong>Status Code</strong>
+        <br/>200 Success<br/>400 Bad Request<br/>404 Not found<br/>405 Method not allowed<br/>422 Error execute query
+      </div>
+    </div>
+    <div class="col-md-3 p-3">
+      <form id="formGetCategories" hx-get="$SERVER_URL$/api/categories" hx-ext="json-enc" hx-trigger="submit" hx-target="#responseGetCategories" hx-swap="innerHTML">
+        <p><strong>Path</strong>
+          <br/>
+          <input type="text" id="pathGetCategories" class="form-control text-light" style="background-color: #696969; font-size: small" value="$SERVER_URL$/api/categories" disabled>
+        </p>
+        <button id="btnGetCategories" class="get button submit-button-green text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px"><strong>Submit</strong></button>
+      </form>
+    </div>
+    <div class="col-md-6 p-3">
+      <p><strong>Response</strong>
+        <br/><textarea rows="10" id="responseGetCategories" class="form-control" style="background-color: #363636; color: white; font-size: small"></textarea>
+      </p>
+      <div id="alertGetCategories" class="alert text-light" role="alert" style="display: block">
+      </div>
+    </div>
+  </div>
+</div>

@@ -13,16 +13,16 @@ Public Sub Initialize
 	mPlaceholders.Initialize
 End Sub
 
-Public Sub AddPlaceholder (Tag1 As Tag)
+Public Sub LoadView (Tag1 As Tag)
 	'mView = View
 	mPlaceholders.Add(Tag1)
 End Sub
 
-Public Sub AddPlaceholder2 (Tags As List)
+Public Sub LoadView2 (Tags As List)
 	mPlaceholders.Add(Tags)
 End Sub
 
-Public Sub AddPlaceholder3 (View1 As String)
+Public Sub LoadView3 (View1 As String)
 	Dim parser As MiniHtmlParser
 	parser.Initialize
 	'parser.ShowParserLogs = True
@@ -33,25 +33,25 @@ Public Sub AddPlaceholder3 (View1 As String)
 	End If
 End Sub
 
-Public Sub ReturnTag As Tag
+Public Sub Render As Tag
 	Dim page1 As Tag = Html.lang("en")
 	page1.add(PageHeader)
 	page1.add(PageBody)
 	Dim body1 As Tag = page1.ChildByTagName("body")
 	body1.add(BodyFooter)
-	body1.script("$SERVER_URL$/assets/js/jquery.min.js")
-	body1.script("$SERVER_URL$/assets/js/jquery.validate.min.js")
+	'body1.script("$SERVER_URL$/assets/js/jquery.min.js")
+	'body1.script("$SERVER_URL$/assets/js/jquery.validate.min.js")
 	body1.script("$SERVER_URL$/assets/js/bootstrap.bundle.min.js")
 	Return page1
 End Sub
 
-Public Sub ReturnView As String
-	Dim doc As Document
-	doc.Initialize
-	doc.AppendDocType
-	doc.Append(ReturnTag.build)
-	Return doc.ToString
-End Sub
+'Public Sub ReturnView As String
+'	Dim doc As Document
+'	doc.Initialize
+'	doc.AppendDocType
+'	doc.Append(ReturnTag.build)
+'	Return doc.ToString
+'End Sub
 
 Private Sub PageHeader As Tag
 	Dim header1 As Tag = Head.init
@@ -72,31 +72,35 @@ End Sub
 
 Private Sub PageBody As Tag
 	Dim body1 As Tag = Body.cls("bg-white")
-	Dim nav1 As Tag = body1.add(Html.create("nav").cls("navbar navbar-expand-lg bd-navbar sticky-top navbar-dark yellow"))
-	nav1.add(Anchor.cls("navbar-brand text-dark p-0 ms-3 me-0 me-lg-2").hrefOf("#")).add(Icon.cls("ti ti-cloud").sty("font-size: 2em"))
-	nav1.add(Anchor.cls("navbar-brand text-dark").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
-	Dim toggler1 As Tag = nav1.add(Button.cls("navbar-toggler custom-toggler"))
+	Dim nav1 As Tag = body1.add(Nav.cls("navbar navbar-expand-lg sticky-top yellow"))
+	Dim div1 As Tag = nav1.add(Div.cls("container-fluid"))
+	
+	div1.add(Anchor.cls("navbar-brand me-0 me-lg-2").hrefOf("#")).add(Icon.cls("ti ti-cloud").sty("font-size: 2em"))
+	div1.add(Anchor.cls("navbar-brand").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
+	
+	Dim toggler1 As Tag = div1.add(Button.cls("navbar-toggler collapsed"))
 	toggler1.typeOf("button") _
-	.attr("data-toggle", "collapse") _
-	.attr("data-target", "#navbarCollapse") _
+	.attr("data-bs-toggle", "collapse") _
+	.attr("data-bs-target", "#navbarCollapse") _
 	.sty("border: none") _
 	.add(Span.cls("navbar-toggler-icon"))
-	Dim collapse1 As Tag = nav1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
-	Dim Ult1 As Tag = collapse1.add(Ul.cls("navbar-nav navbar-brand ms-auto"))
+	
+	Dim collapse1 As Tag = div1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
+	Dim ulist1 As Tag = collapse1.add(Ul.cls("navbar-nav navbar-brand ms-auto mb-md-0"))
 	If Main.Api.EnableHelp Then
-		Dim Lit1 As Tag = Ult1.add(Li.cls("nav-item mt-1 ms-3"))
-		Dim Anchor1 As Tag = Lit1.add(Anchor.cls("nav-link text-dark me-3"))
-		Anchor1.hrefOf($"${Main.App.ServerUrl}/help"$)
-		Anchor1.add(Icon.cls("ti ti-settings me-2").attr("title", "API"))
-		Anchor1.text("API")
-	End If	
-	Dim Lit2 As Tag = Ult1.add(Li.cls("nav-item font-weight-bold d-none d-sm-none d-md-block"))
-	Dim Anchor2 As Tag = Lit2.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
-	Anchor2.add(Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px"))
+		Dim list1 As Tag = ulist1.add(Li.cls("nav-item mt-1 ms-1"))
+		Dim anchor1 As Tag = list1.add(Anchor.cls("nav-link text-dark me-3"))
+		anchor1.hrefOf($"${Main.App.ServerUrl}/help"$)
+		anchor1.add(Icon.cls("ti ti-settings me-2").attr("title", "API"))
+		anchor1.text("API")
+	End If
+	Dim list2 As Tag = ulist1.add(Li.cls("nav-item d-none d-sm-none d-md-block"))
+	Dim anchor2 As Tag = list2.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
+	anchor2.add(Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px"))
 	Dim sponsor As Tag = Div.cls("text-center font-weight-bold d-block d-sm-block d-md-none").up(body1)
 	sponsor.sty("background-color: whitesmoke")
-	Dim Anchor3 As Tag = sponsor.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
-	Anchor3.add(Img.src("/assets/img/sponsor.png").cls("mx-2").sty("width: 174px"))
+	Dim anchor3 As Tag = sponsor.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
+	anchor3.add(Img.src("/assets/img/sponsor.png").cls("mx-2").sty("width: 174px"))
 	
 	Dim content1 As Tag = body1.add(Div.cls("content m-3"))
 	Dim padding2 As Tag = content1.add(Div.cls("p-2"))

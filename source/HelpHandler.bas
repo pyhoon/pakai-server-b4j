@@ -50,6 +50,7 @@ Private Sub ShowHelpPage
 	view1.Initialize
 	view1.DocView = GenerateHtml
 	Dim strMain As String = view1.ReturnView
+	File.WriteString(File.DirApp, "help.html", strMain)
 	strMain = WebApiUtils.BuildHtml(strMain, App.ctx)
 	WebApiUtils.ReturnHtml(strMain, Response)
 End Sub
@@ -421,52 +422,165 @@ Private Sub GenerateNoApiLink (Handler As String, Elements As List) As String
 	Return Link
 End Sub
 
+'Private Sub GenerateVerbSection1 (section As VerbSection) As String
+'	Select section.FileUpload
+'		Case "Image", "PDF"
+'			Dim strPayload As String = $"<p><strong>File:</strong> <label for="file1${section.ElementId}">Choose a file:</label><input type="file" id="file1${section.ElementId}" class="pb-3" name="file1"></p>"$
+'		Case Else
+'			Dim strFormat As String = $"<p><strong>Format:</strong> <span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">${section.Format}</span></p>"$
+'			Dim strPayload As String = $"<p><strong>Payload:</strong> <textarea id="body${section.ElementId}" rows="6" class="form-control" style="background-color: #363636; color: white; font-size: small">${section.Payload}</textarea></p>"$
+'	End Select
+'	Return $"
+'        <button class="collapsible collapsible-background-${section.Color}"><span style="width: 60px" class="badge badge-${section.Color} text-dark py-1 mr-1">${section.Verb}</span>
+'		${IIf(section.Authenticate.EqualsIgnoreCase("Basic") Or section.Authenticate.EqualsIgnoreCase("Token"), _
+'			$"<span style="width: 50px" class="badge rounded-pill pill-yellow pill-yellow-text px-2 py-1">${WebApiUtils.ProperCase(section.Authenticate)}</span>"$, "")}<span class="ml-1">${section.Description}</span>
+'		</button>
+'        <div class="details mb-1">
+'            <div class="row">
+'                <div class="col-md-3 p-3">
+'                    <p><strong>Parameters</strong><br/>
+'                    <label class="col control-label border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small;">${section.Params}</label></p>
+'                    ${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strFormat, "")}
+'                    <div class="mt-3"><strong>Status Code</strong><br/>
+'                    ${section.Expected}</div>
+'                </div>
+'	            <div class="col-md-3 p-3">
+'					<form hx-${section.Verb}="${section.Link}" hx-ext="json-enc" hx-trigger="submit" hx-target="#response${section.ElementId}" hx-swap="innerHTML">
+'					<p><Strong>Path</Strong><Br/>
+'	                <input${IIf(section.InputDisabled, " disabled", "")} id="path${section.ElementId}" class="form-control text-light" style="background-color: ${section.DisabledBackground}; font-size: small" value="${section.Link & IIf(section.Raw, "?format=json", "")}"></p>
+'					${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strPayload, $""$)}
+'					<button id="btn${section.ElementId}" class="${IIf(section.FileUpload.EqualsIgnoreCase("Image") Or section.FileUpload.EqualsIgnoreCase("PDF"), $"file"$, $"${section.Verb.ToLowerCase}"$)}${IIf(section.Authenticate.ToUpperCase = "BASIC" Or section.Authenticate.ToUpperCase = "TOKEN", " " & section.Authenticate.ToLowerCase, "")} button submit-button-${section.Color} text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px"><Strong>Submit</Strong></Button>
+'	            	</form>
+'				</div>
+'                <div class="col-md-6 p-3">
+'                    <p><Strong>Response</Strong><Br/>
+'                    <textarea rows="10" id="response${section.ElementId}" class="form-control" style="background-color: #363636; color: white; font-size: small"></textarea></p>
+'                    <div id="alert${section.ElementId}" class="alert text-light" role="alert" style="display: block"></div>
+'                </div>
+'            </div>
+'        </div>"$
+'End Sub
+
 Private Sub GenerateVerbSection (section As VerbSection) As String
+	Dim Button1 As Tag = Button.cls("collapsible collapsible-background-" & section.Color)
+	Button1.add(Span.cls("badge badge-" & section.Color & " text-dark py-1 mr-1").sty("width: 60px").text(section.Verb))
+	If section.Authenticate.EqualsIgnoreCase("Basic") Or section.Authenticate.EqualsIgnoreCase("Token") Then
+		Button1.add(Span.cls("badge rounded-pill pill-yellow pill-yellow-text px-2 py-1").sty("width: 50px").text(WebApiUtils.ProperCase(section.Authenticate)))
+	End If
+	Button1.add(Span.cls("ml-1").text(section.Description))
+	
 	Select section.FileUpload
 		Case "Image", "PDF"
-			Dim strPayload As String = $"<p><strong>File:</strong> <label for="file1${section.ElementId}">Choose a file:</label><input type="file" id="file1${section.ElementId}" class="pb-3" name="file1"></p>"$
+			'Dim strPayload As String = $"<p><strong>File:</strong> <label for="file1${section.ElementId}">Choose a file:</label><input type="file" id="file1${section.ElementId}" class="pb-3" name="file1"></p>"$
+			Dim Payload1 As Tag = Paragraph.init
+			Payload1.add(Strong.text("File:"))
+			'Payload1.add(Html.create("").text(" "))
+			Payload1.add(Label.forId($"file1${section.ElementId}"$).text("Choose a file:"))
+			Payload1.add(Input.cls("pb-3").typeOf("file").id($"file1${section.ElementId}"$).name("file1"))
 		Case Else
-			Dim strFormat As String = $"<p><strong>Format:</strong> <span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">${section.Format}</span></p>"$
-			Dim strPayload As String = $"<p><strong>Payload:</strong> <textarea id="body${section.ElementId}" rows="6" class="form-control" style="background-color: #363636; color: white; font-size: small">${section.Payload}</textarea></p>"$
+			'Dim strFormat As String = $"<p><strong>Format:</strong> <span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">${section.Format}</span></p>"$
+			'Dim strPayload As String = $"<p><strong>Payload:</strong> <textarea id="body${section.ElementId}" rows="6" class="form-control" style="background-color: #363636; color: white; font-size: small">${section.Payload}</textarea></p>"$
+
+			Dim Format1 As Tag = Paragraph.init
+			Format1.add(Strong.text("Format: "))
+			Format1.add(Span.cls("form-control").sty("background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small").text(section.Format))
+			
+			Dim Payload1 As Tag = Paragraph.init
+			Payload1.add(Strong.text("Payload:"))
+			'Payload1.add(Html.create("").text(" "))
+			Payload1.add(Textarea.rows("6").id("body" & section.ElementId).cls("form-control").sty("background-color: #363636; color: white; font-size: small"))
 	End Select
-	Return $"
-        <button class="collapsible collapsible-background-${section.Color}"><span style="width: 60px" class="badge badge-${section.Color} text-dark py-1 mr-1">${section.Verb}</span>
-		${IIf(section.Authenticate.EqualsIgnoreCase("Basic") Or section.Authenticate.EqualsIgnoreCase("Token"), _
-			$"<span style="width: 50px" class="badge rounded-pill pill-yellow pill-yellow-text px-2 py-1">${WebApiUtils.ProperCase(section.Authenticate)}</span>"$, "")}<span class="ml-1">${section.Description}</span>
-		</button>
-        <div class="details mb-1">
-            <div class="row">
-                <div class="col-md-3 p-3">
-                    <p><strong>Parameters</strong><br/>
-                    <label class="col control-label border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small;">${section.Params}</label></p>
-                    ${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strFormat, "")}
-                    <div class="mt-3"><strong>Status Code</strong><br/>
-                    ${section.Expected}</div>
-                </div>
-	            <div class="col-md-3 p-3">
-					<form method="${section.Verb}">
-					<p><strong>Path</strong><br/>
-	                <input${IIf(section.InputDisabled, " disabled", "")} id="path${section.ElementId}" class="form-control text-light" style="background-color: ${section.DisabledBackground}; font-size: small" value="${section.Link & IIf(section.Raw, "?format=json", "")}"></p>
-					${IIf(section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT"), strPayload, $""$)}
-					<button id="btn${section.ElementId}" class="${IIf(section.FileUpload.EqualsIgnoreCase("Image") Or section.FileUpload.EqualsIgnoreCase("PDF"), $"file"$, $"${section.Verb.ToLowerCase}"$)}${IIf(section.Authenticate.ToUpperCase = "BASIC" Or section.Authenticate.ToUpperCase = "TOKEN", " " & section.Authenticate.ToLowerCase, "")} button submit-button-${section.Color} text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px"><strong>Submit</strong></button>
-	            	</form>
-				</div>
-                <div class="col-md-6 p-3">
-                    <p><strong>Response</strong><br/>
-                    <textarea rows="10" id="response${section.ElementId}" class="form-control" style="background-color: #363636; color: white; font-size: small"></textarea></p>
-                    <div id="alert${section.ElementId}" class="alert text-light" role="alert" style="display: block"></div>
-                </div>
-            </div>
-        </div>"$
+	
+	Dim Details As Tag = Div.cls("details mb-1")
+	Dim Row1 As Tag = Details.add(Div.cls("row"))
+	Dim Col1 As Tag = Row1.add(Div.cls("col-md-3 p-3"))
+	Dim P1 As Tag = Col1.add(Paragraph.init)
+	P1.add(Strong.text("Parameters"))
+	P1.add(Br.init)
+	P1.add(Label.cls("form-control text-light border rounded") _
+	.sty("padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: " & section.DisabledBackground) _
+	.text(section.Params))
+	If section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT") Then
+		Col1.add(Format1)
+	End If
+	Dim Div1 As Tag = Col1.add(Div.cls("mt-3"))
+	Div1.add(Strong.text("Status Code"))
+	Div1.add(Br.init)
+	Div1.text(section.Expected)
+	
+	Dim Col2 As Tag = Row1.add(Div.cls("col-md-3 p-3"))
+	Dim Form1 As Tag = Col2.add(Form.id("form" & section.ElementId))
+	Select section.Verb
+		Case "GET"
+			Form1.hxGet(section.Link & IIf(section.Raw, "?format=json", ""))
+		Case "POST"
+			Form1.hxPost(section.Link)
+		Case "PUT"
+			Form1.hxPut(section.Link)
+		Case "DELETE"
+			Form1.hxDelete(section.Link)
+	End Select
+	Form1.hxExt("json-enc")
+	Form1.hxTrigger("submit")
+	Form1.hxTarget("#response" & section.ElementId)
+	Form1.hxSwap("innerHTML")
+	Dim P2 As Tag = Form1.add(Paragraph.init)
+	P2.add(Strong.text("Path"))
+	P2.add(Br.init)
+	Dim Input1 As Tag = P2.add(Input.typeOf("text"))
+	Input1.id("path" & section.ElementId)
+	Input1.cls("form-control text-light")
+	Input1.sty("background-color: " & section.DisabledBackground & "; font-size: small")
+	Input1.valueOf(section.Link & IIf(section.Raw, "?format=json", ""))
+	If section.InputDisabled Then
+		Input1.attr3("disabled")
+	End If
+	If section.Verb.EqualsIgnoreCase("POST") Or section.Verb.EqualsIgnoreCase("PUT") Then
+		Form1.add(Payload1)
+	End If
+	Dim Submit1 As Tag = Form1.add(Button.id("btn" & section.ElementId))
+	If section.FileUpload.EqualsIgnoreCase("Image") Or section.FileUpload.EqualsIgnoreCase("PDF") Then
+		Submit1.cls("file")
+	Else
+		Submit1.cls(section.Verb.ToLowerCase)
+		If section.Authenticate.ToUpperCase = "BASIC" Or section.Authenticate.ToUpperCase = "TOKEN" Then
+			Submit1.cls(section.Authenticate.ToLowerCase)
+		End If
+	End If
+	Submit1.cls("button submit-button-" & section.Color)
+	Submit1.cls("text-white col-md-6 col-lg-4 p-2 float-right")
+	Submit1.sty("cursor: pointer; padding-bottom: 60px")
+	Submit1.add(Strong.text("Submit"))
+	
+	Dim Col3 As Tag = Row1.add(Div.cls("col-md-6 p-3"))
+	Dim P3 As Tag = Col3.add(Paragraph.init)
+	P3.add(Strong.text("Response"))
+	P3.add(Br.init)
+	P3.add(Textarea.rows("10") _
+	.id("response" & section.ElementId) _
+	.cls("form-control") _
+	.sty("background-color: #363636; color: white; font-size: small"))
+	Dim Alert1 As Tag = Col3.add(Div.id("alert" & section.ElementId))
+	Alert1.cls("alert text-light")
+	Alert1.attr("role", "alert")
+	Alert1.sty("display: block")
+	
+	'Details.PrintMe
+	Dim SB As StringBuilder
+	SB.Initialize
+	SB.Append(Button1.Build)
+	SB.Append(Details.Build)
+	If section.ElementId = "GetCategories" Then
+		File.WriteString(File.DirApp, "Verb.html", SB.ToString)
+	End If
+	Return SB.ToString
 End Sub
 
 Private Sub GenerateHeaderByGroup (Group As String) As String
-	Return $"
-		<div class="row mt-3">
-            <div class="col-md-12">
-                <h6 class="text-uppercase text-primary"><strong>${Group}</strong></h6>
-            </div>
-		</div>"$
+	Dim div1 As Tag = Div.cls("row mt-3")
+	Dim div2 As Tag = div1.add(Div.cls("col-md-12"))
+	div2.add(H6.cls("text-uppercase text-light").add2(Strong.text(Group)))
+	Return div1.Build
 End Sub
 
 Private Sub GenerateDocItem (Props As Map) As String

@@ -1,0 +1,693 @@
+<root>
+  <div class="row mt-3">
+    <div class="col-md-12"><strong>
+  Categories</strong>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-green"><span class="badge badge-green text-dark py-1 mr-1" style="width: 60px">
+  GET</span><span class="ml-1">
+  Read all Categories</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #696969">
+            Not required</label>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseGetCategories" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #696969; font-size: small" type="text" id="pathGetCategories" value="$SERVER_URL$/api/categories" disabled>
+          </p>
+          <button class="get button submit-button-green text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnGetCategories"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseGetCategories"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertGetCategories" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-green"><span class="badge badge-green text-dark py-1 mr-1" style="width: 60px">
+  GET</span><span class="ml-1">
+  Read one Category by id</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #363636">
+            id [Int]</label>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseGetCategoryById" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #363636; font-size: small" type="text" id="pathGetCategoryById" value="$SERVER_URL$/api/categories/{id}">
+          </p>
+          <button class="get button submit-button-green text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnGetCategoryById"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseGetCategoryById"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertGetCategoryById" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-purple"><span class="badge badge-purple text-dark py-1 mr-1" style="width: 60px">
+  POST</span><span class="ml-1">
+  Add new Category</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #696969">
+            Not required</label>
+        </p>
+        <p><strong>
+  Format:</strong><span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">
+  {
+  <br/>
+  &nbsp;&nbsp;"category_name": "category_name"
+  <br/>
+  }</span>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          201 Created
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseCreateNewCategory" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #696969; font-size: small" type="text" id="pathCreateNewCategory" value="$SERVER_URL$/api/categories" disabled>
+          </p>
+          <p><strong>
+  Payload:</strong><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="6" id="bodyCreateNewCategory"></textarea>
+          </p>
+          <button class="post button submit-button-purple text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnCreateNewCategory"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseCreateNewCategory"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertCreateNewCategory" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-blue"><span class="badge badge-blue text-dark py-1 mr-1" style="width: 60px">
+  PUT</span><span class="ml-1">
+  Update Category by id</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #363636">
+            id [Int]</label>
+        </p>
+        <p><strong>
+  Format:</strong><span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">
+  {
+  <br/>
+  &nbsp;&nbsp;"category_name": "category_name"
+  <br/>
+  }</span>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseUpdateCategoryById" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #363636; font-size: small" type="text" id="pathUpdateCategoryById" value="$SERVER_URL$/api/categories/{id}">
+          </p>
+          <p><strong>
+  Payload:</strong><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="6" id="bodyUpdateCategoryById"></textarea>
+          </p>
+          <button class="put button submit-button-blue text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnUpdateCategoryById"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseUpdateCategoryById"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertUpdateCategoryById" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-red"><span class="badge badge-red text-dark py-1 mr-1" style="width: 60px">
+  DELETE</span><span class="ml-1">
+  Delete Category by id</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #363636">
+            id [Int]</label>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseDeleteCategoryById" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #363636; font-size: small" type="text" id="pathDeleteCategoryById" value="$SERVER_URL$/api/categories/{id}">
+          </p>
+          <button class="delete button submit-button-red text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnDeleteCategoryById"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseDeleteCategoryById"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertDeleteCategoryById" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-12"><strong>
+  Products</strong>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-green"><span class="badge badge-green text-dark py-1 mr-1" style="width: 60px">
+  GET</span><span class="ml-1">
+  Read all Products</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #696969">
+            Not required</label>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseGetProducts" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #696969; font-size: small" type="text" id="pathGetProducts" value="$SERVER_URL$/api/products" disabled>
+          </p>
+          <button class="get button submit-button-green text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnGetProducts"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseGetProducts"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertGetProducts" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-green"><span class="badge badge-green text-dark py-1 mr-1" style="width: 60px">
+  GET</span><span class="ml-1">
+  Read one Product by id</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #363636">
+            id [Int]</label>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseGetProductById" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #363636; font-size: small" type="text" id="pathGetProductById" value="$SERVER_URL$/api/products/{id}">
+          </p>
+          <button class="get button submit-button-green text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnGetProductById"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseGetProductById"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertGetProductById" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-purple"><span class="badge badge-purple text-dark py-1 mr-1" style="width: 60px">
+  POST</span><span class="ml-1">
+  Add new Product</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #696969">
+            Not required</label>
+        </p>
+        <p><strong>
+  Format:</strong><span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">
+  {
+  <br/>
+  &nbsp;"category_id": 1,
+  <br/>
+  &nbsp;"product_code": "CODE",
+  <br/>
+  &nbsp;"product_name": "ProductName",
+  <br/>
+  &nbsp;"product_price": 0
+  <br/>
+  }</span>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          201 Created
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responsePostProduct" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #696969; font-size: small" type="text" id="pathPostProduct" value="$SERVER_URL$/api/products" disabled>
+          </p>
+          <p><strong>
+  Payload:</strong><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="6" id="bodyPostProduct"></textarea>
+          </p>
+          <button class="post button submit-button-purple text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnPostProduct"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responsePostProduct"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertPostProduct" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-blue"><span class="badge badge-blue text-dark py-1 mr-1" style="width: 60px">
+  PUT</span><span class="ml-1">
+  Update Product by id</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #363636">
+            id [Int]</label>
+        </p>
+        <p><strong>
+  Format:</strong><span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">
+  {
+  <br/>
+  &nbsp;"category_id": 1,
+  <br/>
+  &nbsp;"product_code": "CODE",
+  <br/>
+  &nbsp;"product_name": "ProductName",
+  <br/>
+  &nbsp;"product_price": 10
+  <br/>
+  }</span>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responsePutProductById" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #363636; font-size: small" type="text" id="pathPutProductById" value="$SERVER_URL$/api/products/{id}">
+          </p>
+          <p><strong>
+  Payload:</strong><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="6" id="bodyPutProductById"></textarea>
+          </p>
+          <button class="put button submit-button-blue text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnPutProductById"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responsePutProductById"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertPutProductById" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-red"><span class="badge badge-red text-dark py-1 mr-1" style="width: 60px">
+  DELETE</span><span class="ml-1">
+  Delete Product by id</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #363636">
+            id [Int]</label>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseDeleteProductById" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #363636; font-size: small" type="text" id="pathDeleteProductById" value="$SERVER_URL$/api/products/{id}">
+          </p>
+          <button class="delete button submit-button-red text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnDeleteProductById"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseDeleteProductById"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertDeleteProductById" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-12"><strong>
+  Find</strong>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-green"><span class="badge badge-green text-dark py-1 mr-1" style="width: 60px">
+  GET</span><span class="ml-1">
+  Search all Products</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #696969">
+            Not required</label>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseGetAllProducts" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #696969; font-size: small" type="text" id="pathGetAllProducts" value="$SERVER_URL$/api/find" disabled>
+          </p>
+          <button class="get button submit-button-green text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnGetAllProducts"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseGetAllProducts"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertGetAllProducts" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-green"><span class="badge badge-green text-dark py-1 mr-1" style="width: 60px">
+  GET</span><span class="ml-1">
+  Search all Products by Category Id</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #363636">
+            id [Int]</label>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          405 Method not allowed
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseGetProductsByCategoryId" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #363636; font-size: small" type="text" id="pathGetProductsByCategoryId" value="$SERVER_URL$/api/find/products-by-category_id/{id}">
+          </p>
+          <button class="get button submit-button-green text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnGetProductsByCategoryId"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseGetProductsByCategoryId"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertGetProductsByCategoryId" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="collapsible collapsible-background-purple"><span class="badge badge-purple text-dark py-1 mr-1" style="width: 60px">
+  POST</span><span class="ml-1">
+  Search Products by keyword</span></button>
+  <div class="details mb-1">
+    <div class="row">
+      <div class="col-md-3 p-3">
+        <p><strong>
+  Parameters</strong>
+          <br/>
+          <label class="form-control text-light border rounded" style="padding-top: 5px; padding-bottom: 5px; font-size: small; background-color: #696969">
+            Not required</label>
+        </p>
+        <p><strong>
+  Format:</strong><span class="form-control" style="background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small">
+  {
+  <br/>
+  &nbsp;&nbsp;"keyword": "text"
+  <br/>
+  }</span>
+        </p>
+        <div class="mt-3"><strong>
+  Status Code</strong>
+          <br/>
+          200 Success
+          <br/>
+          400 Bad Request
+          <br/>
+          404 Not found
+          <br/>
+          422 Error execute query
+        </div>
+      </div>
+      <div class="col-md-3 p-3">
+        <form hx-ext="json-enc" hx-trigger="submit" hx-target="#responseSearchByKeywords" hx-swap="innerHTML">
+          <p><strong>
+  Path</strong>
+            <br/>
+            <input class="form-control text-light" style="background-color: #696969; font-size: small" type="text" id="pathSearchByKeywords" value="$SERVER_URL$/api/find" disabled>
+          </p>
+          <p><strong>
+  Payload:</strong><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="6" id="bodySearchByKeywords"></textarea>
+          </p>
+          <button class="post button submit-button-purple text-white col-md-6 col-lg-4 p-2 float-right" style="cursor: pointer; padding-bottom: 60px" id="btnSearchByKeywords"><strong>
+  Submit</strong></button>
+        </form>
+      </div>
+      <div class="col-md-6 p-3">
+        <p><strong>
+  Response</strong>
+          <br/><textarea class="form-control" style="background-color: #363636; color: white; font-size: small" rows="10" id="responseSearchByKeywords"></textarea>
+        </p>
+        <div class="alert text-light" style="display: block" id="alertSearchByKeywords" role="alert">
+        </div>
+      </div>
+    </div>
+  </div>
+</root>

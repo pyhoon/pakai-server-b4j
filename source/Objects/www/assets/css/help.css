@@ -5,7 +5,7 @@
  */
 body {
     font-family: Arial, Helvetica, Tahoma, Times New Roman;
-    margin-top: 60px;
+    /* margin-top: 60px; */
 }
 
 button {
@@ -177,3 +177,66 @@ button:focus {
     font-size: 0.8em;
     color: red;
 }
+
+/* Alert styles */
+.alert-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.alert-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.alert-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.alert-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+/* Make sure alerts are visible */
+.alert {
+    padding: 12px 20px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    display: none;
+}
+
+/* Collapsible styles */
+.collapsible {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.collapsible-background-green { background-color: #28a745; }
+.collapsible-background-purple { background-color: #6f42c1; }
+.collapsible-background-blue { background-color: #007bff; }
+.collapsible-background-red { background-color: #dc3545; }
+
+.collapsible:hover {
+    opacity: 0.9;
+}
+
+/* Badge colors */
+.badge-green { color: #28a745; }
+.badge-purple { color: #6f42c1; }
+.badge-blue {  color: #007bff; }
+.badge-red { color: #dc3545; }
+
+/* Button colors */
+.submit-button-green { background-color: #28a745; }
+.submit-button-purple { background-color: #6f42c1; }
+.submit-button-blue { background-color: #007bff; }
+.submit-button-red { background-color: #dc3545; }
+
+.submit-button-green:hover { background-color: #218838; }
+.submit-button-purple:hover { background-color: #5a359a; }
+.submit-button-blue:hover { background-color: #0056b3; }
+.submit-button-red:hover { background-color: #c82333; }

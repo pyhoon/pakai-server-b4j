@@ -25,7 +25,10 @@ Public Sub ReturnView As String
 	html1.add(PageBody)
 	Dim body1 As Tag = html1.ChildByTagName("body")
 	body1.add(BodyFooter)
-	body1.script("$SERVER_URL$/assets/js/jquery.min.js")
+	'body1.script("$SERVER_URL$/assets/js/jquery.min.js")
+	body1.script("$SERVER_URL$/assets/js/bootstrap.bundle.min.js")
+	body1.script("$SERVER_URL$/assets/js/htmx.min.js")
+	body1.script("$SERVER_URL$/assets/js/json-enc.js")
 	body1.script("$SERVER_URL$/assets/scripts/help.js")
 	doc.Append(html1.build)
 	Return doc.ToString
@@ -41,25 +44,30 @@ Private Sub PageHeader As Tag
 	header1.title("$APP_TITLE$")
 	header1.linkIcon("image/png", "$SERVER_URL$/assets/img/favicon.png")
 	header1.linkcss("$SERVER_URL$/assets/css/bootstrap.min.css")
-	header1.linkcss("$SERVER_URL$/assets/css/fontawesome.min.css")
-	header1.linkcss("$SERVER_URL$/assets/css/solid.min.css")
+	header1.linkcss("$SERVER_URL$/assets/css/themify-icons.css")
+	'header1.linkcss("$SERVER_URL$/assets/css/fontawesome.min.css")
+	'header1.linkcss("$SERVER_URL$/assets/css/solid.min.css")
 	header1.linkcss("$SERVER_URL$/assets/css/help.css")
 	Return header1
 End Sub
 
 Private Sub PageBody As Tag
-	Dim body1 As Tag = Body.cls("bg-dark text-light")
-	Dim nav1 As Tag = body1.add(Nav.cls("navbar navbar-expand-lg fixed-top navbar-dark yellow pt-1 pb-1"))
-	nav1.add(Anchor.cls("text-dark h4 mt-2 mr-2").hrefOf("#")).add(Icon.cls("fas fa-cloud ml-3"))
-	nav1.add(Anchor.cls("navbar-brand font-weight-bold text-dark").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
-	Dim toggler1 As Tag = nav1.add(Button.cls("navbar-toggler custom-toggler"))
+	Dim body1 As Tag = Body.cls("bg-dark")
+	Dim nav1 As Tag = body1.add(Nav.cls("navbar navbar-expand-lg sticky-top yellow"))
+	Dim div1 As Tag = nav1.add(Div.cls("container-fluid"))
+	
+	div1.add(Anchor.cls("navbar-brand me-0 me-lg-2").hrefOf("#")).add(Icon.cls("ti ti-cloud").sty("font-size: 2em"))
+	div1.add(Anchor.cls("navbar-brand").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
+	
+	Dim toggler1 As Tag = div1.add(Button.cls("navbar-toggler collapsed"))
 	toggler1.typeOf("button") _
-	.attr("data-toggle", "collapse") _
-	.attr("data-target", "#navbarCollapse") _
+	.attr("data-bs-toggle", "collapse") _
+	.attr("data-bs-target", "#navbarCollapse") _
 	.sty("border: none") _
 	.add(Span.cls("navbar-toggler-icon"))
-	Dim collapse1 As Tag = nav1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
-	Dim Ult1 As Tag = collapse1.add(Ul.cls("navbar-nav ml-auto"))
+	
+	Dim collapse1 As Tag = div1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
+	Dim Ult1 As Tag = collapse1.add(Ul.cls("navbar-nav navbar-brand ms-auto mb-md-0"))
 	'If Main.Api.EnableHelp Then
 	'	Dim Lit1 As Tag = Ult1.add(Li.cls("nav-item mt-1 ml-3"))
 	'	Dim Anchor1 As Tag = Lit1.add(Anchor.cls("nav-link font-weight-bold text-dark mr-3"))
@@ -67,7 +75,7 @@ Private Sub PageBody As Tag
 	'	Anchor1.add(Icon.cls("fas fa-cog mr-2").attr("title", "API"))
 	'	Anchor1.text("API")
 	'End If
-	Dim Lit2 As Tag = Ult1.add(Li.cls("nav-item font-weight-bold d-none d-sm-none d-md-block"))
+	Dim Lit2 As Tag = Ult1.add(Li.cls("nav-item d-none d-sm-none d-md-block"))
 	Dim Anchor2 As Tag = Lit2.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
 	Anchor2.add(Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px"))
 	Dim sponsor As Tag = Div.cls("text-center font-weight-bold d-block d-sm-block d-md-none").up(body1)
@@ -94,7 +102,7 @@ Private Sub PageBody As Tag
 		'File.WriteString(File.DirApp, "root.txt", root.Children.Get(0))
 		'Dim newTag As Tag = parser.ConvertToTag(root.Children.Get(0))
 		Dim newTag As Tag = parser.ConvertToTag(root)
-		'Log(newTag.Build)
+		'Log(newTag.PrintMe)
 		'File.WriteString(File.DirApp, "newtag.html", newTag.Build)
 		'padding2.add(newTag.Child(0)) ' DocView
 		For Each child As Tag In newTag.Children
