@@ -5,18 +5,18 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 Sub Class_Globals
-	
+	Private DB As MiniORM
 End Sub
 
 Public Sub Initialize
-	
+	DB.Initialize(Main.DBType, Null)
 End Sub
 
 Public Sub Render As List
 	Dim Tags As List
 	Tags.Initialize
 	Tags.Add(Html.comment2(" Content Begin "))
-	Tags.Add(TableProducts)
+	Tags.Add(ProductContent)
 	Tags.Add(GitHubLink)
 	Tags.Add(Html.comment2(" Content End "))
 	Tags.Add(Html.comment2(" Modal Begin "))
@@ -27,7 +27,7 @@ Public Sub Render As List
 	Return Tags
 End Sub
 
-Private Sub TableProducts As Tag
+Private Sub ProductContent As Tag
 	Dim content1 As Tag = Div.cls("row mt-3")
 	Dim col12 As Tag = content1.add(Div.cls("col-md-12"))
 	Dim form1 As Tag = col12.add(Form.cls("form mb-3").id("search_form").action(""))
@@ -46,10 +46,7 @@ Private Sub TableProducts As Tag
 	
 	Dim results As Tag = Div.id("results").cls("table").up(col12)
 	Dim table1 As Tag = results.add(HtmlTable.cls("table table-bordered rounded-3"))
-	'Dim table1 As Tag = col12.add(Div.id("results").cls("table")).add(HtmlTable.cls("table table-bordered rounded-3"))
-	table1.hxGet("/table") _
-	.hxTrigger("load") _
-	.hxSwap("outerHTML")
+	table1.hxGet("/table").hxTrigger("load").hxSwap("outerHTML")
 	table1.add(Tr.init).add(Td.cls("text-center").text("No results"))
 	Return content1
 End Sub
@@ -97,7 +94,7 @@ Private Sub ModalProductAdd As Tag
 	group4.add(Input.typeOf("text").id("price1").name("category_price").cls("form-control"))
 
 	modalFooter.add(Button.typeOf("submit").cls("btn btn-success").id("add").text("Create"))
-	Dim InputMap As Map = CreateMap("data-dismiss": "modal", "value": "Cancel")
+	Dim InputMap As Map = CreateMap("data-bs-dismiss": "modal", "value": "Cancel")
 	modalFooter.add(Input.typeOf("button").cls("btn btn-default").attr2(InputMap))
 	Return modal1
 End Sub
@@ -136,7 +133,7 @@ Private Sub ModalProductEdit As Tag
 	group4.add(Input.typeOf("text").id("price2").name("product_price").cls("form-control"))
 	
 	modalFooter.add(Button.typeOf("submit").cls("btn btn-primary").id("update").text("Update"))
-	Dim ButtonAttribute2 As Map = CreateMap("data-dismiss": "modal", "value": "Cancel")
+	Dim ButtonAttribute2 As Map = CreateMap("data-bs-dismiss": "modal", "value": "Cancel")
 	modalFooter.add(Input.typeOf("button").cls("btn btn-default").attr2(ButtonAttribute2))
 	Return modal1
 End Sub
@@ -163,4 +160,47 @@ Private Sub ModalProductDelete As Tag
 	Dim ButtonAttribute2 As Map = CreateMap("data-bs-dismiss": "modal", "value": "Cancel")
 	modalFooter.add(Input.typeOf("button").cls("btn btn-default").attr2(ButtonAttribute2))
 	Return modal1
+End Sub
+
+Public Sub RenderTable (Response As ServletResponse)
+	Dim table1 As Tag = HtmlTable.cls("table table-bordered rounded small")
+	Dim thead1 As Tag = table1.add(Thead.cls("table-light"))
+	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
+	thead1.add(Th.text("Code"))
+	thead1.add(Th.text("Name"))
+	thead1.add(Th.text("Category"))
+	thead1.add(Th.sty("text-align: right").text("Price"))
+	thead1.add(Th.sty("text-align: center; width: 90px").text("Actions"))
+	Dim tbody1 As Tag = table1.add(Tbody.init)
+	
+	DB.SQL = Main.DBOpen
+	DB.Table = "tbl_products p"
+	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
+	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
+	DB.OrderBy = CreateMap("p.id": "")
+	DB.Query
+	For Each row As Map In DB.Results2
+		Dim tr1 As Tag = tbody1.add(Tr.init)
+		tr1.add(Td.cls("align-middle").sty("text-align: right").text(row.Get("id")))
+		tr1.add(Td.cls("align-middle").text(row.Get("code")))
+		tr1.add(Td.cls("align-middle").text(row.Get("name")))
+		tr1.add(Td.cls("align-middle").text(row.Get("category")))
+		tr1.add(Td.cls("align-middle").sty("text-align: right").text(row.Get("price")))
+		Dim td1 As Tag = tr1.add(Td.init)
+		Dim anchor1 As Tag = td1.add(Anchor.href("#edit").cls("edit text-primary mx-2").data("bs-toggle", "modal"))
+		Dim icon1 As Tag = anchor1.add(Icon.cls("ti ti-pencil").sty("font-weight: bold"))
+		icon1.data("bs-toggle", "tooltip") _
+		.data("bs-id", row.Get("id")) _
+		.data("bs-name", row.Get("name")) _
+		.attr("title", "Edit")
+		
+		Dim anchor2 As Tag = td1.add(Anchor.href("#delete").cls("delete text-danger mx-2").data("bs-toggle", "modal"))
+		Dim icon2 As Tag = anchor2.add(Icon.cls("ti ti-trash").sty("font-weight: bold"))
+		icon2.data("bs-toggle", "tooltip") _
+		.data("bs-id", row.Get("id")) _
+		.data("bs-name", row.Get("name")) _
+		.attr("title", "Delete")
+	Next
+	DB.Close
+	WebApiUtils.ReturnHtml(table1.Build, Response)
 End Sub

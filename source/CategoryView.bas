@@ -5,18 +5,18 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 Sub Class_Globals
-	
+	Private DB As MiniORM
 End Sub
 
 Public Sub Initialize
-	
+	DB.Initialize(Main.DBType, Null)
 End Sub
 
 Public Sub Render As List
 	Dim Tags As List
 	Tags.Initialize
 	Tags.Add(Html.comment2(" Content Begin "))
-	Tags.Add(TableCategories)
+	Tags.Add(CategoryContent)
 	Tags.Add(Html.comment2(" Content End "))
 	Tags.Add(Html.comment2(" Modal Begin "))
 	Tags.Add(ModalCategoryAdd)
@@ -26,7 +26,7 @@ Public Sub Render As List
 	Return Tags
 End Sub
 
-Private Sub TableCategories As Tag
+Private Sub CategoryContent As Tag
 	Dim content1 As Tag = Div.cls("row mt-3 text-center align-items-center justify-content-center")
 	Dim col1 As Tag = Div.cls("col-md-12 col-lg-6").up(content1)
 	Dim row1 As Tag = Form.cls("form mb-3").action("").up(col1).add(Div.cls("row"))
@@ -42,9 +42,7 @@ Private Sub TableCategories As Tag
 	.add2(Icon.cls("ti ti-plus me-2")).text("New Category"))
 	Dim results As Tag = Div.id("results").cls("table").up(col1)
 	Dim table1 As Tag = results.add(HtmlTable.cls("table table-bordered rounded small"))
-	table1.hxGet("/categories/table") _
-	.hxTrigger("load") _
-	.hxSwap("outerHTML")
+	table1.hxGet("/categories/table").hxTrigger("load").hxSwap("outerHTML")
 	table1.add(Tr.init).add(Td.cls("text-center").text("No results"))
 	Return content1
 End Sub
@@ -85,7 +83,7 @@ Private Sub ModalCategoryEdit As Tag
 	.add(Label.text("Name ")).add2(Span.cls("text-danger").text("*")) _
 	.sib(Input.typeOf("text").id("name1").name("category_name").cls("form-control").attr3("required"))
 	modalFooter.add(Button.typeOf("submit").cls("btn btn-primary").id("update").text("Update"))
-	Dim ButtonAttribute2 As Map = CreateMap("data-dismiss": "modal", "value": "Cancel")
+	Dim ButtonAttribute2 As Map = CreateMap("data-bs-dismiss": "modal", "value": "Cancel")
 	modalFooter.add(Input.typeOf("button").cls("btn btn-default").attr2(ButtonAttribute2))
 	Return modal1
 End Sub
@@ -106,7 +104,56 @@ Private Sub ModalCategoryDelete As Tag
 	.add(Paragraph.id("name2")) _
 	.sib(Paragraph.text("Are you sure you want to delete this Category?"))
 	modalFooter.add(Button.typeOf("button").cls("btn btn-danger").id("remove").text("Delete"))
-	Dim ButtonAttribute2 As Map = CreateMap("data-dismiss": "modal", "value": "Cancel")
+	Dim ButtonAttribute2 As Map = CreateMap("data-bs-dismiss": "modal", "value": "Cancel")
 	modalFooter.add(Input.typeOf("button").cls("btn btn-default").attr2(ButtonAttribute2))
 	Return modal1
+End Sub
+
+Public Sub RenderTable (Response As ServletResponse)
+	Dim table1 As Tag = HtmlTable.cls("table table-bordered rounded small")
+	Dim thead1 As Tag = table1.add(Thead.cls("table-light"))
+	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
+	thead1.add(Th.text("Name"))
+	thead1.add(Th.sty("text-align: center; width: 90px").text("Actions"))
+	Dim tbody1 As Tag = table1.add(Tbody.init)
+	
+	DB.SQL = Main.DBOpen
+	DB.Table = "tbl_categories"
+	DB.Columns = Array("id", "category_name AS name")
+	DB.Query
+	For Each row As Map In DB.Results2
+		Dim tr1 As Tag = tbody1.add(Tr.init)
+		tr1.add(Td.cls("align-middle").sty("text-align: right").text(row.Get("id")))
+		tr1.add(Td.cls("align-middle").text(row.Get("name")))
+		Dim td1 As Tag = tr1.add(Td.init)
+		Dim anchor1 As Tag = td1.add(Anchor.href("#edit").cls("edit text-primary mx-2").data("bs-toggle", "modal"))
+		Dim icon1 As Tag = anchor1.add(Icon.cls("ti ti-pencil").sty("font-weight: bold"))
+		icon1.data("bs-toggle", "tooltip") _
+		.data("bs-id", row.Get("id")) _
+		.data("bs-name", row.Get("name")) _
+		.attr("title", "Edit")
+		
+		Dim anchor2 As Tag = td1.add(Anchor.href("#delete").cls("delete text-danger mx-2").data("bs-toggle", "modal"))
+		Dim icon2 As Tag = anchor2.add(Icon.cls("ti ti-trash").sty("font-weight: bold"))
+		icon2.data("bs-toggle", "tooltip") _
+		.data("bs-id", row.Get("id")) _
+		.data("bs-name", row.Get("name")) _
+		.attr("title", "Delete")
+	Next
+	DB.Close
+	WebApiUtils.ReturnHtml(table1.Build, Response)
+End Sub
+
+Public Sub RenderDropdown (Response As ServletResponse)
+	Dim option1 As Tag = Option.attr("selected", "").attr("disabled", "").text("Select Category")
+	WebApiUtils.ReturnHtml(option1.Build, Response)
+	DB.SQL = Main.DBOpen
+	DB.Table = "tbl_categories"
+	DB.Columns = Array("id", "category_name AS name")
+	DB.Query
+	For Each row As Map In DB.Results2
+		Dim option1 As Tag = Option.valueOf(row.Get("id")).text(row.Get("name"))
+		WebApiUtils.ReturnHtml(option1.Build, Response)
+	Next
+	DB.Close
 End Sub
