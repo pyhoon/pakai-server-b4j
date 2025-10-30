@@ -42,24 +42,30 @@ Public Sub Render As Tag
 	'body1.script("$SERVER_URL$/assets/js/jquery.min.js")
 	'body1.script("$SERVER_URL$/assets/js/jquery.validate.min.js")
 	body1.script("$SERVER_URL$/assets/js/bootstrap.bundle.min.js")
+	body1.script("$SERVER_URL$/assets/js/htmx.min.js")
+	body1.script4($"
+	// Auto-show modals when loaded
+    document.addEventListener('htmx:afterSwap', function(e) {
+        if (e.detail.target.id === 'modal-container') {
+            const modal = new bootstrap.Modal(e.detail.target.querySelector('.modal'));
+            modal.show();
+        }
+    });
+
+    // Auto-clear modal container
+    document.addEventListener('hidden.bs.modal', function() {
+        document.getElementById('modal-container').innerHTML = '';
+    });"$)
 	Return page1
 End Sub
-
-'Public Sub ReturnView As String
-'	Dim doc As Document
-'	doc.Initialize
-'	doc.AppendDocType
-'	doc.Append(ReturnTag.build)
-'	Return doc.ToString
-'End Sub
 
 Private Sub PageHeader As Tag
 	Dim header1 As Tag = Head.init
 	header1.add(Meta.attr("http-equiv", "content-type" ).attr("content", "text/html; charset=utf-8"))
 	header1.add(Meta.attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"))
 	'header1.add(Meta.attr("name", "csrf-token").attr("content", ""))
-	header1.add(Meta.attr("name", "description").attr("content", ""))
-	header1.add(Meta.attr("name", "author").attr("content", ""))
+	header1.add(Meta.attr("name", "description").attr("content", "Created using Pakai framework"))
+	header1.add(Meta.attr("name", "author").attr("content", "Aeric Poon"))
 	header1.title("$APP_TITLE$")
 	header1.linkIcon("image/png", "$SERVER_URL$/assets/img/favicon.png")
 	header1.linkcss("$SERVER_URL$/assets/css/bootstrap.min.css")
@@ -87,20 +93,25 @@ Private Sub PageBody As Tag
 	
 	Dim collapse1 As Tag = div1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
 	Dim ulist1 As Tag = collapse1.add(Ul.cls("navbar-nav navbar-brand ms-auto mb-md-0"))
-	If Main.Api.EnableHelp Then
-		Dim list1 As Tag = ulist1.add(Li.cls("nav-item mt-1 ms-1"))
-		Dim anchor1 As Tag = list1.add(Anchor.cls("nav-link text-dark me-3"))
-		anchor1.hrefOf($"${Main.App.ServerUrl}/help"$)
-		anchor1.add(Icon.cls("ti ti-settings me-2").attr("title", "API"))
-		anchor1.text("API")
-	End If
-	Dim list2 As Tag = ulist1.add(Li.cls("nav-item d-none d-sm-none d-md-block"))
-	Dim anchor2 As Tag = list2.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
-	anchor2.add(Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px"))
+	
+	'If Main.Api.EnableHelp Then
+	'	Dim list2 As Tag = ulist1.add(Li.cls("nav-item mt-1 ms-1"))
+	'	Dim anchor2 As Tag = list2.add(Anchor.cls("nav-link text-dark me-3"))
+	'	anchor2.hrefOf($"${Main.App.ServerUrl}/help"$)
+	'	anchor2.add(Icon.cls("ti ti-settings me-2").attr("title", "API"))
+	'	anchor2.text("API")
+	'End If
+	
+	Dim list1 As Tag = ulist1.add(Li.cls("nav-item d-none d-sm-none d-md-block"))
+	
+	Dim anchor1 As Tag = list1.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
+	anchor1.add(Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px"))
+	
 	Dim sponsor As Tag = Div.cls("text-center font-weight-bold d-block d-sm-block d-md-none").up(body1)
 	sponsor.sty("background-color: whitesmoke")
-	Dim anchor3 As Tag = sponsor.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
-	anchor3.add(Img.src("/assets/img/sponsor.png").cls("mx-2").sty("width: 174px"))
+	
+	Dim anchor2 As Tag = sponsor.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
+	anchor2.add(Img.src("/assets/img/sponsor.png").cls("mx-2").sty("width: 174px"))
 	
 	Dim content1 As Tag = body1.add(Div.cls("content m-3"))
 	Dim padding2 As Tag = content1.add(Div.cls("p-2"))

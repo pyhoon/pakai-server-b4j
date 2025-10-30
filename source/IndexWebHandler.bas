@@ -35,8 +35,8 @@ End Sub
 Private Sub RenderPage
 	main1.LoadView2(view1.Render)
 	Dim page1 As Tag = main1.Render
-	Dim body1 As Tag = page1.ChildByTagName("body")
-	body1.script("$SERVER_URL$/assets/js/htmx.min.js")
+	'Dim body1 As Tag = page1.ChildByTagName("body")
+	'body1.script("$SERVER_URL$/assets/js/htmx.min.js")
 	
 	Dim doc As Document
 	doc.Initialize

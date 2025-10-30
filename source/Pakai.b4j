@@ -16,22 +16,18 @@ Library2=jcore
 Library3=miniormutils
 Library4=webapiutils
 Library5=minihtml
-Module1=CategoriesApiHandler
-Module10=IndexWebHandler
-Module11=JavaScript
-Module12=MainView
-Module13=ProductsApiHandler
-Module2=CategoriesWebHandler
-Module3=CategoryView
-Module4=Database
-Module5=FindApiHandler
-Module6=HelpHandler
-Module7=HelpView
-Module8=HttpsFilter
-Module9=IndexView
+Module1=CategoriesHandler
+Module2=Database
+Module3=FindApiHandler
+Module4=HelpView
+Module5=HttpsFilter
+Module6=IndexView
+Module7=IndexWebHandler
+Module8=MainView
+Module9=ProductsApiHandler
 NumberOfFiles=4
 NumberOfLibraries=5
-NumberOfModules=13
+NumberOfModules=9
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
@@ -90,18 +86,26 @@ Sub AppStart (Args() As String)
 	App.Get("", "IndexWebHandler")
 	App.Get("/table", "IndexWebHandler")
 	#If Debug
-	App.Get("/help", "HelpHandler")
+	'App.Get("/help", "HelpHandler")
 	#End If
-	App.Get("/categories", "CategoriesWebHandler")
-	App.Get("/categories/table", "CategoriesWebHandler")
-	App.Get("/categories/list", "CategoriesWebHandler")
+	App.Get("/categories", "CategoriesHandler")
+	'App.Get("/categories", "CategoriesWebHandler")
+	'App.Get("/categories/table", "CategoriesWebHandler")
+	'App.Get("/categories/list", "CategoriesWebHandler")
 	
 	' *** Api handlers ***
-	App.Get("/api/categories", "CategoriesApiHandler")
-	App.Get("/api/categories/*", "CategoriesApiHandler")
-	App.Post("/api/categories", "CategoriesApiHandler")
-	App.Put("/api/categories/*", "CategoriesApiHandler")
-	App.Delete("/api/categories/*", "CategoriesApiHandler")
+	'App.Get("/api/categories", "CategoriesApiHandler")
+	'App.Post("/api/categories", "CategoriesApiHandler")
+	'App.Put("/api/categories", "CategoriesApiHandler")
+	'App.Delete("/api/categories", "CategoriesApiHandler")
+	'App.Rest("/api/categories", "CategoriesApiHandler")
+	'App.Get("/api/categories", "CategoriesHandler")
+	App.Rest("/api/categories/*", "CategoriesHandler")
+	
+	'App.Get("/api/categories/*", "CategoriesApiHandler")
+	'App.Get("/api/categories/modal/*", "CategoriesApiHandler")
+	'App.Put("/api/categories/*", "CategoriesApiHandler")
+	'App.Delete("/api/categories/*", "CategoriesApiHandler")
 	App.Get("/api/products", "ProductsApiHandler")
 	App.Get("/api/products/*", "ProductsApiHandler")
 	App.Post("/api/products", "ProductsApiHandler")
@@ -122,7 +126,7 @@ Sub AppStart (Args() As String)
 
 	DB.Initialize
 	DB.ConnectDatabase
-	JavaScript.CreateJSFiles
+	'JavaScript.CreateJSFiles
 	StartMessageLoop
 End Sub
 

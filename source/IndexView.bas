@@ -78,7 +78,7 @@ Private Sub ModalProductAdd As Tag
 	group1.add(Label.text("Category ")).add2(Span.cls("text-danger").text("*"))
 	Dim category1 As Tag = group1.add(Dropdown.id("category1").name("category_id").cls("form-select").attr3("required").aria("label", "Default select example"))
 	category1.add(Option.attr("selected", "").attr("disabled", "").text("Select Category"))
-	category1.hxGet("/categories/list")
+	category1.hxGet("/api/categories/list")
 	category1.hxTrigger("load")
 
 	Dim group2 As Tag = modalBody.add(Div.cls("form-group"))
@@ -117,7 +117,7 @@ Private Sub ModalProductEdit As Tag
 	group1.add(Label.text("Category ")).add2(Span.cls("text-danger").text("*"))
 	Dim category2 As Tag = group1.add(Dropdown.id("category2").name("category_id").cls("form-select").attr3("required").aria("label", "Default select example"))
 	category2.add(Option.attr("disabled", "").text("Select Category"))
-	category2.hxGet("/categories/list")
+	category2.hxGet("/api/categories/list")
 	category2.hxTrigger("load")
 
 	Dim group2 As Tag = modalBody.add(Div.cls("form-group"))
