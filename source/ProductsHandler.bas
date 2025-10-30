@@ -234,7 +234,7 @@ Private Sub HandleAddModal
 	
 	Dim modalHeader As Tag = Div.cls("modal-header").up(form1)
 	modalHeader.add(H5.cls("modal-title").text("Add Product"))
-	'modalHeader.add(Button.typeOf("button").cls("btn-close").data("bs-dismiss", "modal"))
+	modalHeader.add(Button.typeOf("button").cls("btn-close").data("bs-dismiss", "modal"))
 	
 	Dim modalBody As Tag = Div.cls("modal-body").up(form1)
 	
@@ -242,10 +242,16 @@ Private Sub HandleAddModal
 	group1.add(Label.text("Category ")).add2(Span.cls("text-danger").text("*"))
 	Dim category1 As Tag = group1.add(Dropdown.id("category").name("category").cls("form-select").attr3("required"))'.aria("label", "Default select example"))
 	category1.add(Option.attr("selected", "").attr3("disabled").text("Select Category"))
-	category1.hxGet("/api/categories/list")
-	category1.hxTrigger("load")
-	category1.hxTarget("#category")
-	category1.hxSwap("outerHTML")
+	DB.SQL = Main.DBOpen
+	DB.Table = "tbl_categories"
+	DB.Columns = Array("id", "category_name AS name")
+	DB.Query
+	For Each row As Map In DB.Results
+		Dim id As Int = row.Get("id")
+		Dim name As String = row.Get("name")
+		Option.valueOf(id).text(name).up(category1)
+	Next
+	DB.Close
 
 	Dim group2 As Tag = modalBody.add(Div.cls("form-group"))
 	group2.add(Label.text("Code ")).add2(Span.cls("text-danger").text("*"))
@@ -278,7 +284,7 @@ Private Sub HandleEditModal
 		Dim code As String = row.Get("code")
 		Dim name As String = row.Get("name")
 		Dim price As Double = row.Get("price")
-		'Dim category As Int = row.Get("category")
+		Dim category As Int = row.Get("category")
 		
 		Dim modal1 As Tag = Div.cls("modal fade")
 		Dim modalDialog As Tag = Div.cls("modal-dialog").up(modal1)
@@ -297,10 +303,20 @@ Private Sub HandleEditModal
 		group1.add(Label.text("Category ")).add2(Span.cls("text-danger").text("*"))
 		Dim category2 As Tag = group1.add(Dropdown.id("category").name("category").cls("form-select").attr3("required").aria("label", "Default select example"))
 		category2.add(Option.attr("disabled", "").text("Select Category"))
-		category2.hxGet("/api/categories/list")
-		category2.hxTrigger("load")
-		category2.hxTarget("#category")
-		category2.hxSwap("outerHTML")
+		DB.SQL = Main.DBOpen
+		DB.Table = "tbl_categories"
+		DB.Columns = Array("id", "category_name AS name")
+		DB.Query
+		For Each categoryrow As Map In DB.Results
+			Dim catid As Int = categoryrow.Get("id")
+			Dim catname As String = categoryrow.Get("name")
+			If catid = category Then
+				Option.valueOf(catid).attr3("selected").text(catname).up(category2)
+			Else
+				Option.valueOf(catid).text(catname).up(category2)
+			End If
+		Next
+		DB.Close
 		
 		Dim group2 As Tag = Div.cls("form-group").up(modalBody)
 		group2.add(Label.text("Code ")).add2(Span.cls("text-danger").text("*"))
@@ -357,10 +373,10 @@ Private Sub HandleProducts
 	Select Method
 		Case "POST"
 			' Create
-			Dim category As Int = Request.GetParameter("category")
 			Dim code As String = Request.GetParameter("code")
 			Dim name As String = Request.GetParameter("name")
 			Dim price As String = Request.GetParameter("price")
+			Dim category As String = Request.GetParameter("category")
 			If code = "" Or code.Trim.Length < 2 Then
 				'Response.Status = 422
 				Response.Write("<script>showError('Product Code must be at least 2 characters long!')</script>")
@@ -394,7 +410,7 @@ Private Sub HandleProducts
 		Case "PUT"
 			' Update
 			Dim id As Int = Request.GetParameter("id")
-			Dim category As Int = Request.GetParameter("category")
+			Dim category As String = Request.GetParameter("category")
 			Dim code As String = Request.GetParameter("code")
 			Dim name As String = Request.GetParameter("name")
 			Dim price As String = Request.GetParameter("price")
@@ -450,3 +466,74 @@ Private Sub HandleProducts
 			Response.Write("<script>closeModalAndRefresh('Product deleted successfully!')</script>")
 	End Select
 End Sub
+
+'Public Sub GetAllProducts
+'	Log($"${Request.Method}: ${Request.RequestURI}"$)
+'	DB.SQL = Main.DBOpen
+'	DB.Table = "tbl_products p"
+'	' Construct results with new column name alias
+'	DB.Select = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
+'	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
+'	DB.OrderBy = CreateMap("p.id": "")
+'	DB.Query
+'	HRM.ResponseCode = 200
+'	HRM.ResponseData = DB.Results2
+'	DB.Close
+'	ReturnApiResponse
+'End Sub
+'
+'Public Sub GetProductsByCategoryId (id As Int)
+'	Log($"${Request.Method}: ${Request.RequestURI}"$)
+'	DB.SQL = Main.DBOpen
+'	DB.Table = "tbl_products p"
+'	' Construct results with new column name alias
+'	DB.Select = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
+'	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
+'	DB.WhereParam("c.id = ?", id)
+'	DB.OrderBy = CreateMap("p.id": "")
+'	DB.Query
+'	HRM.ResponseCode = 200
+'	HRM.ResponseData = DB.Results2
+'	DB.Close
+'	ReturnApiResponse
+'End Sub
+'
+'Public Sub SearchByKeywords
+'	Log($"${Request.Method}: ${Request.RequestURI}"$)
+'	
+'	Dim str As String = WebApiUtils.RequestDataText(Request)
+'	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
+'		HRM.ResponseCode = 422
+'		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
+'		ReturnApiResponse
+'		Return
+'	End If
+'	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+'		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+'	Else
+'		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+'	End If
+'	' Check whether required keys are provided
+'	If data.ContainsKey("keyword") = False Then
+'		HRM.ResponseCode = 400
+'		HRM.ResponseError = "Key 'keyword' not found"
+'		ReturnApiResponse
+'		Return
+'	End If
+'	Dim SearchForText As String = data.Get("keyword")
+'	DB.SQL = Main.DBOpen
+'	DB.Table = "tbl_products p"
+'	' Construct results with new column name alias
+'	DB.Select = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
+'	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
+'	If SearchForText <> "" Then
+'		DB.Where = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
+'		DB.Parameters = Array("%" & SearchForText & "%", "%" & SearchForText.ToUpperCase & "%", "%" & SearchForText.ToUpperCase & "%")
+'	End If
+'	DB.OrderBy = CreateMap("p.id": "")
+'	DB.Query
+'	HRM.ResponseCode = 200
+'	HRM.ResponseData = DB.Results2
+'	DB.Close
+'	ReturnApiResponse
+'End Sub

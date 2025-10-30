@@ -18,16 +18,12 @@ Library4=webapiutils
 Library5=minihtml
 Module1=CategoriesHandler
 Module2=Database
-Module3=FindApiHandler
-Module4=HelpView
-Module5=HttpsFilter
-Module6=IndexView
-Module7=MainView
-Module8=ProductsApiHandler
-Module9=ProductsHandler
+Module3=HttpsFilter
+Module4=MainView
+Module5=ProductsHandler
 NumberOfFiles=4
 NumberOfLibraries=5
-NumberOfModules=9
+NumberOfModules=5
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
