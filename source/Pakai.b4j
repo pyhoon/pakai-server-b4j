@@ -22,9 +22,9 @@ Module3=FindApiHandler
 Module4=HelpView
 Module5=HttpsFilter
 Module6=IndexView
-Module7=IndexWebHandler
-Module8=MainView
-Module9=ProductsApiHandler
+Module7=MainView
+Module8=ProductsApiHandler
+Module9=ProductsHandler
 NumberOfFiles=4
 NumberOfLibraries=5
 NumberOfModules=9
@@ -83,39 +83,17 @@ Sub AppStart (Args() As String)
 	#End If
 
 	' *** Web handlers ***
-	App.Get("", "IndexWebHandler")
-	App.Get("/table", "IndexWebHandler")
-	#If Debug
-	'App.Get("/help", "HelpHandler")
-	#End If
+	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
-	'App.Get("/categories", "CategoriesWebHandler")
-	'App.Get("/categories/table", "CategoriesWebHandler")
-	'App.Get("/categories/list", "CategoriesWebHandler")
+	App.Get("/products", "ProductsHandler")
 	
 	' *** Api handlers ***
-	'App.Get("/api/categories", "CategoriesApiHandler")
-	'App.Post("/api/categories", "CategoriesApiHandler")
-	'App.Put("/api/categories", "CategoriesApiHandler")
-	'App.Delete("/api/categories", "CategoriesApiHandler")
-	'App.Rest("/api/categories", "CategoriesApiHandler")
-	'App.Get("/api/categories", "CategoriesHandler")
 	App.Rest("/api/categories/*", "CategoriesHandler")
+	App.Rest("/api/products/*", "ProductsHandler")
 	
-	'App.Get("/api/categories/*", "CategoriesApiHandler")
-	'App.Get("/api/categories/modal/*", "CategoriesApiHandler")
-	'App.Put("/api/categories/*", "CategoriesApiHandler")
-	'App.Delete("/api/categories/*", "CategoriesApiHandler")
-	App.Get("/api/products", "ProductsApiHandler")
-	App.Get("/api/products/*", "ProductsApiHandler")
-	App.Post("/api/products", "ProductsApiHandler")
-	App.Put("/api/products/*", "ProductsApiHandler")
-	App.Delete("/api/products/*", "ProductsApiHandler")
-	App.Get("/api/find", "FindApiHandler")
-	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
-	App.Post("/api/find", "FindApiHandler")
-
-	'App.Port = 51042
+	'App.Get("/api/find", "FindApiHandler")
+	'App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
+	'App.Post("/api/find", "FindApiHandler")
 	
 	App.Start
 	App.LogStartupMessage
