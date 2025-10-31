@@ -20,12 +20,6 @@
             "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v3.80/MiniORMUtils.b4xlib"
         },
         {
-            "Name": "WebApiUtils.b4xlib",
-            "Platform": "B4J",
-            "Version": 5.50,
-            "Link": "https://github.com/pyhoon/WebApiUtils-B4J/releases/download/v5.50/WebApiUtils.b4xlib"
-        },
-        {
             "Name": "mysql-connector-j-9.3.0.jar",
             "Platform": "B4J",
             "Version": 9.30,

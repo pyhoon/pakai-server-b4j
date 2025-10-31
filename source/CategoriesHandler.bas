@@ -8,14 +8,14 @@ Version=10.3
 ' Version 6.00alpha
 Sub Class_Globals
 	Private DB As MiniORM
-	Private App As EndsMeet
+	'Private App As EndsMeet
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 End Sub
 
 Public Sub Initialize
-	App = Main.App
+	'App = Main.App
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -45,7 +45,11 @@ End Sub
 Private Sub RenderPage
 	Dim main1 As MainView
 	main1.Initialize
-	main1.LoadView2(Contents)
+	'main1.LoadView2(Contents)
+	main1.LoadContent(ContentContainer)
+	main1.LoadModal(ModalContainer)
+	main1.LoadToast(ToastContainer)
+	
 	Dim page1 As Tag = main1.Render
 	Dim body1 As Tag = page1.ChildByTagName("body")
 	
@@ -67,57 +71,62 @@ Private Sub RenderPage
 	    }, 300);
     }"$)
 	
-	Dim DS As String = "$"
-	body1.script4($"
-    // Toast functions
-    function showToast(message, type = 'info') {
-        const toastContainer = document.getElementById('toast-container');
-        const toastId = 'toast-' + Date.now();
-        
-        const toastHTML = `
-            <div id="${DS}{toastId}" class="toast align-items-center text-bg-${DS}{type} border-0" role="alert">
-                <div class="d-flex">
-                    <div class="toast-body">${DS}{message}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        `;
-        
-	    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-	    
-	    const toastElement = document.getElementById(toastId);
-	    const toast = new bootstrap.Toast(toastElement);
-	    toast.show();
-	    
-	    // Remove from DOM after hide
-	    toastElement.addEventListener('hidden.bs.toast', function() {
-	        toastElement.remove();
-	    });
-    }
-
-    function showSuccess(message) { showToast(message, 'success'); }
-    function showError(message) { showToast(message, 'danger'); }
-    function showWarning(message) { showToast(message, 'warning'); }
-	"$)
+'	Dim DS As String = "$"
+'	body1.script4($"
+'    // Toast functions
+'    function showToast(message, type = 'info') {
+'        // Close modal
+'        const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
+'        if (modal) modal.hide();
+'		
+'        const toastContainer = document.getElementById('toast-container');
+'        const toastId = 'toast-' + Date.now();
+'        
+'        const toastHTML = `
+'            <div id="${DS}{toastId}" class="toast align-items-center text-bg-${DS}{type} border-0" style="--bs-bg-opacity: .75;" role="alert">
+'                <div class="d-flex">
+'                    <div class="toast-body">${DS}{message}</div>
+'                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+'                </div>
+'            </div>
+'        `;
+'        
+'	    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+'	    
+'	    const toastElement = document.getElementById(toastId);
+'	    const toast = new bootstrap.Toast(toastElement);
+'	    toast.show();
+'	    
+'	    // Remove from DOM after hide
+'	    toastElement.addEventListener('hidden.bs.toast', function() {
+'	        toastElement.remove();
+'	    });
+'    }
+'
+'    function showSuccess(message) { showToast(message, 'success'); }
+'    function showError(message) { showToast(message, 'danger'); }
+'    function showWarning(message) { showToast(message, 'warning'); }
+'	"$)
 	
 	Dim doc As Document
 	doc.Initialize
 	doc.AppendDocType
 	doc.Append(page1.build)
 
-	Dim strMain As String = WebApiUtils.BuildHtml(doc.ToString, App.ctx)
-	WebApiUtils.ReturnHtml(strMain, Response)
+	'Dim strMain As String = WebApiUtils.BuildHtml(doc.ToString, Main.App.ctx)
+	'WebApiUtils.ReturnHtml(strMain, Response)
+	Response.Write(WebUtils.ReplaceMap(doc.ToString, Main.App.ctx))
 End Sub
 
 ' Use list for multiple tags with no parent tag
-Public Sub Contents As List
-	Dim Tags As List
-	Tags.Initialize
-	Tags.Add(ContentContainer)
-	Tags.Add(ModalContainer)
-	Tags.Add(ToastContainer)
-	Return Tags
-End Sub
+'Public Sub Contents As List
+'	Dim Tags As List
+'	Tags.Initialize
+'	Tags.Add(ContentContainer)
+'	Tags.Add(ModalContainer)
+'	Tags.Add(ToastContainer)
+'	Return Tags
+'End Sub
 
 Private Sub ContentContainer As Tag
 	Dim content1 As Tag = Div.cls("row mt-3 text-center align-items-center justify-content-center")
@@ -128,13 +137,15 @@ Private Sub ContentContainer As Tag
 	Dim div2 As Tag = Div.cls("text-end mt-2").up(div1)
 	
 	Dim anchor1 As Tag = div2.add(Anchor.href("$SERVER_URL$").cls("btn btn-primary mb-2 me-2"))
-	anchor1.add(Icon.cls("ti ti-home me-2"))
+	'anchor1.add(Icon.cls("ti ti-home me-2"))
+	anchor1.add(Icon.cls("bi bi-house me-2"))
 	anchor1.text("Home")
 	
 	Dim anchor2 As Tag = div2.add(Anchor.cls("btn btn-success mb-2 ml-2"))
 	anchor2.hxGet("/api/categories/modal/add")
 	anchor2.hxTarget("#modal-container")
-	anchor2.add(Icon.cls("ti ti-plus me-2"))
+	'anchor2.add(Icon.cls("ti ti-plus me-2"))
+	anchor2.add(Icon.cls("bi bi-plus-lg me-2"))
 	anchor2.text("Add Category")
 
 	Dim container1 As Tag = Div.id("categories-container").cls("table").up(col1)
@@ -148,7 +159,8 @@ Private Sub ModalContainer As Tag
 End Sub
 
 Private Sub ToastContainer As Tag
-	Dim toast1 As Tag = Div.id("toast-container").cls("toast-container position-fixed top-0 end-0 p-3")
+	Dim toast1 As Tag = Div.id("toast-container").cls("toast-container position-fixed end-0 p-3")
+	toast1.sty("top: 10%")
 	Return toast1
 End Sub
 
@@ -172,22 +184,25 @@ Private Sub HandleTable
 		Dim tr1 As Tag = tbody1.add(Tr.init)
 		tr1.add(Td.cls("align-middle").sty("text-align: right").text(id))
 		tr1.add(Td.cls("align-middle").text(name))
-		Dim td1 As Tag = tr1.add(Td.init)
+		Dim td1 As Tag = tr1.add(Td.cls("text-center"))
 
 		Dim anchor1 As Tag = td1.add(Anchor.cls("edit text-primary mx-2"))
 		anchor1.hxGet($"/api/categories/modal/edit/${id}"$)
 		anchor1.hxTarget("#modal-container")
-		anchor1.add(Icon.cls("ti ti-pencil").sty("font-weight: bold"))
+		'anchor1.add(Icon.cls("ti ti-pencil").sty("font-weight: bold"))
+		anchor1.add(Icon.cls("bi bi-pencil").sty("font-size: 1.2em"))
 		anchor1.attr("title", "Edit")
 		
 		Dim anchor2 As Tag = td1.add(Anchor.cls("delete text-danger mx-2"))
 		anchor2.hxGet($"/api/categories/modal/delete/${id}"$)
 		anchor2.hxTarget("#modal-container")
-		anchor2.add(Icon.cls("ti ti-trash").sty("font-weight: bold"))
+		'anchor2.add(Icon.cls("ti ti-trash").sty("font-weight: bold"))
+		anchor2.add(Icon.cls("bi bi-trash3").sty("font-size: 1.2em"))
 		anchor2.attr("title", "Delete")
 	Next
 	DB.Close
-	WebApiUtils.ReturnHtml(table1.Build, Response)
+	'WebApiUtils.ReturnHtml(table1.Build, Response)
+	Response.Write(table1.Build)
 End Sub
 
 ' Return select option HTML
@@ -207,24 +222,26 @@ Private Sub HandleList
 		Option.valueOf(id).text(name).up(select1)
 	Next
 	DB.Close
-	WebApiUtils.ReturnHtml(select1.Build, Response)
+	'WebApiUtils.ReturnHtml(select1.Build, Response)
+	Response.Write(select1.Build)
 End Sub
 
 ' Add modal
 Private Sub HandleAddModal
 	Dim modal1 As Tag = Div.cls("modal fade")
-	Dim modalDialog As Tag = Div.cls("modal-dialog").up(modal1)
+	Dim modalDialog As Tag = Div.cls("modal-dialog modal-dialog-centered").up(modal1)
 	Dim modalContent As Tag = Div.cls("modal-content").up(modalDialog)
 	Dim modalHeader As Tag = Div.cls("modal-header").up(modalContent)
 	Dim modalBody As Tag = Div.cls("modal-body").up(modalContent)
 	modalHeader.add(H5.cls("modal-title").text("Add Category"))
-	'modalHeader.add(Button.typeOf("button").cls("btn-close").data("bs-dismiss", "modal"))
+	modalHeader.add(Button.typeOf("button").cls("btn-close").data("bs-dismiss", "modal"))
 	Dim form1 As Tag = Form.up(modalBody)
 	form1.hxPost("/api/categories")
 	form1.hxTarget("#modal-container")
 	form1.add(Input.typeOf("text").name("name").cls("form-control").attr3("required"))
 	form1.add(Button.cls("btn btn-primary mt-2").text("Create"))
-	WebApiUtils.ReturnHtml(modal1.Build, Response)	
+	'WebApiUtils.ReturnHtml(modal1.Build, Response)
+	Response.Write(modal1.Build)
 End Sub
 
 ' Edit modal
@@ -239,7 +256,7 @@ Private Sub HandleEditModal
 	If DB.Found Then
 		Dim name As String = DB.First.Get("name")
 		Dim modal1 As Tag = Div.cls("modal fade")
-		Dim modalDialog As Tag = Div.cls("modal-dialog").up(modal1)
+		Dim modalDialog As Tag = Div.cls("modal-dialog modal-dialog-centered").up(modal1)
 		Dim modalContent As Tag = Div.cls("modal-content").up(modalDialog)
 		Dim modalHeader As Tag = Div.cls("modal-header").up(modalContent)
 		modalHeader.add(H5.cls("modal-title").text("Edit Category"))
@@ -251,7 +268,8 @@ Private Sub HandleEditModal
 		form1.add(Input.typeOf("text").name("name").valueOf(name).cls("form-control").attr3("required"))
 		form1.add(Input.typeOf("button").cls("btn btn-secondary").data("bs-dismiss", "modal").valueOf("Cancel"))
 		form1.add(Button.cls("btn btn-primary").text("Update"))
-		WebApiUtils.ReturnHtml(modal1.Build, Response)
+		'WebApiUtils.ReturnHtml(modal1.Build, Response)
+		Response.Write(modal1.Build)
 	End If
 	DB.Close
 End Sub
@@ -268,7 +286,7 @@ Private Sub HandleDeleteModal
 	If DB.Found Then
 		Dim name As String = DB.First.Get("name")
 		Dim modal1 As Tag = Div.cls("modal fade")
-		Dim modalDialog As Tag = Div.cls("modal-dialog").up(modal1)
+		Dim modalDialog As Tag = Div.cls("modal-dialog modal-dialog-centered").up(modal1)
 		Dim modalContent As Tag = Div.cls("modal-content").up(modalDialog)
 		Dim modalHeader As Tag = Div.cls("modal-header").up(modalContent)
 		modalHeader.add(H5.cls("modal-title").text("Delete Category"))
@@ -280,7 +298,8 @@ Private Sub HandleDeleteModal
 		form1.add(Input.typeOf("hidden").name("id").valueOf(id))
 		form1.add(Input.typeOf("button").cls("btn btn-secondary").data("bs-dismiss", "modal").valueOf("Cancel"))
 		form1.add(Button.cls("btn btn-danger").text("Delete"))
-		WebApiUtils.ReturnHtml(modal1.Build, Response)
+		'WebApiUtils.ReturnHtml(modal1.Build, Response)
+		Response.Write(modal1.Build)
 	End If
 	DB.Close
 End Sub
@@ -317,7 +336,7 @@ Private Sub HandleCategories
 			' Insert new row
 			DB.Reset
 			DB.Columns = Array("category_name", "created_date")
-			DB.Parameters = Array(name, WebApiUtils.CurrentDateTime)
+			DB.Parameters = Array(name, Main.CurrentDateTime)
 			DB.Save
 			DB.Close
 			Response.Write("<script>closeModalAndRefresh('Category created successfully!')</script>")
@@ -350,7 +369,7 @@ Private Sub HandleCategories
 			' Update row
 			DB.Reset
 			DB.Columns = Array("category_name", "modified_date")
-			DB.Parameters = Array(name, WebApiUtils.CurrentDateTime)
+			DB.Parameters = Array(name, Main.CurrentDateTime)
 			DB.Id = id
 			DB.Save
 			DB.Close
@@ -387,3 +406,4 @@ Private Sub HandleCategories
 			Response.Write("<script>closeModalAndRefresh('Category deleted successfully!')</script>")
 	End Select
 End Sub
+

@@ -12,21 +12,21 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
-	#If SQLite
-	If File.Exists(File.DirApp, "sqlite.ini") = False Then
-		File.Copy(File.DirAssets, "sqlite.example", File.DirApp, "sqlite.ini")
-	End If
-	Dim ctx As Map = File.ReadMap(File.DirApp, "sqlite.ini")
+	#If MariaDB
+	If File.Exists(File.DirApp, "mariadb.ini") = False Then
+		File.Copy(File.DirAssets, "mariadb.example", File.DirApp, "mariadb.ini")
+	End If	
+	Dim ctx As Map = File.ReadMap(File.DirApp, "mariadb.ini")
 	#Else If MySQL
 	If File.Exists(File.DirApp, "mysql.ini") = False Then
 		File.Copy(File.DirAssets, "mysql.example", File.DirApp, "mysql.ini")
 	End If
 	Dim ctx As Map = File.ReadMap(File.DirApp, "mysql.ini")
-	#Else If MariaDB
-	If File.Exists(File.DirApp, "mariadb.ini") = False Then
-		File.Copy(File.DirAssets, "mariadb.example", File.DirApp, "mariadb.ini")
-	End If	
-	Dim ctx As Map = File.ReadMap(File.DirApp, "mariadb.ini")
+	#Else
+	If File.Exists(File.DirApp, "sqlite.ini") = False Then
+		File.Copy(File.DirAssets, "sqlite.example", File.DirApp, "sqlite.ini")
+	End If
+	Dim ctx As Map = File.ReadMap(File.DirApp, "sqlite.ini")
 	#End If
 	info.Initialize
 	info.DBType = ctx.GetDefault("DbType", "")

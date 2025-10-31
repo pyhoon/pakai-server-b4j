@@ -95,6 +95,11 @@ button:focus {
     text-decoration: none !important;
 }
 
+.edit:hover,
+.delete:hover {
+    font-weight: bold;
+}
+
 /** category **/
 .error-feedback {
     display: none;
