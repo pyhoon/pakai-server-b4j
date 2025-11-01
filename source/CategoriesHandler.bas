@@ -8,14 +8,14 @@ Version=10.3
 ' Version 6.00alpha
 Sub Class_Globals
 	Private DB As MiniORM
-	'Private App As EndsMeet
+	Private App As EndsMeet
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 End Sub
 
 Public Sub Initialize
-	'App = Main.App
+	App = Main.App
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -45,88 +45,17 @@ End Sub
 Private Sub RenderPage
 	Dim main1 As MainView
 	main1.Initialize
-	'main1.LoadView2(Contents)
 	main1.LoadContent(ContentContainer)
 	main1.LoadModal(ModalContainer)
 	main1.LoadToast(ToastContainer)
 	
 	Dim page1 As Tag = main1.Render
-	Dim body1 As Tag = page1.ChildByTagName("body")
-	
-	' Add additional JavaScripts
-	body1.script4($"
-	function closeModalAndRefresh(message = null) {
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
-        if (modal) modal.hide();
-
-	    // Small delay to ensure modal is gone, then refresh and show toast
-	    setTimeout(() => {
-			// Refresh table
-	        htmx.ajax('GET', '/api/categories/table', {
-	            target: '#categories-container'
-	        });
-			// Show success toast if message provided
-	        if (message) showSuccess(message);
-	    }, 300);
-    }"$)
-	
-'	Dim DS As String = "$"
-'	body1.script4($"
-'    // Toast functions
-'    function showToast(message, type = 'info') {
-'        // Close modal
-'        const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
-'        if (modal) modal.hide();
-'		
-'        const toastContainer = document.getElementById('toast-container');
-'        const toastId = 'toast-' + Date.now();
-'        
-'        const toastHTML = `
-'            <div id="${DS}{toastId}" class="toast align-items-center text-bg-${DS}{type} border-0" style="--bs-bg-opacity: .75;" role="alert">
-'                <div class="d-flex">
-'                    <div class="toast-body">${DS}{message}</div>
-'                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-'                </div>
-'            </div>
-'        `;
-'        
-'	    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-'	    
-'	    const toastElement = document.getElementById(toastId);
-'	    const toast = new bootstrap.Toast(toastElement);
-'	    toast.show();
-'	    
-'	    // Remove from DOM after hide
-'	    toastElement.addEventListener('hidden.bs.toast', function() {
-'	        toastElement.remove();
-'	    });
-'    }
-'
-'    function showSuccess(message) { showToast(message, 'success'); }
-'    function showError(message) { showToast(message, 'danger'); }
-'    function showWarning(message) { showToast(message, 'warning'); }
-'	"$)
-	
 	Dim doc As Document
 	doc.Initialize
 	doc.AppendDocType
 	doc.Append(page1.build)
-
-	'Dim strMain As String = WebApiUtils.BuildHtml(doc.ToString, Main.App.ctx)
-	'WebApiUtils.ReturnHtml(strMain, Response)
-	Response.Write(WebUtils.ReplaceMap(doc.ToString, Main.App.ctx))
+	Response.Write(App.ReplaceMap(doc.ToString, App.ctx))
 End Sub
-
-' Use list for multiple tags with no parent tag
-'Public Sub Contents As List
-'	Dim Tags As List
-'	Tags.Initialize
-'	Tags.Add(ContentContainer)
-'	Tags.Add(ModalContainer)
-'	Tags.Add(ToastContainer)
-'	Return Tags
-'End Sub
 
 Private Sub ContentContainer As Tag
 	Dim content1 As Tag = Div.cls("row mt-3 text-center align-items-center justify-content-center")
@@ -350,7 +279,7 @@ Private Sub HandleCategories
 			DB.Find(id)
 			If DB.Found = False Then
 				'Response.Status = 404
-            	Response.Write("<script>showError('Category not found!')</script>")
+				Response.Write("<script>showError('Category not found!')</script>")
 				DB.Close
 				Return
 			End If
@@ -383,7 +312,7 @@ Private Sub HandleCategories
 			DB.Find(id)
 			If DB.Found = False Then
 				'Response.Status = 404
-            	Response.Write("<script>showError('Category not found!')</script>")
+				Response.Write("<script>showError('Category not found!')</script>")
 				DB.Close
 				Return
 			End If
@@ -406,4 +335,3 @@ Private Sub HandleCategories
 			Response.Write("<script>closeModalAndRefresh('Category deleted successfully!')</script>")
 	End Select
 End Sub
-

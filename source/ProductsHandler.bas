@@ -8,14 +8,14 @@ Version=10.3
 ' Version 6.00alpha
 Sub Class_Globals
 	Private DB As MiniORM
-	'Private App As EndsMeet
+	Private App As EndsMeet
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 End Sub
 
 Public Sub Initialize
-	'App = Main.App
+	App = Main.App
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -45,124 +45,16 @@ End Sub
 Private Sub RenderPage
 	Dim main1 As MainView
 	main1.Initialize
-	'main1.LoadView2(Contents)
 	main1.LoadContent(ContentContainer)
 	main1.LoadModal(ModalContainer)
 	main1.LoadToast(ToastContainer)
 	
 	Dim page1 As Tag = main1.Render
-	Dim body1 As Tag = page1.ChildByTagName("body")
-	
-	' Add additional JavaScripts
-	body1.script4($"
-	function closeModalAndRefresh(message = null) {
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
-        if (modal) modal.hide();
-
-	    // Small delay to ensure modal is gone, then refresh and show toast
-	    setTimeout(() => {
-			// Refresh table
-	        htmx.ajax('GET', '/api/products/table', {
-	            target: '#products-container'
-	        });
-			// Show success toast if message provided
-	        if (message) showSuccess(message);
-	    }, 300);
-    }"$)
-	
-'	Dim DS As String = "$"
-'	body1.script4($"
-'    // Toast functions
-'    function showToast(message, type = 'info') {
-'        // Close modal
-'        const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
-'        if (modal) modal.hide();
-'			
-'        const toastContainer = document.getElementById('toast-container');
-'        const toastId = 'toast-' + Date.now();
-'        
-'        const toastHTML = `
-'            <div id="${DS}{toastId}" class="toast align-items-center text-bg-${DS}{type} border-0" style="--bs-bg-opacity: .75;" role="alert">
-'                <div class="d-flex">
-'                    <div class="toast-body">${DS}{message}</div>
-'                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-'                </div>
-'            </div>
-'        `;
-'        
-'	    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-'	    
-'	    const toastElement = document.getElementById(toastId);
-'	    const toast = new bootstrap.Toast(toastElement);
-'	    toast.show();
-'	    
-'	    // Remove from DOM after hide
-'	    toastElement.addEventListener('hidden.bs.toast', function() {
-'	        toastElement.remove();
-'	    });
-'    }
-'
-'    function showSuccess(message) { showToast(message, 'success'); }
-'    function showError(message) { showToast(message, 'danger'); }
-'    function showWarning(message) { showToast(message, 'warning'); }
-'	"$)
-
-'	Dim DS As String = "$"
-'	body1.script4($"
-'	// Toast functions
-'	function showToast(message, type = 'info') {
-'	    const toastContainer = document.getElementById('toast-container');
-'	    const toastId = 'toast-' + Date.now();
-'	    
-'	    const toastHTML = `
-'	        <div id="${DS}{toastId}" class="toast align-items-center text-bg-${DS}{type} border-0" style="--bs-bg-opacity: .75;" role="alert">
-'	            <div class="d-flex">
-'	                <div class="toast-body">${DS}{message}</div>
-'	                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-'	            </div>
-'	        </div>
-'	    `;
-'	    
-'	    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-'	    const toast = new bootstrap.Toast(document.getElementById(toastId));
-'	    toast.show();
-'	}
-'
-'	function showSuccess(message) { showToast(message, 'success'); }
-'	function showError(message) { showToast(message, 'danger'); }
-'	function showWarning(message) { showToast(message, 'warning'); }
-'
-'	// Simple modal management
-'	document.addEventListener('htmx:afterSwap', function(e) {
-'	    if (e.detail.target.id === 'modal-container') {
-'	        const modalElement = e.detail.target.querySelector('.modal');
-'	        if (modalElement) {
-'	            const modal = new bootstrap.Modal(modalElement);
-'	            
-'	            // Clean up when modal is closed
-'	            modalElement.addEventListener('hidden.bs.modal', function() {
-'	                document.getElementById('modal-container').innerHTML = '';
-'	            });
-'	            
-'	            modal.show();
-'	        }
-'	    }
-'	});
-'
-'	// Global error handler for network issues
-'	document.addEventListener('htmx:responseError', function(event) {
-'	    showError('Network error occurred. Please try again.');
-'	});"$)
-	
 	Dim doc As Document
 	doc.Initialize
 	doc.AppendDocType
 	doc.Append(page1.build)
-
-	'Dim strMain As String = WebApiUtils.BuildHtml(doc.ToString, App.ctx)
-	'WebApiUtils.ReturnHtml(strMain, Response)
-	Response.Write(WebUtils.ReplaceMap(doc.ToString, Main.App.ctx))
+	Response.Write(App.ReplaceMap(doc.ToString, App.ctx))
 End Sub
 
 ' Use list for multiple tags with no parent tag
@@ -564,20 +456,7 @@ Private Sub HandleProducts
 				DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
 				DB.Save
 				DB.Close
-				'Response.Write("<script>closeModalAndRefresh('Product created successfully!')</script>")
-				'Response.Write("<script>handleModalResponse('Product created successfully!', true)</script>")
-				Response.Write($"
-			<div id='categories-container' hx-swap-oob='true'>
-				${GenerateProductsTable}
-            </div>
-            <script>
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
-                if (modal) modal.hide();
-                
-                // Show success toast
-                showSuccess('Product created successfully!');
-            </script>"$)
+				ShowToast("Product created successfully!")
 			Catch
 				Response.Write($"<div class='alert alert-danger'>Database error: ${LastException.Message}</div>"$)
 			End Try
@@ -626,20 +505,7 @@ Private Sub HandleProducts
 				DB.Id = id
 				DB.Save
 				DB.Close
-				'Response.Write("<script>closeModalAndRefresh('Product updated successfully!')</script>")
-				'Response.Write("<script>handleModalResponse('Product updated successfully!', true)</script>")
-				Response.Write($"
-			<div id='products-container' hx-swap-oob='true'>
-				${GenerateProductsTable}
-            </div>
-            <script>
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
-                if (modal) modal.hide();
-                
-                // Show success toast
-                showSuccess('Product updated successfully!');
-            </script>"$)
+				ShowToast("Product updated successfully!")
 			Catch
 				Response.Write($"<div class='alert alert-danger'>Database error: ${LastException.Message}</div>"$)
 			End Try
@@ -662,11 +528,11 @@ Private Sub HandleProducts
 			DB.Id = id
 			DB.Delete
 			DB.Close
-			Response.Write("<script>closeModalAndRefresh('Product deleted successfully!')</script>")
+			ShowToast("Product deleted successfully!")			
 	End Select
 End Sub
 
-Private Sub GenerateProductsTable As String
+Private Sub GenerateProductsTable As Tag
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
@@ -717,5 +583,21 @@ Private Sub GenerateProductsTable As String
 		anchor2.attr("title", "Delete")
 	Next
 	DB.Close
-	Return table1.Build
+	Return table1
+End Sub
+
+Private Sub ShowToast (message As String)
+	Dim div1 As Tag = Div.id("products-container").hxSwapOob("true")
+	div1.add(GenerateProductsTable)
+	'Response.Write(div1.Build)
+			
+	Dim script1 As MiniJS
+	script1.Initialize
+	'script1.AddComment("Close the modal")
+	script1.DeclareVariable("modal", "bootstrap.Modal.getInstance(document.querySelector('.modal'))", True)
+	script1.AddConditionalCall("modal", "modal.hide();")
+	script1.AddLine("")
+	'script1.AddComment("Show success toast")
+	script1.AddFunctionCall("showSuccess", Array As String(message))
+	Response.Write(div1.Build & CRLF & script1.Generate)
 End Sub

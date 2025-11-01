@@ -26,7 +26,6 @@ End Sub
 Public Sub LoadView3 (View1 As String)
 	Dim parser As MiniHtmlParser
 	parser.Initialize
-	'parser.ShowParserLogs = True
 	Dim root As HtmlNode = parser.Parse(View1)
 	If root.IsInitialized Then
 		Dim newTag As Tag = parser.ConvertToTag(root)
@@ -52,30 +51,11 @@ Public Sub Render As Tag
 	page1.add(PageBody)
 	Dim body1 As Tag = page1.ChildByTagName("body")
 	body1.add(BodyFooter)
-	'body1.script("$SERVER_URL$/assets/js/jquery.min.js")
-	'body1.script("$SERVER_URL$/assets/js/jquery.validate.min.js")
-	#if Debug
-	'body1.script("$SERVER_URL$/assets/js/bootstrap.bundle.js")
-	body1.script("$SERVER_URL$/assets/js/bootstrap.js")
-	#else
-	'body1.script("$SERVER_URL$/assets/js/bootstrap.bundle.min.js")
-	body1.script("$SERVER_URL$/assets/js/bootstrap.min.js")
-	#End If
-	body1.script("$SERVER_URL$/assets/js/htmx.min.js")
+	body1.cdnScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
+	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y")
+	body1.cdnScript("https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
+	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz")
 	body1.script("$SERVER_URL$/assets/js/main.js")
-'	body1.script4($"
-'	// Auto-show modals when loaded
-'    document.addEventListener('htmx:afterSwap', function(e) {
-'        if (e.detail.target.id === 'modal-container') {
-'            const modal = new bootstrap.Modal(e.detail.target.querySelector('.modal'));
-'            modal.show();
-'        }
-'    });
-'
-'    // Auto-clear modal container
-'    document.addEventListener('hidden.bs.modal', function() {
-'        document.getElementById('modal-container').innerHTML = '';
-'    });"$)
 	Return page1
 End Sub
 
@@ -83,16 +63,13 @@ Private Sub PageHeader As Tag
 	Dim header1 As Tag = Head.init
 	header1.add(Meta.attr("http-equiv", "content-type" ).attr("content", "text/html; charset=utf-8"))
 	header1.add(Meta.attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"))
-	'header1.add(Meta.attr("name", "csrf-token").attr("content", ""))
 	header1.add(Meta.attr("name", "description").attr("content", "Created using Pakai framework"))
 	header1.add(Meta.attr("name", "author").attr("content", "Aeric Poon"))
 	header1.title("$APP_TITLE$")
 	header1.linkIcon("image/png", "$SERVER_URL$/assets/img/favicon.png")
-	header1.linkcss("$SERVER_URL$/assets/css/bootstrap.min.css")
-	header1.linkcss("$SERVER_URL$/assets/css/bootstrap-icons.min.css")
-	'header1.linkcss("$SERVER_URL$/assets/css/themify-icons.css")
-	'header1.linkcss("$SERVER_URL$/assets/css/fontawesome.min.css")
-	'header1.linkcss("$SERVER_URL$/assets/css/solid.min.css")
+	header1.cdnStyle("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
+	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB")
+	header1.linkcss("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")
 	header1.linkcss("$SERVER_URL$/assets/css/main.css?v=$VERSION$")
 	Return header1
 End Sub
@@ -116,15 +93,6 @@ Private Sub PageBody As Tag
 	
 	Dim collapse1 As Tag = div1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
 	Dim ulist1 As Tag = collapse1.add(Ul.cls("navbar-nav navbar-brand ms-auto mb-md-0"))
-	
-	'If Main.Api.EnableHelp Then
-	'	Dim list2 As Tag = ulist1.add(Li.cls("nav-item mt-1 ms-1"))
-	'	Dim anchor2 As Tag = list2.add(Anchor.cls("nav-link text-dark me-3"))
-	'	anchor2.hrefOf($"${Main.App.ServerUrl}/help"$)
-	'	anchor2.add(Icon.cls("ti ti-settings me-2").attr("title", "API"))
-	'	anchor2.text("API")
-	'End If
-	
 	Dim list1 As Tag = ulist1.add(Li.cls("nav-item d-none d-md-block"))
 	
 	Dim anchor1 As Tag = list1.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
@@ -132,7 +100,6 @@ Private Sub PageBody As Tag
 	
 	Dim sponsor As Tag = Div.cls("text-center font-weight-bold d-block d-sm-block d-md-none").up(body1)
 	sponsor.sty("background-color: whitesmoke")
-	
 	Dim anchor2 As Tag = sponsor.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
 	anchor2.add(Img.src("/assets/img/sponsor.png").cls("mx-2").sty("width: 174px"))
 	
@@ -146,11 +113,6 @@ Private Sub PageBody As Tag
 	.text("$HOME_TITLE$")
 	div1.add(Span.cls("small").text("Version: $VERSION$"))
 
-	'For Each TagList As List In mPlaceholders
-	'	For Each ChildTag As Tag In TagList
-	'		padding2.add(ChildTag) ' DocView
-	'	Next
-	'Next
 	If mContent.IsInitialized Then padding2.add(mContent)
 	If mModal.IsInitialized Then body1.add(mModal)
 	
@@ -167,7 +129,6 @@ Private Sub BodyFooter As Tag
 	Dim span1 As Tag = Span.sty("color: red").up(caption1)
 	'span1.add(Icon.cls("ti ti-heart"))
 	span1.add(Icon.cls("bi bi-heart"))
-	'.text("❤"))
 	caption1.text(" B4X")
 	Return footer1
 End Sub
