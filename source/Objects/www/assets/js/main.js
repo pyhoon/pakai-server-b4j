@@ -24,7 +24,7 @@ function showToast(message, type = 'info') {
 
 function showSuccess(message) { showToast(message, 'success'); }
 function showWarning(message) { showToast(message, 'warning'); }
-function showError(message) { showToast(message, 'danger'); }
+function showDanger(message) { showToast(message, 'danger'); }
 
 // Modal functions - NO variable declarations that could conflict
 function closeCurrentModal() {
@@ -37,11 +37,11 @@ function closeCurrentModal() {
     }
 }
 
-function refreshCategoriesTable() {
-    htmx.ajax('GET', '/api/categories/table', {
-        target: '#categories-container'
-    });
-}
+// function refreshCategoriesTable() {
+//     htmx.ajax('GET', '/api/categories/table', {
+//         target: '#categories-container'
+//     });
+// }
 
 // Modal management
 document.addEventListener('htmx:afterSwap', function(e) {
