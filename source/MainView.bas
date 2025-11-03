@@ -7,6 +7,7 @@ Version=10.3
 Sub Class_Globals
 	Private mPlaceholders As List
 	Private mContent As Tag
+	Private mSubContent As Tag
 	Private mModal As Tag
 	Private mToast As Tag
 End Sub
@@ -35,6 +36,10 @@ End Sub
 
 Public Sub LoadContent (Tag1 As Tag)
 	mContent = Tag1
+End Sub
+
+Public Sub LoadSubContent (Tag1 As Tag)
+	mSubContent = Tag1
 End Sub
 
 Public Sub LoadModal (Tag1 As Tag)
@@ -114,6 +119,7 @@ Private Sub PageBody As Tag
 	div1.add(Span.cls("small").text("Version: $VERSION$"))
 
 	If mContent.IsInitialized Then padding2.add(mContent)
+	If mSubContent.IsInitialized Then padding2.add(mSubContent)
 	If mModal.IsInitialized Then body1.add(mModal)
 	
 	body1.add(Div.cls("bottom"))
