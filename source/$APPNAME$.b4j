@@ -11,21 +11,19 @@ FileGroup2=config
 FileGroup3=config
 FileGroup4=config
 Group=App
-Library1=byteconverter
-Library2=endsmeet
-Library3=jcore
-Library4=minihtml
+Library1=endsmeet
+Library2=jcore
+Library3=minihtml
+Library4=minijs
 Library5=miniormutils
-Library6=minijs
 Module1=CategoriesHandler
 Module2=Database
 Module3=HttpsFilter
 Module4=MainView
 Module5=ProductsHandler
-Module6=WebUtils
 NumberOfFiles=4
-NumberOfLibraries=6
-NumberOfModules=6
+NumberOfLibraries=5
+NumberOfModules=5
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
@@ -44,16 +42,10 @@ Version=10.3
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
 #Region Macros
-'For source
-'#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00alpha).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\css&args=Objects\www\assets\img&args=Objects\www\assets\js\*.min.js&args=Objects\www\assets\js\main.js
-#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00alpha).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\main.js
-#Macro: Title, Release folder, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
-#Macro: Title, Copy to AddLibs, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
-'For release
-'#Macro: Title, GetLibraries, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&args=false
-'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-10-20_1651.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
-'#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
-'#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
+#Macro: Title, GetLibraries, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&args=false
+#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-10-20_1651.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
+#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
 	Public DB 					As Database
@@ -94,14 +86,6 @@ Sub AppStart (Args() As String)
 	DB.ConnectDatabase
 	StartMessageLoop
 End Sub
-
-' Set global ApiSettings from Main to HttpResponseMessage
-'Public Sub SetApiMessage (Message As HttpResponseMessage)
-'	Message.VerboseMode = Api.VerboseMode
-'	Message.OrderedKeys = Api.OrderedKeys
-'	Message.ContentType = Api.ContentType
-'	Message.PayloadType = Api.PayloadType
-'End Sub
 
 Public Sub DBType As String
 	Return DB.Engine

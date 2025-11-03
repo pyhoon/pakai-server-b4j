@@ -93,14 +93,6 @@ Sub AppStart (Args() As String)
 	StartMessageLoop
 End Sub
 
-' Set global ApiSettings from Main to HttpResponseMessage
-'Public Sub SetApiMessage (Message As HttpResponseMessage)
-'	Message.VerboseMode = Api.VerboseMode
-'	Message.OrderedKeys = Api.OrderedKeys
-'	Message.ContentType = Api.ContentType
-'	Message.PayloadType = Api.PayloadType
-'End Sub
-
 Public Sub DBType As String
 	Return DB.Engine
 End Sub

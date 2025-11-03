@@ -107,7 +107,7 @@ End Sub
 Private Sub GitHubLink As Tag
 	Dim div1 As Tag = Div.cls("text-center mb-3")
 	Dim anchor1 As Tag = Anchor.href("https://github.com/pyhoon/pakai-server-b4j").cls("text-primary mr-1").up(div1)
-	anchor1.attr("aria-label", "github").attr("title", "GitHub").targetOf("_blank")
+	anchor1.aria("label", "github").attr("title", "GitHub").targetOf("_blank")
 	Dim svg1 As Tag = Svg.aria("hidden", "true").width("24").height("24").up(anchor1)
 	svg1.attr("version", "1.1").attr("viewBox", "0 0 16 16")
 	Dim path1 As Tag = Html.create("path").up(svg1)
@@ -179,7 +179,6 @@ Private Sub HandleTable
 		anchor2.attr("title", "Delete")
 	Next
 	DB.Close
-	'WebApiUtils.ReturnHtml(table1.Build, Response)
 	Response.Write(table1.Build)
 End Sub
 
@@ -239,7 +238,6 @@ Private Sub HandleSearch
 		anchor2.attr("title", "Delete")
 	Next
 	DB.Close
-	'WebApiUtils.ReturnHtml(table1.Build, Response)
 	Response.Write(table1.Build)
 End Sub
 
@@ -292,8 +290,7 @@ Private Sub HandleAddModal
 	Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 	modalFooter.add(Button.typeOf("submit").cls("btn btn-success px-3").text("Create"))
 	modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").attr("value", "Cancel"))
-	
-	'WebApiUtils.ReturnHtml(modal1.Build, Response)
+
 	Response.Write(modal1.Build)
 End Sub
 
@@ -318,7 +315,7 @@ Private Sub HandleEditModal
 		
 		Dim form1 As Tag = Form.up(modalContent)
 		form1.hxPut($"/api/products"$)
-		form1.hxTarget("#modal-messages")
+		form1.hxTarget("#modal-container")
 		form1.hxSwap("innerHTML")
 		form1.add(Input.typeOf("hidden").name("id").valueOf(id))
 		
@@ -364,7 +361,6 @@ Private Sub HandleEditModal
 		Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 		modalFooter.add(Button.cls("btn btn-primary px-3").text("Update"))
 		modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel"))
-		'WebApiUtils.ReturnHtml(modal1.Build, Response)
 		Response.Write(modal1.Build)
 	End If
 	DB.Close
@@ -389,7 +385,7 @@ Private Sub HandleDeleteModal
 
 		Dim form1 As Tag = Form.up(modalContent)
 		form1.hxDelete($"/api/products"$)
-		form1.hxTarget("#modal-messages")
+		form1.hxTarget("#modal-container")
 		form1.hxSwap("innerHTML")
 		form1.add(Input.typeOf("hidden").name("id").valueOf(id))
 		
@@ -404,7 +400,6 @@ Private Sub HandleDeleteModal
 		Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 		modalFooter.add(Button.cls("btn btn-danger px-3").text("Delete"))
 		modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel"))
-		'WebApiUtils.ReturnHtml(modal1.Build, Response)
 		Response.Write(modal1.Build)
 	End If
 	DB.Close
@@ -594,14 +589,14 @@ Private Sub ShowToast (class As String, message As String)
 	Dim script1 As MiniJS
 	script1.Initialize
 	'script1.AddComment("Close the modal")
-	script1.DeclareVariable("modalElement", "document.querySelector('.modal')", True)
-	'script1.AddConditionalCall("modalInstance", "modalInstance.hide();")
-	script1.StartIf("modalElement")
-	script1.DeclareVariable("modal", "bootstrap.Modal.getInstance(modalElement)", True)
-	script1.AddConditionalCall("modal", "modal.hide();")
-	script1.EndIf
-	script1.AddLine("")
+	'script1.DeclareVariable("modalElement", "document.querySelector('.modal')", True)
+	'script1.StartIf("modalElement")
+	'script1.DeclareVariable("modal", "bootstrap.Modal.getInstance(modalElement)", True)
+	'script1.AddConditionalCall("modal", "modal.hide();")
+	'script1.EndIf
+	'script1.AddLine("")
 	'script1.AddComment("Show success toast")
+	script1.AddFunctionCall("closeCurrentModal", Null)
 	Select class
 		Case "success"
 			script1.AddFunctionCall("showSuccess", Array As String(message))

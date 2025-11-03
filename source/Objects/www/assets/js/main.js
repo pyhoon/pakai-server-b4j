@@ -5,10 +5,10 @@
  */
 // Toast functions
 function showToast(message, type = 'info') {
-  const toastContainer = document.getElementById('toast-container');
-  const toastId = 'toast-' + Date.now();
-
-  const toastHTML = `
+    const toastContainer = document.getElementById('toast-container');
+    const toastId = 'toast-' + Date.now();
+    
+    const toastHTML = `
         <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert">
             <div class="d-flex">
                 <div class="toast-body">${message}</div>
@@ -16,31 +16,47 @@ function showToast(message, type = 'info') {
             </div>
         </div>
     `;
-
-  toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-  const toastInstance = new bootstrap.Toast(document.getElementById(toastId));
-  toastInstance.show();
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+    const toast = new bootstrap.Toast(document.getElementById(toastId));
+    toast.show();
 }
 
 function showSuccess(message) { showToast(message, 'success'); }
-function showError(message) { showToast(message, 'danger'); }
 function showWarning(message) { showToast(message, 'warning'); }
+function showError(message) { showToast(message, 'danger'); }
 
-// Modal management - FIXED VARIABLE NAMES
-document.addEventListener('htmx:afterSwap', function (e) {
-  if (e.detail.target.id === 'modal-container') {
-    const modalElement = e.detail.target.querySelector('.modal');
+// Modal functions - NO variable declarations that could conflict
+function closeCurrentModal() {
+    const modalElement = document.querySelector('.modal.show');
     if (modalElement) {
-      // Use modalInstance instead of modal
-      const modalInstance = new bootstrap.Modal(modalElement);
-
-      modalElement.addEventListener('hidden.bs.modal', function () {
-        document.getElementById('modal-container').innerHTML = '';
-      });
-
-      modalInstance.show();
+        const bsModal = bootstrap.Modal.getInstance(modalElement);
+        if (bsModal) {
+            bsModal.hide();
+        }
     }
-  }
+}
+
+function refreshCategoriesTable() {
+    htmx.ajax('GET', '/api/categories/table', {
+        target: '#categories-container'
+    });
+}
+
+// Modal management
+document.addEventListener('htmx:afterSwap', function(e) {
+    if (e.detail.target.id === 'modal-container') {
+        const modalElement = e.detail.target.querySelector('.modal');
+        if (modalElement) {
+            const bsModal = new bootstrap.Modal(modalElement);
+            
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                document.getElementById('modal-container').innerHTML = '';
+            });
+            
+            bsModal.show();
+        }
+    }
 });
 
 // Global error handler

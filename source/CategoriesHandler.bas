@@ -130,7 +130,6 @@ Private Sub HandleTable
 		anchor2.attr("title", "Delete")
 	Next
 	DB.Close
-	'WebApiUtils.ReturnHtml(table1.Build, Response)
 	Response.Write(table1.Build)
 End Sub
 
@@ -151,7 +150,6 @@ Private Sub HandleList
 		Option.valueOf(id).text(name).up(select1)
 	Next
 	DB.Close
-	'WebApiUtils.ReturnHtml(select1.Build, Response)
 	Response.Write(select1.Build)
 End Sub
 
@@ -180,7 +178,6 @@ Private Sub HandleAddModal
 	Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 	modalFooter.add(Button.typeOf("submit").cls("btn btn-success px-3").text("Create"))
 	modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").attr("value", "Cancel"))	
-	'WebApiUtils.ReturnHtml(modal1.Build, Response)
 	Response.Write(modal1.Build)
 End Sub
 
@@ -200,7 +197,7 @@ Private Sub HandleEditModal
 
 		Dim form1 As Tag = Form.up(modalContent)
 		form1.hxPut($"/api/categories"$)
-		form1.hxTarget("#modal-messages")
+		form1.hxTarget("#modal-container")
 		form1.hxSwap("innerHTML")
 		form1.add(Input.typeOf("hidden").name("id").valueOf(id))
 		
@@ -241,7 +238,7 @@ Private Sub HandleDeleteModal
 
 		Dim form1 As Tag = Form.up(modalContent)
 		form1.hxDelete($"/api/categories"$)
-		form1.hxTarget("#modal-messages")
+		form1.hxTarget("#modal-container")
 		form1.hxSwap("innerHTML")
 		form1.add(Input.typeOf("hidden").name("id").valueOf(id))
 		
@@ -256,7 +253,6 @@ Private Sub HandleDeleteModal
 		Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 		modalFooter.add(Button.cls("btn btn-danger px-3").text("Delete"))
 		modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel"))		
-		'WebApiUtils.ReturnHtml(modal1.Build, Response)
 		Response.Write(modal1.Build)
 	End If
 	DB.Close
@@ -422,7 +418,7 @@ Private Sub GenerateCategoriesTable As Tag
 End Sub
 
 Private Sub ShowToast (class As String, message As String)
-	Dim div1 As Tag = Div.id("products-container").hxSwapOob("true")
+	Dim div1 As Tag = Div.id("categories-container").hxSwapOob("true")
 	div1.add(GenerateCategoriesTable)
 	'Response.Write(div1.Build)
 			
