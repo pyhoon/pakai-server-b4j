@@ -251,9 +251,7 @@ Private Sub HandleAddModal
 	
 	Dim form1 As Tag = Form.up(modalContent)
 	form1.hxPost("/api/products")
-	'form1.hxTarget("#modal-container")
 	form1.hxTarget("#modal-messages")
-	'form1.hxSwapOob("true")
 	form1.hxSwap("innerHTML")
 
 	Dim modalHeader As Tag = Div.cls("modal-header").up(form1)
@@ -264,9 +262,10 @@ Private Sub HandleAddModal
 	Div.id("modal-messages").up(modalBody)
 	
 	Dim group1 As Tag = modalBody.add(Div.cls("form-group"))
-	group1.add(Label.text("Category ")).add2(Span.cls("text-danger").text("*"))
+	group1.add(Label.text("Category ")).add(Span.cls("text-danger").text("*"))
 	Dim category1 As Tag = group1.add(Dropdown.id("category").name("category").cls("form-select").attr3("required"))'.aria("label", "Default select example"))
 	category1.add(Option.attr3("disabled").text("Select Category"))
+	
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
@@ -279,11 +278,11 @@ Private Sub HandleAddModal
 	DB.Close
 
 	Dim group2 As Tag = modalBody.add(Div.cls("form-group"))
-	group2.add(Label.text("Code ")).add2(Span.cls("text-danger").text("*"))
+	group2.add(Label.text("Code ")).add(Span.cls("text-danger").text("*"))
 	group2.add(Input.typeOf("text").name("code").cls("form-control").attr3("required"))
 
 	Dim group3 As Tag = modalBody.add(Div.cls("form-group"))
-	group3.add(Label.text("Name ")).add2(Span.cls("text-danger").text("*"))
+	group3.add(Label.text("Name ")).add(Span.cls("text-danger").text("*"))
 	group3.add(Input.typeOf("text").name("name").cls("form-control").attr3("required"))
 
 	Dim group4 As Tag = modalBody.add(Div.cls("form-group"))
@@ -291,8 +290,8 @@ Private Sub HandleAddModal
 	group4.add(Input.typeOf("text").name("price").cls("form-control"))
 
 	Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
-	modalFooter.add(Button.typeOf("submit").cls("btn btn-success").text("Create"))
-	modalFooter.add(Input.typeOf("button").cls("btn btn-default").data("bs-dismiss", "modal").attr("value", "Cancel"))
+	modalFooter.add(Button.typeOf("submit").cls("btn btn-success px-3").text("Create"))
+	modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").attr("value", "Cancel"))
 	
 	'WebApiUtils.ReturnHtml(modal1.Build, Response)
 	Response.Write(modal1.Build)
@@ -319,11 +318,8 @@ Private Sub HandleEditModal
 		
 		Dim form1 As Tag = Form.up(modalContent)
 		form1.hxPut($"/api/products"$)
-		'form1.hxTarget("#modal-container")
 		form1.hxTarget("#modal-messages")
-		'form1.hxSwapOob("true")
 		form1.hxSwap("innerHTML")
-		
 		form1.add(Input.typeOf("hidden").name("id").valueOf(id))
 		
 		Dim modalHeader As Tag = Div.cls("modal-header").up(form1)
@@ -334,8 +330,8 @@ Private Sub HandleEditModal
 		Div.id("modal-messages").up(modalBody)
 		
 		Dim group1 As Tag = Div.cls("form-group").up(modalBody)
-		group1.add(Label.text("Category ")).add2(Span.cls("text-danger").text("*"))
-		Dim category2 As Tag = group1.add(Dropdown.id("category").name("category").cls("form-select").attr3("required").aria("label", "Default select example"))
+		group1.add(Label.text("Category ")).add(Span.cls("text-danger").text("*"))
+		Dim category2 As Tag = group1.add(Dropdown.id("category").cls("form-select").name("category").attr3("required").aria("label", "Default select example"))
 		category2.add(Option.attr3("disabled").text("Select Category"))
 		DB.SQL = Main.DBOpen
 		DB.Table = "tbl_categories"
@@ -353,17 +349,17 @@ Private Sub HandleEditModal
 		DB.Close
 		
 		Dim group2 As Tag = Div.cls("form-group").up(modalBody)
-		group2.add(Label.text("Code ")).add2(Span.cls("text-danger").text("*"))
+		group2.add(Label.text("Code ")).add(Span.cls("text-danger").text("*"))
 		'group2.add(Input.typeOf("text").name("code").cls("form-control").attr3("required").valueOf(code))
-		group2.add(Input.typeOf("text").name("code").cls("form-control").valueOf(code))
+		group2.add(Input.typeOf("text").cls("form-control").name("code").valueOf(code))
 
 		Dim group3 As Tag = Div.cls("form-group").up(modalBody)
-		group3.add(Label.text("Name ")).add2(Span.cls("text-danger").text("*"))
-		group3.add(Input.typeOf("text").name("name").cls("form-control").attr3("required").valueOf(name))
+		group3.add(Label.text("Name ")).add(Span.cls("text-danger").text("*"))
+		group3.add(Input.typeOf("text").cls("form-control").name("name").valueOf(name).attr3("required"))
 
 		Dim group4 As Tag = Div.cls("form-group").up(modalBody)
 		group4.add(Label.text("Price "))
-		group4.add(Input.typeOf("text").name("price").cls("form-control").valueOf(NumberFormat2(price, 1, 2, 2, False)))
+		group4.add(Input.typeOf("text").cls("form-control").name("price").valueOf(NumberFormat2(price, 1, 2, 2, False)))
 		
 		Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 		modalFooter.add(Button.cls("btn btn-primary px-3").text("Update"))
@@ -384,29 +380,26 @@ Private Sub HandleDeleteModal
 	DB.Query
 	
 	If DB.Found Then
-		Dim code As String = DB.First.Get("code")
-		Dim name As String = DB.First.Get("name")
+		Dim row As Map = DB.First
+		Dim code As String = row.Get("code")
+		Dim name As String = row.Get("name")
 		Dim modal1 As Tag = Div.cls("modal fade")
 		Dim modalDialog As Tag = Div.cls("modal-dialog modal-dialog-centered").up(modal1)
 		Dim modalContent As Tag = Div.cls("modal-content").up(modalDialog)
-		Dim modalHeader As Tag = Div.cls("modal-header").up(modalContent)
-		modalHeader.add(H5.cls("modal-title").text("Delete Product"))
-		modalHeader.add(Button.typeOf("button").cls("btn-close").data("bs-dismiss", "modal"))
-		Dim modalBody As Tag = Div.cls("modal-body").up(modalContent)
-		modalBody.add(Paragraph.text($"Delete (${code}) ${name}?"$))
-		'Dim form1 As Tag = Form.up(modalBody)
+
 		Dim form1 As Tag = Form.up(modalContent)
 		form1.hxDelete($"/api/products"$)
-		'form1.hxTarget("#modal-container")
 		form1.hxTarget("#modal-messages")
-		'form1.hxSwapOob("true")
 		form1.hxSwap("innerHTML")
-		
 		form1.add(Input.typeOf("hidden").name("id").valueOf(id))
 		
-		'form1.add(Button.cls("btn btn-danger").text("Delete"))
-		'form1.add(Input.typeOf("button").cls("btn btn-secondary").data("bs-dismiss", "modal").valueOf("Cancel"))
-		Div.id("modal-messages").up(form1)
+		Dim modalHeader As Tag = Div.cls("modal-header").up(form1)
+		modalHeader.add(H5.cls("modal-title").text("Delete Product"))
+		modalHeader.add(Button.typeOf("button").cls("btn-close").data("bs-dismiss", "modal"))
+		
+		Dim modalBody As Tag = Div.cls("modal-body").up(form1)
+		Div.id("modal-messages").up(modalBody)
+		modalBody.add(Paragraph.text($"Delete (${code}) ${name}?"$))
 		
 		Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 		modalFooter.add(Button.cls("btn btn-danger px-3").text("Delete"))
@@ -428,7 +421,7 @@ Private Sub HandleProducts
 			Dim category As Int = Request.GetParameter("category")
 			If code = "" Or code.Trim.Length < 2 Then
 				'Response.Status = 422
-				Response.Write($"<div class='alert alert-danger'>Product Code must be at least 2 characters long.</div>"$)
+				ShowAlert("warning", "Product Code must be at least 2 characters long.")
 				Return
 			End If
 			' Check conflict
@@ -441,13 +434,13 @@ Private Sub HandleProducts
 				If DB.Found Then
 					DB.Close
 					'Response.Status = 409
-					Response.Write($"<div class='alert alert-danger'>Product Code already exists!</div>"$)
+					ShowAlert("warning", "Product Code already exists!")
 					Return
 				End If
 			Catch
 				Log(LastException)
 				'Response.Status = 500
-				Response.Write("<script>showError('Database error! Please try again.')</script>")
+				ShowAlert("danger", $"Database error: ${LastException.Message}"$)
 			End Try
 			' Insert new row
 			Try
@@ -456,9 +449,9 @@ Private Sub HandleProducts
 				DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
 				DB.Save
 				DB.Close
-				ShowToast("Product created successfully!")
+				ShowToast("success", "Product created successfully!")
 			Catch
-				Response.Write($"<div class='alert alert-danger'>Database error: ${LastException.Message}</div>"$)
+				ShowAlert("danger", $"Database error: ${LastException.Message}"$)
 			End Try
 		Case "PUT"
 			' Update
@@ -472,15 +465,14 @@ Private Sub HandleProducts
 			
 			If code = "" Or code.Trim.Length < 2 Then
 				'Response.Status = 422
-				Response.Write($"<div class='alert alert-danger'>Product Code must be at least 2 characters long.</div>"$)
+				ShowAlert("warning", "Product Code must be at least 2 characters long.")
 				Return
 			End If
 			
 			DB.Find(id)
 			If DB.Found = False Then
 				'Response.Status = 404
-				'Response.Write("<script>showError('Product not found!')</script>")
-				Response.Write($"<div class='alert alert-danger'>Product not found!</div>"$)
+				ShowAlert("warning", "Product not found!")
 				DB.Close
 				Return
 			End If
@@ -491,8 +483,7 @@ Private Sub HandleProducts
 			DB.Query
 			If DB.Found Then
 				'Response.Status = 409
-				'Response.Write("<script>showError('Product Code already exist')</script>")
-				Response.Write($"<div class='alert alert-danger'>Product Code already exists!</div>"$)
+				ShowAlert("warning", "Product Code already exists!")
 				DB.Close
 				Return
 			End If
@@ -505,9 +496,9 @@ Private Sub HandleProducts
 				DB.Id = id
 				DB.Save
 				DB.Close
-				ShowToast("Product updated successfully!")
+				ShowToast("success", "Product updated successfully!")
 			Catch
-				Response.Write($"<div class='alert alert-danger'>Database error: ${LastException.Message}</div>"$)
+				ShowAlert("danger", $"Database error: ${LastException.Message}"$)
 			End Try
 		Case "DELETE"
 			' Delete
@@ -518,17 +509,21 @@ Private Sub HandleProducts
 			DB.Find(id)
 			If DB.Found = False Then
 				'Response.Status = 404
-				Response.Write("<script>showError('Product not found!')</script>")
+				ShowAlert("warning", "Product not found!")
 				DB.Close
 				Return
 			End If
 
 			' Delete row
-			DB.Table = "tbl_products"
-			DB.Id = id
-			DB.Delete
-			DB.Close
-			ShowToast("Product deleted successfully!")			
+			Try
+				DB.Table = "tbl_products"
+				DB.Id = id
+				DB.Delete
+				DB.Close
+				ShowToast("success", "Product deleted successfully!")
+			Catch
+				ShowAlert("danger", $"Database error: ${LastException.Message}"$)
+			End Try
 	End Select
 End Sub
 
@@ -586,7 +581,12 @@ Private Sub GenerateProductsTable As Tag
 	Return table1
 End Sub
 
-Private Sub ShowToast (message As String)
+Private Sub ShowAlert (class As String, message As String)
+	Dim div1 As Tag = Div.cls("alert alert-" & class).text(message)
+	Response.Write(div1.Build)
+End Sub
+
+Private Sub ShowToast (class As String, message As String)
 	Dim div1 As Tag = Div.id("products-container").hxSwapOob("true")
 	div1.add(GenerateProductsTable)
 	'Response.Write(div1.Build)
@@ -594,10 +594,21 @@ Private Sub ShowToast (message As String)
 	Dim script1 As MiniJS
 	script1.Initialize
 	'script1.AddComment("Close the modal")
-	script1.DeclareVariable("modal", "bootstrap.Modal.getInstance(document.querySelector('.modal'))", True)
+	script1.DeclareVariable("modalElement", "document.querySelector('.modal')", True)
+	'script1.AddConditionalCall("modalInstance", "modalInstance.hide();")
+	script1.StartIf("modalElement")
+	script1.DeclareVariable("modal", "bootstrap.Modal.getInstance(modalElement)", True)
 	script1.AddConditionalCall("modal", "modal.hide();")
+	script1.EndIf
 	script1.AddLine("")
 	'script1.AddComment("Show success toast")
-	script1.AddFunctionCall("showSuccess", Array As String(message))
+	Select class
+		Case "success"
+			script1.AddFunctionCall("showSuccess", Array As String(message))
+		Case "warning"
+			script1.AddFunctionCall("showWarning", Array As String(message))
+		Case "danger"
+			script1.AddFunctionCall("showDanger", Array As String(message))
+	End Select
 	Response.Write(div1.Build & CRLF & script1.Generate)
 End Sub

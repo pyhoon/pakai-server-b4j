@@ -124,7 +124,8 @@ Private Sub BodyFooter As Tag
 	Dim footer1 As Tag = Footer.cls("footer mt-auto py-3 bg-body-tertiary border-top")
 	Dim small1 As Tag = footer1.add(Div.cls("footer small text-center d-md-block") _
 	.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"))
-	Dim caption1 As Tag = small1.add(Caption.text("$APP_COPYRIGHT$").add2(Br.init))
+	Dim caption1 As Tag = small1.add(Caption.text("$APP_COPYRIGHT$"))
+	caption1.add(Br.init)
 	caption1.text("Pakai ")
 	Dim span1 As Tag = Span.sty("color: red").up(caption1)
 	'span1.add(Icon.cls("ti ti-heart"))
