@@ -63,3 +63,15 @@ document.addEventListener('htmx:afterSwap', function(e) {
 document.addEventListener('htmx:responseError', function (event) {
   showError('Network error occurred. Please try again.');
 });
+
+// Fix bug for Chrome browser Blocked aria-hidden on an element
+// Source - https://stackoverflow.com/questions/79159883/warning-blocked-aria-hidden-on-an-element-because-its-descendant-retained-focu
+// Posted by Project Mayhem
+// Retrieved 11/5/2025, License - CC-BY-SA 4.0
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener('hide.bs.modal', function (event) {
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+    });
+});
