@@ -37,12 +37,6 @@ function closeCurrentModal() {
     }
 }
 
-// function refreshCategoriesTable() {
-//     htmx.ajax('GET', '/api/categories/table', {
-//         target: '#categories-container'
-//     });
-// }
-
 // Modal management
 document.addEventListener('htmx:afterSwap', function(e) {
     if (e.detail.target.id === 'modal-container') {
