@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Database class module
-'Version 6.00alpha
+'Version 6.00beta
 Sub Class_Globals
 	Private conn 	As ORMConnector
 	Private info 	As ConnectionInfo
@@ -13,29 +13,24 @@ End Sub
 
 Public Sub Initialize
 	#If MariaDB
-	If File.Exists(File.DirApp, "mariadb.ini") = False Then
-		File.Copy(File.DirAssets, "mariadb.example", File.DirApp, "mariadb.ini")
-	End If	
-	Dim ctx As Map = File.ReadMap(File.DirApp, "mariadb.ini")
+	Dim dbvar As String = "mariadb"
 	#Else If MySQL
-	If File.Exists(File.DirApp, "mysql.ini") = False Then
-		File.Copy(File.DirAssets, "mysql.example", File.DirApp, "mysql.ini")
-	End If
-	Dim ctx As Map = File.ReadMap(File.DirApp, "mysql.ini")
+	Dim dbvar As String = "mysql"
 	#Else
-	If File.Exists(File.DirApp, "sqlite.ini") = False Then
-		File.Copy(File.DirAssets, "sqlite.example", File.DirApp, "sqlite.ini")
-	End If
-	Dim ctx As Map = File.ReadMap(File.DirApp, "sqlite.ini")
+	Dim dbvar As String = "sqlite"
 	#End If
+	If File.Exists(File.DirApp, $"${dbvar}.ini"$) = False Then
+		File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)
+	End If
+	Dim ctx As Map = File.ReadMap(File.DirApp, $"${dbvar}.ini"$)
 	info.Initialize
 	info.DBType = ctx.GetDefault("DbType", "")
 	Select info.DBType
 		Case "SQLite"
 			info.DBDir = ctx.GetDefault("DbDir", "")
 			info.DBFile = ctx.GetDefault("DbFile", "")
-			info.JournalMode = "WAL"		
-		Case "MySQL", "MariaDB"
+			info.JournalMode = "WAL"
+		Case "MariaDB", "MySQL"
 			info.DBHost = ctx.GetDefault("DbHost", "")
 			info.DBPort = ctx.GetDefault("DbPort", "")
 			info.DBName = ctx.GetDefault("DbName", "")
@@ -72,7 +67,7 @@ Public Sub ConnectDatabase
 		Select Engine
 			Case "SQLite"
 				Dim DBFound As Boolean = conn.DBExist			
-			Case "MySQL", "MariaDB"
+			Case "MariaDB", "MySQL"
 				Wait For (conn.InitSchema) Complete (Success As Boolean)
 				If Success = False Then
 					LogColor("Database initilialization failed!", Main.COLOR_RED)
@@ -90,7 +85,7 @@ Public Sub ConnectDatabase
 		End Select
 		If DBFound Then
 			LogColor($"${Engine} database found!"$, Main.COLOR_BLUE)
-			If Engine = "MySQL" Or Engine = "MariaDB" Then
+			If Engine = "MariaDB" Or Engine = "MySQL" Then
 				conn.InitPool
 			End If
 			Return
@@ -115,7 +110,7 @@ Private Sub CreateDatabase
 	End If
 	
 	LogColor("Creating tables...", Main.COLOR_BLUE)
-	If Engine = "MySQL" Or Engine = "MariaDB" Then
+	If Engine = "MariaDB" Or Engine = "MySQL" Then
 		conn.InitPool
 	End If
 	
@@ -160,7 +155,7 @@ Public Sub CurrentTimeStamp As String
 	Select Engine
 		Case "SQLite"
 			Return "datetime('Now')"		
-		Case "MySQL", "MariaDB"
+		Case "MariaDB", "MySQL"
 			Return "NOW()"
 		Case Else
 			Return ""
@@ -171,7 +166,7 @@ Public Sub CurrentTimeStampAddMinute (Value As Int) As String
 	Select Engine
 		Case "SQLite"
 			Return $"datetime('Now', '+${Value} minute')"$		
-		Case "MySQL", "MariaDB"
+		Case "MariaDB", "MySQL"
 			Return $"DATE_ADD(NOW(), INTERVAL ${Value} MINUTE)"$
 		Case Else
 			Return ""

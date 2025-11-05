@@ -5,34 +5,16 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 Sub Class_Globals
-	Private mPlaceholders As List
-	Private mContent As Tag
-	Private mSubContent As Tag
 	Private mModal As Tag
 	Private mToast As Tag
+	Private mContent As Tag
+	Private mSubContent As Tag
 End Sub
 
 Public Sub Initialize
-	mPlaceholders.Initialize
+
 End Sub
 
-Public Sub LoadView (Tag1 As Tag)
-	mPlaceholders.Add(Tag1)
-End Sub
-
-Public Sub LoadView2 (Tags As List)
-	mPlaceholders.Add(Tags)
-End Sub
-
-Public Sub LoadView3 (View1 As String)
-	Dim parser As MiniHtmlParser
-	parser.Initialize
-	Dim root As HtmlNode = parser.Parse(View1)
-	If root.IsInitialized Then
-		Dim newTag As Tag = parser.ConvertToTag(root)
-		mPlaceholders.Add(newTag)
-	End If
-End Sub
 
 Public Sub LoadContent (Tag1 As Tag)
 	mContent = Tag1
@@ -84,8 +66,7 @@ Private Sub PageBody As Tag
 	If mToast.IsInitialized Then body1.add(mToast)
 	Dim nav1 As Tag = body1.add(Nav.cls("navbar navbar-expand-lg sticky-top yellow"))
 	Dim div1 As Tag = nav1.add(Div.cls("container-fluid"))
-	
-	'div1.add(Anchor.cls("navbar-brand me-0 me-lg-2 pt-2").hrefOf("#")).add(Icon.cls("ti ti-infinite").sty("font-size: 1.8em"))
+
 	div1.add(Anchor.cls("navbar-brand me-0 me-lg-2 pt-2").hrefOf("#")).add(Icon.cls("bi bi-infinity").sty("font-size: 1.8em"))
 	div1.add(Anchor.cls("navbar-brand d-none d-md-block").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
 	
@@ -111,8 +92,7 @@ Private Sub PageBody As Tag
 	Dim content1 As Tag = body1.add(Div.cls("content m-3"))
 	Dim padding2 As Tag = content1.add(Div.cls("p-2"))
 	Dim row1 As Tag = padding2.add(Div.cls("row text-center align-items-center justify-content-center"))
-	'row1.add(Div.cls("mx-3")) _
-	'.add(Img.src("$SERVER_URL$/assets/img/loading.webp").width("60px").height("60px"))
+
 	Dim div1 As Tag = row1.add(Div.init)
 	div1.add(H3.cls("mb-0").sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")) _
 	.text("$HOME_TITLE$")
@@ -134,7 +114,6 @@ Private Sub BodyFooter As Tag
 	caption1.add(Br.init)
 	caption1.text("Pakai ")
 	Dim span1 As Tag = Span.sty("color: red").up(caption1)
-	'span1.add(Icon.cls("ti ti-heart"))
 	span1.add(Icon.cls("bi bi-heart"))
 	caption1.text(" B4X")
 	Return footer1
