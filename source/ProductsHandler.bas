@@ -77,20 +77,24 @@ Private Sub ContentContainer As Tag
 	Dim col2 As Tag = Div.cls("col-md-6 col-lg-6").up(row1)
 	Dim div2 As Tag = Div.cls("float-end mt-2").up(col2)
 	
-	Dim anchor1 As Tag = Anchor.href("$SERVER_URL$/categories").cls("btn btn-primary me-2").up(div2)
+	Dim anchor1 As Tag = Anchor.up(div2)
+	anchor1.hrefOf("$SERVER_URL$/categories")
+	anchor1.cls("btn btn-primary me-2")
 	anchor1.add(Icon.cls("bi bi-list me-2"))
 	anchor1.text("Show Category")
 	
-	Dim anchor2 As Tag = Anchor.up(div2)
-	anchor2.cls("btn btn-success")
-	anchor2.hxGet("/api/products/modal/add")
-	anchor2.hxTarget("#modal-container")
-	anchor2.add(Icon.cls("bi bi-plus-lg me-2"))
-	anchor2.text("Add Product")
-	
+	Dim button2 As Tag = Button.up(div2)
+	button2.cls("btn btn-success ml-2")
+	button2.hxGet("/api/products/modal/add")
+	button2.hxTarget("#modal-content")
+	button2.hxTrigger("click")
+	button2.data("bs-toggle", "modal")
+	button2.data("bs-target", "#modal-container")
+	button2.add(Icon.cls("bi bi-plus-lg me-2"))
+	button2.text("Add Product")
+
 	Dim container1 As Tag = Div.up(col12)
 	container1.id("products-container")
-	container1.cls("table")
 	container1.hxGet("/api/products/table")
 	container1.hxTrigger("load")
 	container1.text("Loading...")
@@ -100,12 +104,10 @@ End Sub
 
 Private Sub GitHubLink As Tag
 	Dim div1 As Tag = Div.cls("text-center mb-3")
-	
 	Dim anchor1 As Tag = Anchor.up(div1)
 	anchor1.hrefOf("https://github.com/pyhoon/pakai-server-b4j/tree/v6.00")
 	anchor1.cls("text-primary mr-1")
 	anchor1.aria("label", "github").attr("title", "GitHub").targetOf("_blank")
-	
 	Dim svg1 As Tag = Svg.up(anchor1)
 	svg1.aria("hidden", "true")
 	svg1.width("24").height("24")
@@ -114,78 +116,43 @@ Private Sub GitHubLink As Tag
 	Dim path1 As Tag = Html.create("path").up(svg1)
 	path1.attr("fill-rule", "evenodd")
 	path1.attr("d", "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z")
-	
 	Dim anchor2 As Tag = Anchor.up(div1)
 	anchor2.hrefOf("https://github.com/pyhoon/pakai-server-b4j/tree/v6.00")
 	anchor2.sty("text-decoration: none")
 	anchor2.targetOf("_blank")
 	Span.sty("vertical-align: middle").text("Visit my GitHub repository").up(anchor2)
-	
 	Return div1
 End Sub
 
 Private Sub ModalContainer As Tag
-	Return Div.id("modal-container")
+	Dim modal1 As Tag = Div.id("modal-container")
+	modal1.cls("modal fade")
+	modal1.attr("tabindex", "-1")
+	modal1.aria("hidden", "true")
+	Dim modalDialog As Tag = Div.up(modal1).cls("modal-dialog modal-dialog-centered")
+	Div.cls("modal-content").id("modal-content").up(modalDialog)
+	Return modal1
 End Sub
 
 Private Sub ToastContainer As Tag
-	Dim toast1 As Tag = Div.id("toast-container")
-	toast1.cls("toast-container position-fixed end-0 p-3")
-	toast1.sty("top: 10%")
-	Return toast1
+	Dim div1 As Tag = Div.cls("position-fixed end-0 p-3")
+	div1.sty("z-index: 2000")
+	div1.sty("bottom: 0%")
+	Dim toast1 As Tag = Div.id("toast-container").up(div1)
+	toast1.cls("toast align-items-center text-bg-success border-0")
+	toast1.attr("role", "alert")
+	Dim div2 As Tag = Div.cls("d-flex").up(toast1)
+	Dim div3 As Tag = Div.cls("toast-body").id("toast-body").up(div2)
+	div3.text("Operation successful!")
+	Dim button1 As Tag = Button.typeOf("button").up(div2)
+	button1.cls("btn-close btn-close-white me-2 m-auto")
+	button1.data("bs-dismiss", "toast")
+	Return div1
 End Sub
 
 ' Return table HTML
 Private Sub HandleTable
-	DB.SQL = Main.DBOpen
-	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
-	DB.OrderBy = CreateMap("p.id": "")
-	DB.Query
-
-	Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
-	
-	Dim thead1 As Tag = table1.add(Thead.cls("table-light"))
-	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
-	thead1.add(Th.text("Code"))
-	thead1.add(Th.text("Name"))
-	thead1.add(Th.text("Category"))
-	thead1.add(Th.sty("text-align: right").text("Price"))
-	thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
-
-	Dim tbody1 As Tag = table1.add(Tbody.init)
-
-	For Each row As Map In DB.Results
-		Dim id As Int = row.Get("id")
-		Dim code As String = row.Get("code")
-		Dim name As String = row.Get("name")
-		Dim price As Double = row.Get("price")
-		Dim category As String = row.Get("category")
-		
-		Dim tr1 As Tag = tbody1.add(Tr.init)
-		tr1.add(Td.cls("align-middle").sty("text-align: right").text(id))
-		tr1.add(Td.cls("align-middle").text(code))
-		tr1.add(Td.cls("align-middle").text(name))
-		tr1.add(Td.cls("align-middle").text(category))
-		tr1.add(Td.cls("align-middle").sty("text-align: right").text(NumberFormat2(price, 1, 2, 2, True)))
-		
-		Dim td1 As Tag = tr1.add(Td.cls("align-middle text-center px-1 py-1"))
-		
-		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td1)
-		anchor1.hxGet($"/api/products/modal/edit/${id}"$)
-		anchor1.hxTarget("#modal-container")
-		anchor1.add(Icon.cls("bi bi-pencil"))
-		anchor1.attr("title", "Edit")
-		
-		Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td1)
-		anchor2.hxGet($"/api/products/modal/delete/${id}"$)
-		anchor2.hxTarget("#modal-container")
-		anchor2.add(Icon.cls("bi bi-trash3"))
-		anchor2.attr("title", "Delete")
-	Next
-	DB.Close
-	Response.Write(table1.Build)
+	Response.Write(GenerateProductsTable.Build)
 End Sub
 
 ' Search product using keyword
@@ -232,13 +199,19 @@ Private Sub HandleSearch
 
 		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td1)
 		anchor1.hxGet($"/api/products/modal/edit/${id}"$)
-		anchor1.hxTarget("#modal-container")
+		anchor1.hxTarget("#modal-content")
+		anchor1.hxTrigger("click")
+		anchor1.data("bs-toggle", "modal")
+		anchor1.data("bs-target", "#modal-container")
 		anchor1.add(Icon.cls("bi bi-pencil"))
 		anchor1.attr("title", "Edit")
 		
 		Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td1)
 		anchor2.hxGet($"/api/products/modal/delete/${id}"$)
-		anchor2.hxTarget("#modal-container")
+		anchor2.hxTarget("#modal-content")
+		anchor2.hxTrigger("click")
+		anchor2.data("bs-toggle", "modal")		
+		anchor2.data("bs-target", "#modal-container")
 		anchor2.add(Icon.cls("bi bi-trash3"))
 		anchor2.attr("title", "Delete")
 	Next
@@ -249,11 +222,7 @@ End Sub
 
 ' Add modal
 Private Sub HandleAddModal
-	Dim modal1 As Tag = Div.cls("modal fade")
-	Dim modalDialog As Tag = Div.cls("modal-dialog modal-dialog-centered").up(modal1)
-	Dim modalContent As Tag = Div.cls("modal-content").up(modalDialog)
-	
-	Dim form1 As Tag = Form.up(modalContent)
+	Dim form1 As Tag = Form.init
 	form1.hxPost("/api/products")
 	form1.hxTarget("#modal-messages")
 	form1.hxSwap("innerHTML")
@@ -303,46 +272,39 @@ Private Sub HandleAddModal
 	modalFooter.add(Button.typeOf("submit").cls("btn btn-success px-3").text("Create"))
 	modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").attr("value", "Cancel"))
 
-	Response.Write(modal1.Build)
+	Response.Write(form1.Build)
 End Sub
 
 ' Edit modal
 Private Sub HandleEditModal
 	Dim id As String = Request.RequestURI.SubString("/api/products/modal/edit/".Length)
-	
+	Dim form1 As Tag = Form.init
+	form1.hxPut($"/api/products"$)
+	form1.hxTarget("#modal-messages")
+	form1.hxSwap("innerHTML")
+		
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products"
 	DB.Columns = Array("category_id category", "product_code code", "product_name name", "product_price price")
 	DB.WhereParam("id = ?", id)
 	DB.Query
-	
 	If DB.Found Then
 		Dim row As Map = DB.First
 		Dim code As String = row.Get("code")
 		Dim name As String = row.Get("name")
 		Dim price As Double = row.Get("price")
 		Dim category As Int = row.Get("category")
-		
-		Dim modal1 As Tag = Div.cls("modal fade")
-		Dim modalDialog As Tag = Div.cls("modal-dialog modal-dialog-centered").up(modal1)
-		Dim modalContent As Tag = Div.cls("modal-content").up(modalDialog)
-		
-		Dim form1 As Tag = Form.up(modalContent)
-		form1.hxPut($"/api/products"$)
-		'form1.hxTarget("#modal-container")
-		form1.hxTarget("#modal-messages")
-		form1.hxSwap("innerHTML")
-		
+
 		Dim modalHeader As Tag = Div.cls("modal-header").up(form1)
-		modalHeader.add(H5.cls("modal-title").text("Edit Product"))
-		modalHeader.add(Button.typeOf("button").cls("btn-close").data("bs-dismiss", "modal"))
+		H5.cls("modal-title").text("Edit Product").up(modalHeader)
+		Button.typeOf("button").cls("btn-close").data("bs-dismiss", "modal").up(modalHeader)
 		
 		Dim modalBody As Tag = Div.cls("modal-body").up(form1)
 		Div.id("modal-messages").up(modalBody)
-		Input.typeOf("hidden").name("id").valueOf(id).up(modalBody)
+		Input.typeOf("hidden").up(modalBody).name("id").valueOf(id)
 		
 		Dim group1 As Tag = Div.cls("form-group").up(modalBody)
-		group1.add(Label.forId("category2").text("Category ")).add(Span.cls("text-danger").text("*"))
+		Label.forId("category2").text("Category ").up(group1).add(Span.cls("text-danger")).text("*")
 		
 		Dim select1 As Tag = Dropdown.up(group1)
 		select1.id("category2")
@@ -382,36 +344,28 @@ Private Sub HandleEditModal
 		Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 		modalFooter.add(Button.cls("btn btn-primary px-3").text("Update"))
 		modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel"))
-		
-		Response.Write(modal1.Build)
 	End If
 	DB.Close
+	Response.Write(form1.Build)
 End Sub
 
 ' Delete modal
 Private Sub HandleDeleteModal
 	Dim id As String = Request.RequestURI.SubString("/api/products/modal/delete/".Length)
-	
+	Dim form1 As Tag = Form.init
+	form1.hxDelete($"/api/products"$)
+	form1.hxTarget("#modal-messages")
+	form1.hxSwap("innerHTML")
+		
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_products"
 	DB.Columns = Array("id", "product_code AS code", "product_name AS name")
 	DB.WhereParam("id = ?", id)
 	DB.Query
-	
 	If DB.Found Then
 		Dim row As Map = DB.First
 		Dim code As String = row.Get("code")
 		Dim name As String = row.Get("name")
-		
-		Dim modal1 As Tag = Div.cls("modal fade")
-		Dim modalDialog As Tag = Div.cls("modal-dialog modal-dialog-centered").up(modal1)
-		Dim modalContent As Tag = Div.cls("modal-content").up(modalDialog)
-
-		Dim form1 As Tag = Form.up(modalContent)
-		form1.hxDelete($"/api/products"$)
-		'form1.hxTarget("#modal-container")
-		form1.hxTarget("#modal-messages")
-		form1.hxSwap("innerHTML")		
 
 		Dim modalHeader As Tag = Div.cls("modal-header").up(form1)
 		H5.cls("modal-title").text("Delete Product").up(modalHeader)
@@ -425,10 +379,9 @@ Private Sub HandleDeleteModal
 		Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 		Button.cls("btn btn-danger px-3").text("Delete").up(modalFooter)
 		Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel").up(modalFooter)
-		
-		Response.Write(modal1.Build)
 	End If
 	DB.Close
+	Response.Write(form1.Build)
 End Sub
 
 ' Handle CRUD operations
@@ -438,11 +391,12 @@ Private Sub HandleProducts
 			' Create
 			Dim code As String = Request.GetParameter("code")
 			Dim name As String = Request.GetParameter("name")
-			Dim price As Double = Request.GetParameter("price")
+			Dim tempprice As String = Request.GetParameter("price")
+			Dim price As Double = IIf(tempprice.Trim = "", 0, tempprice)
 			Dim category As Int = Request.GetParameter("category")
 			
 			If code = "" Or code.Trim.Length < 2 Then
-				ShowAlert("warning", "Product Code must be at least 2 characters long.")
+				ShowAlert("Product Code must be at least 2 characters long.", "warning")
 				Return
 			End If
 			
@@ -455,12 +409,12 @@ Private Sub HandleProducts
 				DB.Query
 				If DB.Found Then
 					DB.Close
-					ShowAlert("warning", "Product Code already exists!")
+					ShowAlert("Product Code already exists!", "warning")
 					Return
 				End If
 			Catch
 				Log(LastException)
-				ShowAlert("danger", $"Database error: ${LastException.Message}"$)
+				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
 			' Insert new row
 			Try
@@ -469,9 +423,9 @@ Private Sub HandleProducts
 				DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
 				DB.Save
 				DB.Close
-				ShowToast("success", "Product created successfully!")
+				ShowToast("Product", "created", "Product created successfully!", "success")
 			Catch
-				ShowAlert("danger", $"Database error: ${LastException.Message}"$)
+				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
 		Case "PUT"
 			' Update
@@ -482,7 +436,7 @@ Private Sub HandleProducts
 			Dim category As Int = Request.GetParameter("category")
 			
 			If code = "" Or code.Trim.Length < 2 Then
-				ShowAlert("warning", "Product Code must be at least 2 characters long.")
+				ShowAlert("Product Code must be at least 2 characters long.", "warning")
 				Return
 			End If
 			
@@ -490,7 +444,7 @@ Private Sub HandleProducts
 			DB.Table = "tbl_products"
 			DB.Find(id)
 			If DB.Found = False Then
-				ShowAlert("warning", "Product not found!")
+				ShowAlert("Product not found!", "warning")
 				DB.Close
 				Return
 			End If
@@ -500,7 +454,7 @@ Private Sub HandleProducts
 			DB.Parameters = Array(code, id)
 			DB.Query
 			If DB.Found Then
-				ShowAlert("warning", "Product Code already exists!")
+				ShowAlert("Product Code already exists!", "warning")
 				DB.Close
 				Return
 			End If
@@ -513,9 +467,9 @@ Private Sub HandleProducts
 				DB.Id = id
 				DB.Save
 				DB.Close
-				ShowToast("success", "Product updated successfully!")
+				ShowToast("Product", "updated", "Product updated successfully!", "info")
 			Catch
-				ShowAlert("danger", $"Database error: ${LastException.Message}"$)
+				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
 		Case "DELETE"
 			' Delete
@@ -525,7 +479,7 @@ Private Sub HandleProducts
 			DB.Table = "tbl_products"
 			DB.Find(id)
 			If DB.Found = False Then
-				ShowAlert("warning", "Product not found!")
+				ShowAlert("Product not found!", "warning")
 				DB.Close
 				Return
 			End If
@@ -536,22 +490,22 @@ Private Sub HandleProducts
 				DB.Id = id
 				DB.Delete
 				DB.Close
-				ShowToast("success", "Product deleted successfully!")
+				ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
 			Catch
-				ShowAlert("danger", $"Database error: ${LastException.Message}"$)
+				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
 	End Select
 End Sub
 
 Private Sub GenerateProductsTable As Tag
-	Dim table1 As Tag = HtmlTable.cls("table table-bordered rounded small")
+	Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
 	Dim thead1 As Tag = table1.add(Thead.cls("table-light"))
 	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
 	thead1.add(Th.text("Code"))
 	thead1.add(Th.text("Name"))
 	thead1.add(Th.text("Category"))
 	thead1.add(Th.sty("text-align: right").text("Price"))
-	thead1.add(Th.sty("text-align: center; width: 90px").text("Actions"))
+	thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
 	Dim tbody1 As Tag = table1.add(Tbody.init)
 
 	DB.SQL = Main.DBOpen
@@ -572,45 +526,51 @@ Private Sub GenerateProductsTable As Tag
 		tr1.add(Td.cls("align-middle").text(code))
 		tr1.add(Td.cls("align-middle").text(name))
 		tr1.add(Td.cls("align-middle").text(category))
-		tr1.add(Td.cls("align-middle").sty("text-align: right").text(NumberFormat2(price, 1, 2, 2, False)))
+		tr1.add(Td.cls("align-middle").sty("text-align: right").text(NumberFormat2(price, 1, 2, 2, True)))
 		
-		Dim td1 As Tag = tr1.add(Td.cls("text-center"))
+		Dim td1 As Tag = tr1.add(Td.cls("align-middle text-center px-1 py-1"))
 		
 		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td1)
 		anchor1.hxGet($"/api/products/modal/edit/${id}"$)
-		anchor1.hxTarget("#modal-container")
-		anchor1.add(Icon.cls("bi bi-pencil").sty("font-size: 1.2em"))
+		anchor1.hxTarget("#modal-content")
+		anchor1.hxTrigger("click")
+		anchor1.data("bs-toggle", "modal")
+		anchor1.data("bs-target", "#modal-container")
+		anchor1.add(Icon.cls("bi bi-pencil"))
 		anchor1.attr("title", "Edit")
 		
 		Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td1)
 		anchor2.hxGet($"/api/products/modal/delete/${id}"$)
-		anchor2.hxTarget("#modal-container")
-		anchor2.add(Icon.cls("bi bi-trash3").sty("font-size: 1.2em"))
+		anchor2.hxTarget("#modal-content")
+		anchor2.hxTrigger("click")
+		anchor2.data("bs-toggle", "modal")		
+		anchor2.data("bs-target", "#modal-container")
+		anchor2.add(Icon.cls("bi bi-trash3"))
 		anchor2.attr("title", "Delete")
 	Next
 	DB.Close
 	Return table1
 End Sub
 
-Private Sub ShowAlert (class As String, message As String)
-	Dim div1 As Tag = Div.cls("alert alert-" & class).text(message)
+Private Sub ShowAlert (message As String, status As String)
+	Dim div1 As Tag = Div.cls("alert alert-" & status).text(message)
 	Response.Write(div1.Build)
 End Sub
 
-Private Sub ShowToast (class As String, message As String)
-	Dim div1 As Tag = Div.id("products-container").hxSwapOob("true")
+Private Sub ShowToast (entity As String, action As String, message As String, status As String)
+	Dim div1 As Tag = Div.id("products-container")
+	div1.hxSwapOob("true")
 	div1.add(GenerateProductsTable)
+	
+	Dim details As Map
+    details.Initialize
+    details.Put("entity", entity)
+    details.Put("action", action)
+    details.Put("message", message)
+    details.Put("status", status)
 
 	Dim script1 As MiniJs
 	script1.Initialize
-	script1.AddFunctionCall("closeCurrentModal", Null)
-	Select class
-		Case "success"
-			script1.AddFunctionCall("showSuccess", Array As String(message))
-		Case "warning"
-			script1.AddFunctionCall("showWarning", Array As String(message))
-		Case "danger"
-			script1.AddFunctionCall("showDanger", Array As String(message))
-	End Select
+	script1.AddCustomEventDispatch($"entity:changed"$, details)
 	Response.Write(div1.Build & CRLF & script1.Generate)
 End Sub

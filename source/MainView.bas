@@ -15,7 +15,6 @@ Public Sub Initialize
 
 End Sub
 
-
 Public Sub LoadContent (Tag1 As Tag)
 	mContent = Tag1
 End Sub
@@ -42,7 +41,9 @@ Public Sub Render As Tag
 	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y")
 	body1.cdnScript("https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
 	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz")
-	body1.script("$SERVER_URL$/assets/js/main.js")
+	'body1.script("$SERVER_URL$/assets/js/htmx.js")
+	'body1.script("$SERVER_URL$/assets/js/main.js")
+	body1.script("$SERVER_URL$/assets/js/app.js")
 	Return page1
 End Sub
 

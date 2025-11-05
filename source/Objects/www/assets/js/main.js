@@ -26,17 +26,6 @@ function showSuccess(message) { showToast(message, 'success'); }
 function showWarning(message) { showToast(message, 'warning'); }
 function showDanger(message) { showToast(message, 'danger'); }
 
-// Modal functions - NO variable declarations that could conflict
-function closeCurrentModal() {
-    const modalElement = document.querySelector('.modal.show');
-    if (modalElement) {
-        const bsModal = bootstrap.Modal.getInstance(modalElement);
-        if (bsModal) {
-            bsModal.hide();
-        }
-    }
-}
-
 // Modal management
 document.addEventListener('htmx:afterSwap', function(e) {
     if (e.detail.target.id === 'modal-container') {
@@ -52,6 +41,17 @@ document.addEventListener('htmx:afterSwap', function(e) {
         }
     }
 });
+
+// Modal functions - NO variable declarations that could conflict
+function closeCurrentModal() {
+    const modalElement = document.querySelector('.modal.show');
+    if (modalElement) {
+        const bsModal = bootstrap.Modal.getInstance(modalElement);
+        if (bsModal) {
+            bsModal.hide();
+        }
+    }
+}
 
 // Global error handler
 document.addEventListener('htmx:responseError', function (event) {

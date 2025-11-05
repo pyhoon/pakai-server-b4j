@@ -10,14 +10,14 @@
         {
             "Name": "MiniHtml.b4xlib",
             "Platform": "B4X",
-            "Version": 0.30,
-            "Link": "https://github.com/pyhoon/MiniHtml-B4X/releases/download/v0.30/MiniHtml.b4xlib"
+            "Version": 0.40,
+            "Link": "https://github.com/pyhoon/MiniHtml-B4X/releases/download/v0.40/MiniHtml.b4xlib"
         },
         {
             "Name": "MiniJS.b4xlib",
             "Platform": "B4X",
-            "Version": 0.10,
-            "Link": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.10/MiniJs.b4xlib"
+            "Version": 0.20,
+            "Link": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.20/MiniJs.b4xlib"
         },
         {
             "Name": "MiniORMUtils.b4xlib",
