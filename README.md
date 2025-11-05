@@ -1,8 +1,8 @@
-# Pakai - Web API Server framework
+# Pakai Server - Web Application framework
 
-Version: 6.00alpha
+Version: 6.00beta
 
-Create REST API Backend using B4J project template
+Create Web Application using B4J project template
 
 ### Preview
 ![Index](../main/pakai-index.png)
@@ -11,22 +11,22 @@ Create REST API Backend using B4J project template
 ---
 
 ## Template:
-- Pakai Server (6.00alpha).b4xtemplate
+- Pakai Server (6.00beta).b4xtemplate
 
 ## Depends on:
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
+- [MiniJs.b4xlib](https://github.com/pyhoon/MiniJs-B4X)
 - [MiniHtml.b4xlib](https://github.com/pyhoon/MiniHtml-B4X)
 - [MiniORMUtils.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
-- [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
 - sqlite-jdbc-3.7.2.jar (SQLite)
 - mysql-connector-j-9.3.0.jar (MySQL)
 - mariadb-java-client-3.5.6.jar (MariaDB)
 
 ## Features:
 - Use Server Handlers
-- Improved API documentation
-- Built-in web front-end with CRUD examples
-- Supports JSON and XML formats payload and response
+- Use HTMX v2.0 and Bootstrap v5.3
+- Built-in CRUD examples
+
 
 ## What's New
 - More cleaner code in Main module
@@ -39,18 +39,19 @@ Create REST API Backend using B4J project template
 Sub AppStart (Args() As String)
 	App.Initialize
 	App.LoadConfig
-
-	Api = App.api
-	Api.EnableHelp = True
-
-	App.Get("", "IndexWebHandler")
-	App.Get("/api/products", "ProductsApiHandler")
-	App.Get("/api/products/*", "ProductsApiHandler")
-	App.Post("/api/products", "ProductsApiHandler")
-	App.Put("/api/products/*", "ProductsApiHandler")
-	App.Delete("/api/products/*", "ProductsApiHandler")
-
+	
+	' *** Web handlers ***
+	App.Get("", "ProductsHandler")
+	App.Get("/categories", "CategoriesHandler")
+	
+	' *** Api handlers ***
+	App.Rest("/api/products/*", "ProductsHandler")
+	App.Rest("/api/categories/*", "CategoriesHandler")
+	
 	App.Start
+
+	DB.Initialize
+	DB.ConnectDatabase
 	StartMessageLoop
 End Sub
 ```
