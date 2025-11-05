@@ -5,9 +5,7 @@ Version: 6.00beta
 Create Web Application using B4J project template
 
 ### Preview
-![Index](../main/pakai-index.png)
-![Edit](../main/pakai-form-validation.png)
-![Documentation](../main/pakai.png)
+![Index](../v6.00/pakai-index.png)
 ---
 
 ## Template:
