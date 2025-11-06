@@ -37,12 +37,15 @@ Public Sub Render As Tag
 	page1.add(PageBody)
 	Dim body1 As Tag = page1.ChildByTagName("body")
 	body1.add(BodyFooter)
+	#If Bundle
+	body1.script("$SERVER_URL$/assets/js/bootstrap.min.js")
+	body1.script("$SERVER_URL$/assets/js/htmx.min.js")
+	#Else
 	body1.cdnScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
 	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y")
 	body1.cdnScript("https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
 	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz")
-	'body1.script("$SERVER_URL$/assets/js/htmx.js")
-	'body1.script("$SERVER_URL$/assets/js/main.js")
+	#End If
 	body1.script("$SERVER_URL$/assets/js/app.js")
 	Return page1
 End Sub
@@ -55,9 +58,14 @@ Private Sub PageHeader As Tag
 	header1.add(Meta.attr("name", "author").attr("content", "Aeric Poon"))
 	header1.title("$APP_TITLE$")
 	header1.linkIcon("image/png", "$SERVER_URL$/assets/img/favicon.png")
+	#If Bundle
+	header1.linkCss("$SERVER_URL$/assets/css/bootstrap.min.css")
+	header1.linkCss("$SERVER_URL$/assets/css/bootstrap-icons.min.css")
+	#Else
 	header1.cdnStyle("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
 	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB")
 	header1.linkcss("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")
+	#End If
 	header1.linkcss("$SERVER_URL$/assets/css/main.css?v=$VERSION$")
 	Return header1
 End Sub
