@@ -55,6 +55,8 @@ Private Sub RenderPage
 	doc.Initialize
 	doc.AppendDocType
 	doc.Append(page1.build)
+
+	Response.ContentType = "text/html"
 	Response.Write(App.ReplaceMap(doc.ToString, App.ctx))
 End Sub
 
@@ -152,6 +154,7 @@ End Sub
 
 ' Return table HTML
 Private Sub HandleTable
+	Response.ContentType = "text/html"
 	Response.Write(GenerateProductsTable.Build)
 End Sub
 
@@ -217,6 +220,7 @@ Private Sub HandleSearch
 	Next
 	DB.Close
 	
+	Response.ContentType = "text/html"
 	Response.Write(table1.Build)
 End Sub
 
@@ -272,6 +276,7 @@ Private Sub HandleAddModal
 	modalFooter.add(Button.typeOf("submit").cls("btn btn-success px-3").text("Create"))
 	modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").attr("value", "Cancel"))
 
+	Response.ContentType = "text/html"
 	Response.Write(form1.Build)
 End Sub
 
@@ -346,6 +351,8 @@ Private Sub HandleEditModal
 		modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel"))
 	End If
 	DB.Close
+	
+	Response.ContentType = "text/html"
 	Response.Write(form1.Build)
 End Sub
 
@@ -381,6 +388,8 @@ Private Sub HandleDeleteModal
 		Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel").up(modalFooter)
 	End If
 	DB.Close
+	
+	Response.ContentType = "text/html"
 	Response.Write(form1.Build)
 End Sub
 
@@ -554,6 +563,7 @@ End Sub
 
 Private Sub ShowAlert (message As String, status As String)
 	Dim div1 As Tag = Div.cls("alert alert-" & status).text(message)
+	Response.ContentType = "text/html"
 	Response.Write(div1.Build)
 End Sub
 
@@ -572,5 +582,7 @@ Private Sub ShowToast (entity As String, action As String, message As String, st
 	Dim script1 As MiniJs
 	script1.Initialize
 	script1.AddCustomEventDispatch($"entity:changed"$, details)
+
+	Response.ContentType = "text/html"
 	Response.Write(div1.Build & CRLF & script1.Generate)
 End Sub

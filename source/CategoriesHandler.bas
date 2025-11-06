@@ -54,6 +54,8 @@ Private Sub RenderPage
 	doc.Initialize
 	doc.AppendDocType
 	doc.Append(page1.build)
+	
+	Response.ContentType = "text/html"
 	Response.Write(App.ReplaceMap(doc.ToString, App.ctx))
 End Sub
 
@@ -120,6 +122,7 @@ End Sub
 
 ' Return table HTML
 Private Sub HandleTable
+	Response.ContentType = "text/html"
 	Response.Write(GenerateCategoriesTable.Build)
 End Sub
 
@@ -140,6 +143,8 @@ Private Sub HandleList
 		Option.valueOf(id).text(name).up(select1)
 	Next
 	DB.Close
+
+	Response.ContentType = "text/html"
 	Response.Write(select1.Build)
 End Sub
 
@@ -165,6 +170,7 @@ Private Sub HandleAddModal
 	Button.typeOf("submit").cls("btn btn-success px-3").text("Create").up(modalFooter)
 	Button.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").text("Cancel").up(modalFooter)
 
+	Response.ContentType = "text/html"
 	Response.Write(form1.Build)
 End Sub
 
@@ -201,6 +207,8 @@ Private Sub HandleEditModal
 		Button.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").text("Cancel").up(modalFooter)
 	End If
 	DB.Close
+
+	Response.ContentType = "text/html"
 	Response.Write(form1.Build)
 End Sub
 
@@ -234,6 +242,8 @@ Private Sub HandleDeleteModal
 		Button.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").text("Cancel").up(modalFooter)
 	End If
 	DB.Close
+
+	Response.ContentType = "text/html"
 	Response.Write(form1.Build)
 End Sub
 
@@ -391,6 +401,7 @@ End Sub
 
 Private Sub ShowAlert (message As String, status As String)
 	Dim div1 As Tag = Div.cls("alert alert-" & status).text(message)
+	Response.ContentType = "text/html"
 	Response.Write(div1.Build)
 End Sub
 
@@ -409,5 +420,7 @@ Private Sub ShowToast (entity As String, action As String, message As String, st
 	Dim script1 As MiniJs
 	script1.Initialize
 	script1.AddCustomEventDispatch($"entity:changed"$, details)
+
+	Response.ContentType = "text/html"
 	Response.Write(div1.Build & CRLF & script1.Generate)
 End Sub
