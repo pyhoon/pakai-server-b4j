@@ -5,37 +5,32 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Database class module
-'Version 5.50
+'Version 6.00
 Sub Class_Globals
-	Private conn 	As ORMConnector
-	Private info 	As ConnectionInfo
+	Private conn As ORMConnector
+	Private info As ConnectionInfo
 End Sub
 
 Public Sub Initialize
-	#If SQLite
-	If File.Exists(File.DirApp, "sqlite.ini") = False Then
-		File.Copy(File.DirAssets, "sqlite.example", File.DirApp, "sqlite.ini")
-	End If
-	Dim ctx As Map = File.ReadMap(File.DirApp, "sqlite.ini")
+	#If MariaDB
+	Dim dbvar As String = "mariadb"
 	#Else If MySQL
-	If File.Exists(File.DirApp, "mysql.ini") = False Then
-		File.Copy(File.DirAssets, "mysql.example", File.DirApp, "mysql.ini")
-	End If
-	Dim ctx As Map = File.ReadMap(File.DirApp, "mysql.ini")
-	#Else If MariaDB
-	If File.Exists(File.DirApp, "mariadb.ini") = False Then
-		File.Copy(File.DirAssets, "mariadb.example", File.DirApp, "mariadb.ini")
-	End If	
-	Dim ctx As Map = File.ReadMap(File.DirApp, "mariadb.ini")
+	Dim dbvar As String = "mysql"
+	#Else
+	Dim dbvar As String = "sqlite"
 	#End If
+	If File.Exists(File.DirApp, $"${dbvar}.ini"$) = False Then
+		File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)
+	End If
+	Dim ctx As Map = File.ReadMap(File.DirApp, $"${dbvar}.ini"$)
 	info.Initialize
 	info.DBType = ctx.GetDefault("DbType", "")
 	Select info.DBType
 		Case "SQLite"
 			info.DBDir = ctx.GetDefault("DbDir", "")
 			info.DBFile = ctx.GetDefault("DbFile", "")
-			info.JournalMode = "WAL"		
-		Case "MySQL", "MariaDB"
+			info.JournalMode = "WAL"
+		Case "MariaDB", "MySQL"
 			info.DBHost = ctx.GetDefault("DbHost", "")
 			info.DBPort = ctx.GetDefault("DbPort", "")
 			info.DBName = ctx.GetDefault("DbName", "")
@@ -72,7 +67,7 @@ Public Sub ConnectDatabase
 		Select Engine
 			Case "SQLite"
 				Dim DBFound As Boolean = conn.DBExist			
-			Case "MySQL", "MariaDB"
+			Case "MariaDB", "MySQL"
 				Wait For (conn.InitSchema) Complete (Success As Boolean)
 				If Success = False Then
 					LogColor("Database initilialization failed!", Main.COLOR_RED)
@@ -90,7 +85,8 @@ Public Sub ConnectDatabase
 		End Select
 		If DBFound Then
 			LogColor($"${Engine} database found!"$, Main.COLOR_BLUE)
-			If Engine = "MySQL" Or Engine = "MariaDB" Then
+			'AddUsersTable
+			If Engine = "MariaDB" Or Engine = "MySQL" Then
 				conn.InitPool
 			End If
 			Return
@@ -115,7 +111,7 @@ Private Sub CreateDatabase
 	End If
 	
 	LogColor("Creating tables...", Main.COLOR_BLUE)
-	If Engine = "MySQL" Or Engine = "MariaDB" Then
+	If Engine = "MariaDB" Or Engine = "MySQL" Then
 		conn.InitPool
 	End If
 	
@@ -126,7 +122,7 @@ Private Sub CreateDatabase
 	DB.QueryAddToBatch = True
 	
 	DB.Table = "tbl_categories"
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_name")))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_name", "Null": False)))
 	DB.Create
 
 	DB.Columns = Array("category_name")
@@ -134,10 +130,10 @@ Private Sub CreateDatabase
 	DB.Insert2(Array("Toys"))
 
 	DB.Table = "tbl_products"
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_id", "Type": DB.INTEGER)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_code", "Length": "12")))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_name")))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Default": "0.00")))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_id", "Type": DB.INTEGER, "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_code", "Length": "12", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_name", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Null": False, "Default": "0.00")))
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_image", "Type": DB.BLOB)))
 	DB.Foreign("category_id", "id", "tbl_categories", "", "")
 	DB.Create
@@ -156,11 +152,43 @@ Private Sub CreateDatabase
 	DB.Close
 End Sub
 
+' Add sample code for creating new table
+Public Sub AddUsersTable
+	LogColor("Creating users table...", Main.COLOR_BLUE)
+	If Engine = "MariaDB" Or Engine = "MySQL" Then
+		conn.InitPool
+	End If
+	
+	Dim DB As MiniORM
+	DB.Initialize(Engine, Open)
+	DB.ShowExtraLogs = True
+	DB.UseTimestamps = True
+	DB.QueryAddToBatch = True
+
+	DB.Table = "tbl_users"
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "first_name", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "last_name", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "email", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "hash", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "salt", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "admin", "Null": False, "Type": DB.INTEGER, "Default": "0")))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "active", "Null": False, "Type": DB.INTEGER, "Default": "0")))
+	DB.Create
+	
+	Wait For (DB.ExecuteBatch) Complete (Success As Boolean)
+	If Success Then
+		LogColor("Table is created successfully!", Main.COLOR_BLUE)
+	Else
+		LogColor("Table creation failed!", Main.COLOR_RED)
+	End If
+	DB.Close
+End Sub
+
 Public Sub CurrentTimeStamp As String
 	Select Engine
 		Case "SQLite"
 			Return "datetime('Now')"		
-		Case "MySQL", "MariaDB"
+		Case "MariaDB", "MySQL"
 			Return "NOW()"
 		Case Else
 			Return ""
@@ -171,7 +199,7 @@ Public Sub CurrentTimeStampAddMinute (Value As Int) As String
 	Select Engine
 		Case "SQLite"
 			Return $"datetime('Now', '+${Value} minute')"$		
-		Case "MySQL", "MariaDB"
+		Case "MariaDB", "MySQL"
 			Return $"DATE_ADD(NOW(), INTERVAL ${Value} MINUTE)"$
 		Case Else
 			Return ""

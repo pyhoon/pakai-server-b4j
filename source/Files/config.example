@@ -1,9 +1,9 @@
-# Product: 	    Pakai Server (formerly known as Web API Server)
-# Version: 	    5.50
-# License:	    MIT License
+# Product:      Pakai Server (formerly known as Web API Server)
+# Version:      6.00
+# License:      MIT License
 # Developer:    Poon Yip Hoon (Aeric)
-# Description: 	B4J project template for building JSON and XML formats API backend
-# Discussion:   https://www.b4x.com/android/forum/threads/project-template-pakai-server-v5.167788
+# Description:  B4J project template for building JSON and XML formats API backend
+# Discussion:   https://www.b4x.com/android/forum/threads/web-project-template-pakai-server-v6-00.169224/
 # Source Code:  https://github.com/pyhoon/pakai-server-b4j
 
 # Thanks to Erel, Anywhere Software for the great products and B4X community for encouragement and supports.
@@ -33,12 +33,12 @@ REDIRECT_TO_HTTPS=False
 
 # SSL Settings
 # Generate a keystore from Windows CMD
-# C:\Java\jdk-19.0.2\bin\keytool -keystore keystore -alias jetty -genkey -keyalg RSA
+# C:\Java\jdk-19.0.2\bin\keytool -keystore keystore.jks -alias jetty -genkey -keyalg RSA
 # Copy keystore file to Objects folder of the B4J project
-SSL_PORT=0
-SSL_KEYSTORE_DIR=/etc/letsencrypt/live/mydomain.com
+SSL_PORT=8888
+SSL_KEYSTORE_DIR=
 SSL_KEYSTORE_FILE=keystore.jks
-SSL_KEYSTORE_PASSWORD=xxxxxxxxx
+SSL_KEYSTORE_PASSWORD=xxxxxxxx
 SSL_ENABLED=False
 
 # Email Settings

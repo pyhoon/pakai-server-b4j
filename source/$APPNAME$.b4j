@@ -1,70 +1,60 @@
 ﻿AppType=StandardJava
-Build1=Default,b4j.webapi,SQLite,hu2_acceptall
-Build2=MariaDB,b4j.webapi,MariaDB,hu2_acceptall
-Build3=MySQL,b4j.webapi,MySQL,hu2_acceptall
-File1=category.html
-File2=config.example
-File3=help.html
-File4=index.html
-File5=main.html
-File6=mariadb.example
-File7=mysql.example
-File8=sqlite.example
-FileGroup1=Default Group
-FileGroup2=Default Group
-FileGroup3=Default Group
-FileGroup4=Default Group
-FileGroup5=Default Group
-FileGroup6=Default Group
-FileGroup7=Default Group
-FileGroup8=Default Group
+Build1=Bundle,b4j.pakai,SQLite,hu2_acceptall,Bundle
+Build2=Default,b4j.pakai,SQLite,hu2_acceptall
+Build3=MariaDB,b4j.pakai,MariaDB,hu2_acceptall
+Build4=MySQL,b4j.pakai,MySQL,hu2_acceptall
+File1=config.example
+File2=mariadb.example
+File3=mysql.example
+File4=sqlite.example
+FileGroup1=config
+FileGroup2=config
+FileGroup3=config
+FileGroup4=config
 Group=App
 Library1=endsmeet
 Library2=jcore
-Library3=webapiutils
-Library4=miniormutils
-Module1=CategoriesApiHandler
-Module2=CategoriesWebHandler
-Module3=Database
-Module4=FindApiHandler
-Module5=HelpHandler
-Module6=HttpsFilter
-Module7=IndexWebHandler
-Module8=JavaScript
-Module9=ProductsApiHandler
-NumberOfFiles=8
-NumberOfLibraries=4
-NumberOfModules=9
+Library3=minihtml
+Library4=minijs
+Library5=miniormutils
+Module1=CategoriesHandler
+Module2=Database
+Module3=HttpsFilter
+Module4=MainView
+Module5=ProductsHandler
+NumberOfFiles=4
+NumberOfLibraries=5
+NumberOfModules=5
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 5.50
+' Version: 6.00
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
 #MergeLibraries: True
 #End Region
-#If SQLite
-#AdditionalJar: sqlite-jdbc-3.7.2
+#If MariaDB
+#AdditionalJar: mariadb-java-client-3.5.6
 #Else If MySQL
 #AdditionalJar: mysql-connector-j-9.3.0
-#Else If MariaDB
-#AdditionalJar: mariadb-java-client-3.5.6
+#Else
+#AdditionalJar: sqlite-jdbc-3.7.2
 #End If
 #Region Macros
 #Macro: Title, GetLibraries, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&args=false
-#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-10-20_1345.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=*.json
-#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
-#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
+#Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
+'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-11-11_2025.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+'#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
+'#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
 	Public DB 					As Database
 	Public App 					As EndsMeet
-	Public Api 					As ApiSettings
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "5.50"
+	Public Const VERSION 		As String = "6.00"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -77,54 +67,19 @@ Sub AppStart (Args() As String)
 	App.ssl.Enabled = True
 	App.RedirectToHttps = True
 	#End If
-	
-	' *** Api Settings ***
-	Api = App.api
-	#If Debug
-	Api.EnableHelp = True
-	#End If
-
-	' *** Web handlers ***
-	App.Get("", "IndexWebHandler")
-	#If Debug
-	App.Get("/help", "HelpHandler")
-	#End If
-	App.Get("/categories", "CategoriesWebHandler")
-	
-	' *** Api handlers ***
-	App.Get("/api/categories", "CategoriesApiHandler")
-	App.Get("/api/categories/*", "CategoriesApiHandler")
-	App.Post("/api/categories", "CategoriesApiHandler")
-	App.Put("/api/categories/*", "CategoriesApiHandler")
-	App.Delete("/api/categories/*", "CategoriesApiHandler")
-	App.Get("/api/products", "ProductsApiHandler")
-	App.Get("/api/products/*", "ProductsApiHandler")
-	App.Post("/api/products", "ProductsApiHandler")
-	App.Put("/api/products/*", "ProductsApiHandler")
-	App.Delete("/api/products/*", "ProductsApiHandler")
-	App.Get("/api/find", "FindApiHandler")
-	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
-	App.Post("/api/find", "FindApiHandler")
-
+	App.Get("", "ProductsHandler")
+	App.Get("/categories", "CategoriesHandler")
+	App.Rest("/api/products/*", "ProductsHandler")
+	App.Rest("/api/categories/*", "CategoriesHandler")
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", VERSION)
 	Log($"App version: ${VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
-
 	DB.Initialize
 	DB.ConnectDatabase
-	JavaScript.CreateJSFiles
 	StartMessageLoop
-End Sub
-
-' Set global ApiSettings from Main to HttpResponseMessage
-Public Sub SetApiMessage (Message As HttpResponseMessage)
-	Message.VerboseMode = Api.VerboseMode
-	Message.OrderedKeys = Api.OrderedKeys
-	Message.ContentType = Api.ContentType
-	Message.PayloadType = Api.PayloadType
 End Sub
 
 Public Sub DBType As String
@@ -137,4 +92,13 @@ End Sub
 
 Public Sub DBClose
 	DB.Close
+End Sub
+
+Public Sub CurrentDateTime As String
+	Dim CurrentDateFormat As String = DateTime.DateFormat
+	DateTime.DateFormat = "yyyy-MM-dd HH:mm:ss"
+	DateTime.SetTimeZone(0)
+	Dim Current As String = DateTime.Date(DateTime.Now)
+	DateTime.DateFormat = CurrentDateFormat
+	Return Current
 End Sub
