@@ -51,6 +51,16 @@ Private Sub RenderPage
 	main1.LoadToast(ToastContainer)
 	
 	Dim page1 As Tag = main1.Render
+	Dim body1 As Tag = page1.Child(1)
+	Dim nav1 As Tag = body1.Child(1)
+	Dim container1 As Tag = nav1.Child(0)
+	Dim navbar1 As Tag = container1.Child(3)
+	Dim ulist1 As Tag = navbar1.Child(0)
+	Dim list2 As Tag = Li.cls("nav-item d-block d-lg-none").up(ulist1)
+	Dim anchor1 As Tag = Anchor.href("/inventories").up(list2)
+	anchor1.cls("nav-link")
+	anchor1.text("Inventory")
+	
 	Dim doc As Document
 	doc.Initialize
 	doc.AppendDocType
@@ -89,7 +99,7 @@ Private Sub ContentContainer As Tag
 	anchor2.cls("btn btn-primary me-2")
 	anchor2.add(Icon.cls("bi bi-list me-2"))
 	anchor2.text("Show Inventory")
-	
+
 	Dim button2 As Tag = Button.up(div2)
 	button2.cls("btn btn-success ml-2")
 	button2.hxGet("/api/products/add")

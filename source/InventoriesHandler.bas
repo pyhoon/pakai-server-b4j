@@ -46,6 +46,16 @@ Private Sub RenderPage
 	main1.LoadModal(ModalContainer)
 	main1.LoadToast(ToastContainer)
 	Dim page1 As Tag = main1.Render
+	Dim body1 As Tag = page1.Child(1)
+	Dim nav1 As Tag = body1.Child(1)
+	Dim container1 As Tag = nav1.Child(0)
+	Dim navbar1 As Tag = container1.Child(3)
+	Dim ulist1 As Tag = navbar1.Child(0)
+	Dim list2 As Tag = Li.cls("nav-item d-block d-lg-none").up(ulist1)
+	Dim anchor1 As Tag = Anchor.href("#").up(list2)
+	anchor1.cls("nav-link")
+	anchor1.text("Inventory")
+	
 	Dim doc As Document
 	doc.Initialize
 	doc.AppendDocType
@@ -60,7 +70,7 @@ Private Sub ContentContainer As Tag
 	
 	Dim row1 As Tag = Div.cls("row").up(form1)
 	Dim col2 As Tag = Div.cls("col-md-6 col-lg-6 text-start").up(row1)
-	H3.cls("text-uppercase").text("TITLE").up(col2)
+	H3.cls("text-uppercase").text("inventory list").up(col2)
 	
 	Dim div1 As Tag = Div.cls("col-md-6 col-lg-6").up(row1)
 	Dim div2 As Tag = Div.cls("text-end mt-2").up(div1)
