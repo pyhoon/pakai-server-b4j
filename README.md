@@ -10,9 +10,9 @@ Create Web Application using B4J project template
 ---
 
 ## Templates
-- Pakai Server starter(6.00).b4xtemplate **recommended**
-- Pakai Server bundle(6.00).b4xtemplate (local css/js)
-- Pakai Server min(6.00).b4xtemplate (assets excluded)
+- Pakai Server (6.00) starter.b4xtemplate **recommended**
+- Pakai Server (6.00) bundle.b4xtemplate (local css/js)
+- Pakai Server (6.00) min.b4xtemplate (assets excluded)
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
