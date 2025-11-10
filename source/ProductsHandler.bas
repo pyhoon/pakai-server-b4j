@@ -9,7 +9,6 @@ Version=10.3
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
-	Private KVS As KeyValueStore
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -17,7 +16,6 @@ End Sub
 
 Public Sub Initialize
 	App = Main.App
-	KVS = Main.KVS
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -45,24 +43,20 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 End Sub
 
 Private Sub RenderPage
-	If KVS.ContainsKey("/") = False Then
-		Dim main1 As MainView
-		main1.Initialize
-		main1.LoadContent(ContentContainer)
-		main1.LoadSubContent(GitHubLink)
-		main1.LoadModal(ModalContainer)
-		main1.LoadToast(ToastContainer)
+	Dim main1 As MainView
+	main1.Initialize
+	main1.LoadContent(ContentContainer)
+	main1.LoadSubContent(GitHubLink)
+	main1.LoadModal(ModalContainer)
+	main1.LoadToast(ToastContainer)
 	
-		Dim page1 As Tag = main1.Render
-		Dim doc As Document
-		doc.Initialize
-		doc.AppendDocType
-		doc.Append(page1.build)
-		
-		' Store for reuse
-		KVS.Put("/", App.ReplaceMap(doc.ToString, App.ctx))
-	End If
-	App.WriteHtml(Response, KVS.Get("/"))
+	Dim page1 As Tag = main1.Render
+	Dim doc As Document
+	doc.Initialize
+	doc.AppendDocType
+	doc.Append(page1.build)
+
+	App.WriteHtml2(Response, doc.ToString, App.ctx)
 End Sub
 
 Private Sub ContentContainer As Tag
@@ -159,7 +153,7 @@ End Sub
 
 ' Return table HTML
 Private Sub HandleTable
-	App.WriteHtml(Response, GenerateProductsTable.Build)
+	App.WriteHtml(Response, CreateProductsTable.Build)
 End Sub
 
 ' Search product using keyword
@@ -217,7 +211,7 @@ Private Sub HandleSearch
 		anchor2.hxGet($"/api/products/delete/${id}"$)
 		anchor2.hxTarget("#modal-content")
 		anchor2.hxTrigger("click")
-		anchor2.data("bs-toggle", "modal")		
+		anchor2.data("bs-toggle", "modal")
 		anchor2.data("bs-target", "#modal-container")
 		anchor2.add(Icon.cls("bi bi-trash3"))
 		anchor2.attr("title", "Delete")
@@ -326,18 +320,10 @@ Private Sub HandleEditModal
 End Sub
 
 Private Sub CreateCategoriesDropdown (selected As Int) As Tag
-	'Avoid using KVS for small components
-	'If KVS.ContainsKey("/api/categories/list") Then
-	'	Dim select1 As Tag = Html.Parse(KVS.Get("/api/categories/list"))
-	'Else
-		Dim select1 As Tag = Dropdown.cls("form-select")
-		select1.attr3("required")
-		select1.hxGet("/api/categories/list")
+	Dim select1 As Tag = Dropdown.cls("form-select")
+	select1.attr3("required")
+	select1.hxGet("/api/categories/list")
 
-	'	' Store for reuse
-	'	KVS.Put("/api/categories/list", select1.Build)
-	'End If
-	
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
@@ -352,7 +338,7 @@ Private Sub CreateCategoriesDropdown (selected As Int) As Tag
 		Else
 			Option.valueOf(catid).text(catname).up(select1)
 		End If
-	Next	
+	Next
 	DB.Close
 	Return select1
 End Sub
@@ -403,12 +389,6 @@ Private Sub HandleProducts
 			Dim tempprice As String = Request.GetParameter("price")
 			Dim price As Double = IIf(tempprice.Trim = "", 0, tempprice)
 			Dim category As Int = Request.GetParameter("category")
-			'Dim tempcategory As String = Request.GetParameter("category")
-			'Dim category As Int = IIf(tempcategory.Trim = "", 0, tempcategory)
-			'If category < 1 Then
-			'	ShowAlert("Please select a category.", "warning")
-			'	Return
-			'End If
 
 			If code = "" Or code.Trim.Length < 2 Then
 				ShowAlert("Product Code must be at least 2 characters long.", "warning")
@@ -449,12 +429,6 @@ Private Sub HandleProducts
 			Dim name As String = Request.GetParameter("name")
 			Dim price As Double = Request.GetParameter("price")
 			Dim category As Int = Request.GetParameter("category")
-			'Dim tempcategory As String = Request.GetParameter("category")
-			'Dim category As Int = IIf(tempcategory.Trim = "", 0, tempcategory)
-			'If category < 1 Then
-			'	ShowAlert("Please select a category.", "warning")
-			'	Return
-			'End If
 			
 			If code = "" Or code.Trim.Length < 2 Then
 				ShowAlert("Product Code must be at least 2 characters long.", "warning")
@@ -518,7 +492,7 @@ Private Sub HandleProducts
 	End Select
 End Sub
 
-Private Sub GenerateProductsTable As Tag
+Private Sub CreateProductsTable As Tag
 	Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
 	Dim thead1 As Tag = table1.add(Thead.cls("table-light"))
 	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
@@ -536,41 +510,48 @@ Private Sub GenerateProductsTable As Tag
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	For Each row As Map In DB.Results
-		Dim id As Int = row.Get("id")
-		Dim code As String = row.Get("code")
-		Dim name As String = row.Get("name")
-		Dim price As Double = row.Get("price")
-		Dim category As String = row.Get("category")
-		
-		Dim tr1 As Tag = tbody1.add(Tr.init)
-		tr1.add(Td.cls("align-middle").sty("text-align: right").text(id))
-		tr1.add(Td.cls("align-middle").text(code))
-		tr1.add(Td.cls("align-middle").text(name))
-		tr1.add(Td.cls("align-middle").text(category))
-		tr1.add(Td.cls("align-middle").sty("text-align: right").text(NumberFormat2(price, 1, 2, 2, True)))
-		
-		Dim td1 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
-		
-		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td1)
-		anchor1.hxGet($"/api/products/edit/${id}"$)
-		anchor1.hxTarget("#modal-content")
-		anchor1.hxTrigger("click")
-		anchor1.data("bs-toggle", "modal")
-		anchor1.data("bs-target", "#modal-container")
-		anchor1.add(Icon.cls("bi bi-pencil"))
-		anchor1.attr("title", "Edit")
-		
-		Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td1)
-		anchor2.hxGet($"/api/products/delete/${id}"$)
-		anchor2.hxTarget("#modal-content")
-		anchor2.hxTrigger("click")
-		anchor2.data("bs-toggle", "modal")		
-		anchor2.data("bs-target", "#modal-container")
-		anchor2.add(Icon.cls("bi bi-trash3"))
-		anchor2.attr("title", "Delete")
+		Dim tr1 As Tag = CreateProductsRow(row)
+		tr1.up(tbody1)
 	Next
 	DB.Close
 	Return table1
+End Sub
+
+Private Sub CreateProductsRow (data As Map) As Tag
+	Dim id As Int = data.Get("id")
+	Dim code As String = data.Get("code")
+	Dim name As String = data.Get("name")
+	Dim price As Double = data.Get("price")
+	Dim category As String = data.Get("category")
+
+	Dim tr1 As Tag = Tr.init
+	tr1.add(Td.cls("align-middle").sty("text-align: right").text(id))
+	tr1.add(Td.cls("align-middle").text(code))
+	tr1.add(Td.cls("align-middle").text(name))
+	tr1.add(Td.cls("align-middle").text(category))
+	tr1.add(Td.cls("align-middle").sty("text-align: right").text(NumberFormat2(price, 1, 2, 2, True)))
+
+	Dim td6 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
+
+	Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td6)
+	anchor1.hxGet($"/api/products/edit/${id}"$)
+	anchor1.hxTarget("#modal-content")
+	anchor1.hxTrigger("click")
+	anchor1.data("bs-toggle", "modal")
+	anchor1.data("bs-target", "#modal-container")
+	anchor1.add(Icon.cls("bi bi-pencil"))
+	anchor1.attr("title", "Edit")
+
+	Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td6)
+	anchor2.hxGet($"/api/products/delete/${id}"$)
+	anchor2.hxTarget("#modal-content")
+	anchor2.hxTrigger("click")
+	anchor2.data("bs-toggle", "modal")
+	anchor2.data("bs-target", "#modal-container")
+	anchor2.add(Icon.cls("bi bi-trash3"))
+	anchor2.attr("title", "Delete")
+
+	Return tr1
 End Sub
 
 Private Sub ShowAlert (message As String, status As String)
@@ -581,7 +562,7 @@ End Sub
 Private Sub ShowToast (entity As String, action As String, message As String, status As String)
 	Dim div1 As Tag = Div.id("products-container")
 	div1.hxSwapOob("true")
-	div1.add(GenerateProductsTable)
+	div1.add(CreateProductsTable)
 
 	Dim script1 As MiniJs
 	script1.Initialize

@@ -17,14 +17,13 @@ Library2=jcore
 Library3=minihtml
 Library4=minijs
 Library5=miniormutils
-Library6=keyvaluestore
 Module1=CategoriesHandler
 Module2=Database
 Module3=HttpsFilter
 Module4=MainView
 Module5=ProductsHandler
 NumberOfFiles=4
-NumberOfLibraries=6
+NumberOfLibraries=5
 NumberOfModules=5
 Version=10.3
 @EndOfDesignText@
@@ -47,9 +46,9 @@ Version=10.3
 'For source
 '#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\css&args=Objects\www\assets\img&args=Objects\www\assets\js\*.min.js&args=Objects\www\assets\js\app.js
 '#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
-#Macro: Title, Create Template (starter), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta3starter).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
-#Macro: Title, Create Template (bundle), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta3bundle).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css&args=Objects\www\assets\js\app.js&args=Objects\www\assets\js\*.min.js
-#Macro: Title, Create Template (min), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta3min).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE
+#Macro: Title, Create Template (starter), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta4starter).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
+#Macro: Title, Create Template (bundle), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta4bundle).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css&args=Objects\www\assets\js\app.js&args=Objects\www\assets\js\*.min.js
+#Macro: Title, Create Template (min), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta4min).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE
 #Macro: Title, Release folder, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 #Macro: Title, Copy to AddLibs, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
 'For release
@@ -62,7 +61,6 @@ Version=10.3
 Sub Process_Globals
 	Public DB 					As Database
 	Public App 					As EndsMeet
-	Public KVS 					As KeyValueStore
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
 	Public Const VERSION 		As String = "6.00beta"
@@ -90,8 +88,6 @@ Sub AppStart (Args() As String)
 	Log(App.ServerUrl)
 	DB.Initialize
 	DB.ConnectDatabase
-	KVS.Initialize(App.RootPath, "kvs")
-	'KVS.DeleteAll
 	StartMessageLoop
 End Sub
 

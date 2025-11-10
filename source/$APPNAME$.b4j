@@ -1,7 +1,8 @@
 ﻿AppType=StandardJava
-Build1=Default,b4j.pakai,SQLite,hu2_acceptall
-Build2=MariaDB,b4j.pakai,MariaDB,hu2_acceptall
-Build3=MySQL,b4j.pakai,MySQL,hu2_acceptall
+Build1=Bundle,b4j.pakai,SQLite,hu2_acceptall,Bundle
+Build2=Default,b4j.pakai,SQLite,hu2_acceptall
+Build3=MariaDB,b4j.pakai,MariaDB,hu2_acceptall
+Build4=MySQL,b4j.pakai,MySQL,hu2_acceptall
 File1=config.example
 File2=mariadb.example
 File3=mysql.example
@@ -44,9 +45,9 @@ Version=10.3
 #Region Macros
 #Macro: Title, GetLibraries, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&args=false
 #Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
-'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-11-06_1245.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
-'#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
-'#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
+#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-11-10_1205.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
+#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
 	Public DB 					As Database
@@ -66,22 +67,16 @@ Sub AppStart (Args() As String)
 	App.ssl.Enabled = True
 	App.RedirectToHttps = True
 	#End If
-	
-	' *** Web handlers ***
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
-	
-	' *** Api handlers ***
 	App.Rest("/api/products/*", "ProductsHandler")
 	App.Rest("/api/categories/*", "CategoriesHandler")
-	
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", VERSION)
 	Log($"App version: ${VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
-
 	DB.Initialize
 	DB.ConnectDatabase
 	StartMessageLoop

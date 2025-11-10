@@ -9,7 +9,6 @@ Version=10.3
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
-	Private KVS As KeyValueStore
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -17,7 +16,6 @@ End Sub
 
 Public Sub Initialize
 	App = Main.App
-	KVS = Main.KVS
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -43,23 +41,17 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 End Sub
 
 Private Sub RenderPage
-	If KVS.ContainsKey("/categories") = False Then
-		Dim main1 As MainView
-		main1.Initialize
-		main1.LoadContent(ContentContainer)
-		main1.LoadModal(ModalContainer)
-		main1.LoadToast(ToastContainer)
-	
-		Dim page1 As Tag = main1.Render
-		Dim doc As Document
-		doc.Initialize
-		doc.AppendDocType
-		doc.Append(page1.build)
-
-		' Store for reuse
-		KVS.Put("/categories", App.ReplaceMap(doc.ToString, App.ctx))
-	End If
-	App.WriteHtml(Response, KVS.Get("/categories"))
+	Dim main1 As MainView
+	main1.Initialize
+	main1.LoadContent(ContentContainer)
+	main1.LoadModal(ModalContainer)
+	main1.LoadToast(ToastContainer)
+	Dim page1 As Tag = main1.Render
+	Dim doc As Document
+	doc.Initialize
+	doc.AppendDocType
+	doc.Append(page1.build)
+	App.WriteHtml2(Response, doc.ToString, App.ctx)
 End Sub
 
 Private Sub ContentContainer As Tag
@@ -125,9 +117,7 @@ End Sub
 
 ' Return table HTML
 Private Sub HandleTable
-	'Dim s As String = GenerateCategoriesTable.Build
-	'File.WriteString(File.DirApp, "table.html", s)
-	App.WriteHtml(Response, GenerateCategoriesTable.Build)
+	App.WriteHtml(Response, CreateCategoriesTable.Build)
 End Sub
 
 ' Add modal
@@ -334,53 +324,13 @@ Private Sub HandleCategories
 	End Select
 End Sub
 
-Private Sub GenerateCategoriesTable As Tag
-	'KVS.Remove("/categories/table")
-	'KVS.Remove("/categories/table/row")
-	'Avoid using KVS for small components
-	'If KVS.ContainsKey("/categories/table") Then
-	'	Dim table1 As Tag = Html.Parse(KVS.Get("/categories/table"))
-	'	Dim tbody1 As Tag = table1.Child(1)
-	'Else
-		Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
-		Dim thead1 As Tag = Thead.cls("table-light").up(table1)
-		thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
-		thead1.add(Th.text("Name"))
-		thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
-		Dim tbody1 As Tag = Tbody.init.up(table1)
-		
-	'	' Store for reuse
-	'	KVS.Put("/categories/table", table1.Build)
-	'End If
-
-	'Avoid using KVS for small components
-	'If KVS.ContainsKey("/categories/table/row") = False Then
-	'	Dim tr1 As Tag = Tr.init
-	'	Td.cls("align-middle").sty("text-align: right").up(tr1)
-	'	Td.cls("align-middle").up(tr1)
-	'	Dim td1 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
-	'	
-	'	Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td1)
-	'	anchor1.hxGet("")
-	'	anchor1.hxTarget("#modal-content")
-	'	anchor1.hxTrigger("click")
-	'	anchor1.data("bs-toggle", "modal")
-	'	anchor1.data("bs-target", "#modal-container")
-	'	anchor1.add(Icon.cls("bi bi-pencil"))
-	'	anchor1.attr("title", "Edit")
-	'	
-	'	Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td1)
-	'	anchor2.hxGet("")
-	'	anchor2.hxTarget("#modal-content")
-	'	anchor2.hxTrigger("click")
-	'	anchor2.data("bs-toggle", "modal")
-	'	anchor2.data("bs-target", "#modal-container")
-	'	anchor2.add(Icon.cls("bi bi-trash3"))
-	'	anchor2.attr("title", "Delete")
-	'	
-	'	' Store for reuse
-	'	KVS.Put("/categories/table/row", tr1.Build)
-	'End If
+Private Sub CreateCategoriesTable As Tag
+	Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
+	Dim thead1 As Tag = Thead.cls("table-light").up(table1)
+	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
+	thead1.add(Th.text("Name"))
+	thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
+	Dim tbody1 As Tag = Tbody.init.up(table1)
 	
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
@@ -388,58 +338,42 @@ Private Sub GenerateCategoriesTable As Tag
 	DB.OrderBy = CreateMap("id": "")
 	DB.Query
 	For Each row As Map In DB.Results
-		Dim id As Int = row.Get("id")
-		Dim name As String = row.Get("name")
-		
-		'Avoid using KVS for small components
-		'Dim tr1 As Tag = Html.Parse(KVS.Get("/categories/table/row"))
-		
-		'Dim td1 As Tag = tr1.Child(0)
-		'td1.text(id)
-		
-		'Dim td2 As Tag = tr1.Child(1)
-		'td2.text(name)
-		
-		'Dim td3 As Tag = tr1.Child(2)
-		
-		'Dim anchor1 As Tag = td3.Child(0)
-		'anchor1.hxGet($"/api/categories/edit/${id}"$)
-		
-		'Dim anchor2 As Tag = td3.Child(1)
-		'anchor2.hxGet($"/api/categories/delete/${id}"$)
-
-		Dim tr1 As Tag = Tr.init
-		
-		Dim td1 As Tag = Td.cls("align-middle").sty("text-align: right").up(tr1)
-		td1.text(id)
-		
-		Dim td2 As Tag = Td.cls("align-middle").up(tr1)
-		td2.text(name)
-		
-		Dim td3 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
-		
-		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td3)
-		anchor1.hxGet($"/api/categories/edit/${id}"$)
-		anchor1.hxTarget("#modal-content")
-		anchor1.hxTrigger("click")
-		anchor1.data("bs-toggle", "modal")
-		anchor1.data("bs-target", "#modal-container")
-		anchor1.add(Icon.cls("bi bi-pencil"))
-		anchor1.attr("title", "Edit")
-		
-		Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td3)
-		anchor2.hxGet($"/api/categories/delete/${id}"$)
-		anchor2.hxTarget("#modal-content")
-		anchor2.hxTrigger("click")
-		anchor2.data("bs-toggle", "modal")
-		anchor2.data("bs-target", "#modal-container")
-		anchor2.add(Icon.cls("bi bi-trash3"))
-		anchor2.attr("title", "Delete")
-
-		tbody1.add(tr1)
+		Dim tr1 As Tag = CreateCategoriesRow(row)
+		tr1.up(tbody1)
 	Next
 	DB.Close
 	Return table1
+End Sub
+
+Private Sub CreateCategoriesRow (data As Map) As Tag
+	Dim id As Int = data.Get("id")
+	Dim name As String = data.Get("name")
+
+	Dim tr1 As Tag = Tr.init
+	tr1.add(Td.cls("align-middle").sty("text-align: right").text(id))
+	tr1.add(Td.cls("align-middle").text(name))
+	
+	Dim td3 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
+
+	Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td3)
+	anchor1.hxGet($"/api/categories/edit/${id}"$)
+	anchor1.hxTarget("#modal-content")
+	anchor1.hxTrigger("click")
+	anchor1.data("bs-toggle", "modal")
+	anchor1.data("bs-target", "#modal-container")
+	anchor1.add(Icon.cls("bi bi-pencil"))
+	anchor1.attr("title", "Edit")
+		
+	Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td3)
+	anchor2.hxGet($"/api/categories/delete/${id}"$)
+	anchor2.hxTarget("#modal-content")
+	anchor2.hxTrigger("click")
+	anchor2.data("bs-toggle", "modal")
+	anchor2.data("bs-target", "#modal-container")
+	anchor2.add(Icon.cls("bi bi-trash3"))
+	anchor2.attr("title", "Delete")
+	
+	Return tr1
 End Sub
 
 Private Sub ShowAlert (message As String, status As String)
@@ -450,7 +384,7 @@ End Sub
 Private Sub ShowToast (entity As String, action As String, message As String, status As String)
 	Dim div1 As Tag = Div.id("categories-container")
 	div1.hxSwapOob("true")
-	div1.add(GenerateCategoriesTable)
+	div1.add(CreateCategoriesTable)
 
 	Dim script1 As MiniJs
 	script1.Initialize
