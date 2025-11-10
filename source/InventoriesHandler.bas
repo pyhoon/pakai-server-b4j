@@ -309,14 +309,25 @@ Private Sub HandleInventories
 				Return
 			End If
 			
-			DB.Table = "tbl_inventories"
-			DB.WhereParam("inventory_id = ?", id)
-			DB.Query
-			If DB.Found Then
-				ShowAlert("Cannot delete inventory with associated products!", "warning")
-				DB.Close
-				Return
-			End If
+'			Try
+'				DB.Table = "tbl_inventories"
+'				DB.WhereParam("inventory_id = ?", id)
+'				DB.Query
+'				If DB.Error.Message <> "" Then
+'					ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+'					DB.Close
+'					Return
+'				End If
+'				If DB.Found Then
+'					ShowAlert("Cannot delete inventory with associated products!", "warning")
+'					DB.Close
+'					Return
+'				End If
+'			Catch
+'				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
+'				DB.Close
+'				Return
+'			End Try
 
 			' Delete row
 			Try
