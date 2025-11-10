@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.00beta
+' Version 6.00
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -46,22 +46,23 @@ Private Sub RenderPage
 	main1.LoadContent(ContentContainer)
 	main1.LoadModal(ModalContainer)
 	main1.LoadToast(ToastContainer)
+
 	Dim page1 As Tag = main1.Render
 	Dim body1 As Tag = page1.Child(1)
 	Dim nav1 As Tag = body1.Child(1)
 	Dim container1 As Tag = nav1.Child(0)
 	Dim navbar1 As Tag = container1.Child(3)
 	Dim ulist1 As Tag = navbar1.Child(0)
-	
 	Dim list1 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
 	Dim anchor1 As Tag = Anchor.href("#").up(list1)
 	anchor1.cls("nav-link")
 	anchor1.text("Categories")
-	
-	Dim list2 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
-	Dim anchor2 As Tag = Anchor.href("/inventories").up(list2)
-	anchor2.cls("nav-link")
-	anchor2.text("Inventory")
+
+	' Sample for adding additional menu link
+	'Dim list2 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
+	'Dim anchor2 As Tag = Anchor.href("/users").up(list2)
+	'anchor2.cls("nav-link")
+	'anchor2.text("Users")
 	
 	Dim doc As Document
 	doc.Initialize
@@ -157,7 +158,6 @@ Private Sub HandleAddModal
 	Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 	Button.typeOf("submit").cls("btn btn-success px-3").text("Create").up(modalFooter)
 	Button.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").text("Cancel").up(modalFooter)
-
 	App.WriteHtml(Response, form1.Build)
 End Sub
 
@@ -194,7 +194,6 @@ Private Sub HandleEditModal
 		Button.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").text("Cancel").up(modalFooter)
 	End If
 	DB.Close
-
 	App.WriteHtml(Response, form1.Build)
 End Sub
 
@@ -228,7 +227,6 @@ Private Sub HandleDeleteModal
 		Button.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").text("Cancel").up(modalFooter)
 	End If
 	DB.Close
-
 	App.WriteHtml(Response, form1.Build)
 End Sub
 
@@ -249,8 +247,8 @@ Private Sub HandleCategories
 				DB.Parameters = Array(name)
 				DB.Query
 				If DB.Found Then
-					DB.Close
 					ShowAlert("Category already exists!", "warning")
+					DB.Close
 					Return
 				End If
 			Catch
@@ -264,11 +262,11 @@ Private Sub HandleCategories
 				DB.Columns = Array("category_name", "created_date")
 				DB.Parameters = Array(name, Main.CurrentDateTime)
 				DB.Save
-				DB.Close
 				ShowToast("Category", "created", "Category created successfully!", "success")
 			Catch
 				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
+			DB.Close
 		Case "PUT"
 			' Update
 			Dim id As Int = Request.GetParameter("id")
@@ -300,11 +298,11 @@ Private Sub HandleCategories
 				DB.Parameters = Array(name, Main.CurrentDateTime)
 				DB.Id = id
 				DB.Save
-				DB.Close
 				ShowToast("Category", "updated", "Category updated successfully!", "info")
 			Catch
 				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
+			DB.Close
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
@@ -332,11 +330,11 @@ Private Sub HandleCategories
 				DB.Table = "tbl_categories"
 				DB.Id = id
 				DB.Delete
-				DB.Close
 				ShowToast("Category", "deleted", "Category deleted successfully!", "danger")
 			Catch
 				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
+			DB.Close
 	End Select
 End Sub
 
@@ -368,7 +366,6 @@ Private Sub CreateCategoriesRow (data As Map) As Tag
 	Dim tr1 As Tag = Tr.init
 	tr1.add(Td.cls("align-middle").sty("text-align: right").text(id))
 	tr1.add(Td.cls("align-middle").text(name))
-	
 	Dim td3 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
 
 	Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td3)

@@ -1,11 +1,10 @@
 /*!
- * Pakai Server Framework B4J Project Template v6.00beta by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
+ * Pakai Server Framework B4J Project Template v6.00 by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
  * Copyright (c) 2022-2025 Poon Yip Hoon (Aeric)
  * Licensed under MIT (https://github.com/pyhoon/pakai-server-b4j/blob/main/LICENSE)
  */
 body {
     font-family: Arial, Helvetica, Tahoma, Times New Roman;
-    /* margin-top: 60px; */
 }
 
 button {
@@ -16,10 +15,6 @@ button:focus {
     outline: 0px;
 }
 
-.yellow {
-    background-color: #f7d600 !important;
-}
-
 .error {
     font-size: 0.8em;
     color: red;
@@ -28,7 +23,6 @@ button:focus {
 .edit,
 .delete {
     cursor: pointer;
-    /* text-decoration: none !important; */
 }
 
 .edit:hover,

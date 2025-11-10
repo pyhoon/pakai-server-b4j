@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Index Handler class
-' Version 6.00beta
+' Version 6.00
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -49,29 +49,28 @@ Private Sub RenderPage
 	main1.LoadSubContent(GitHubLink)
 	main1.LoadModal(ModalContainer)
 	main1.LoadToast(ToastContainer)
-	
+
 	Dim page1 As Tag = main1.Render
 	Dim body1 As Tag = page1.Child(1)
 	Dim nav1 As Tag = body1.Child(1)
 	Dim container1 As Tag = nav1.Child(0)
 	Dim navbar1 As Tag = container1.Child(3)
 	Dim ulist1 As Tag = navbar1.Child(0)
-	
 	Dim list1 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
 	Dim anchor1 As Tag = Anchor.href("/categories").up(list1)
 	anchor1.cls("nav-link")
 	anchor1.text("Categories")
-	
-	Dim list2 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
-	Dim anchor2 As Tag = Anchor.href("/inventories").up(list2)
-	anchor2.cls("nav-link")
-	anchor2.text("Inventory")
-	
+
+	' Sample for adding additional menu link
+	'Dim list2 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
+	'Dim anchor2 As Tag = Anchor.href("/users").up(list1)
+	'anchor2.cls("nav-link")
+	'anchor2.text("Users")
+
 	Dim doc As Document
 	doc.Initialize
 	doc.AppendDocType
 	doc.Append(page1.build)
-
 	App.WriteHtml2(Response, doc.ToString, App.ctx)
 End Sub
 
@@ -81,30 +80,24 @@ Private Sub ContentContainer As Tag
 	Dim form1 As Tag = Form.cls("form mb-3").up(col12)
 	Dim row1 As Tag = Div.cls("row").up(form1)
 	Dim col1 As Tag = Div.cls("col-md-6 col-lg-6").up(row1)
-	
+
 	Dim input_group1 As Tag = col1.add(Div.cls("input-group mb-3"))
 	input_group1.add(Label.forId("keyword").cls("input-group-text mt-2").text("Search"))
 	input_group1.add(Input.typeOf("text").cls("form-control col-md-6 mt-2").id("keyword").name("keyword"))
-	
+
 	Dim searchBtn As Tag = input_group1.add(Button.cls("btn btn-danger btn-md pl-3 pr-3 ml-3 mt-2").text("Submit"))
 	searchBtn.hxPost("/api/products/search")
 	searchBtn.hxTarget("#products-container")
 	searchBtn.hxSwap("innerHTML")
-	
+
 	Dim col2 As Tag = Div.cls("col-md-6 col-lg-6").up(row1)
 	Dim div2 As Tag = Div.cls("float-end mt-2").up(col2)
-	
-'	Dim anchor1 As Tag = Anchor.up(div2)
-'	anchor1.hrefOf("$SERVER_URL$/categories")
-'	anchor1.cls("btn btn-primary me-2")
-'	anchor1.add(Icon.cls("bi bi-list me-2"))
-'	anchor1.text("Show Category")
-'	
-'	Dim anchor2 As Tag = Anchor.up(div2)
-'	anchor2.hrefOf("$SERVER_URL$/inventories")
-'	anchor2.cls("btn btn-primary me-2")
-'	anchor2.add(Icon.cls("bi bi-list me-2"))
-'	anchor2.text("Show Inventory")
+
+	'Dim anchor1 As Tag = Anchor.up(div2)
+	'anchor1.hrefOf("$SERVER_URL$/categories")
+	'anchor1.cls("btn btn-primary me-2")
+	'anchor1.add(Icon.cls("bi bi-list me-2"))
+	'anchor1.text("Show Category")
 
 	Dim button2 As Tag = Button.up(div2)
 	button2.cls("btn btn-success ml-2")
@@ -128,7 +121,7 @@ End Sub
 Private Sub GitHubLink As Tag
 	Dim div1 As Tag = Div.cls("text-center mb-3")
 	Dim anchor1 As Tag = Anchor.up(div1)
-	anchor1.hrefOf("https://github.com/pyhoon/pakai-server-b4j/tree/v6.00")
+	anchor1.hrefOf("https://github.com/pyhoon/pakai-server-b4j")
 	anchor1.cls("text-primary mr-1")
 	anchor1.aria("label", "github").attr("title", "GitHub").targetOf("_blank")
 	Dim svg1 As Tag = Svg.up(anchor1)
@@ -140,10 +133,10 @@ Private Sub GitHubLink As Tag
 	path1.attr("fill-rule", "evenodd")
 	path1.attr("d", "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z")
 	Dim anchor2 As Tag = Anchor.up(div1)
-	anchor2.hrefOf("https://github.com/pyhoon/pakai-server-b4j/tree/v6.00")
+	anchor2.hrefOf("https://github.com/pyhoon/pakai-server-b4j")
 	anchor2.sty("text-decoration: none")
 	anchor2.targetOf("_blank")
-	Span.sty("vertical-align: middle").text("Visit my GitHub repository").up(anchor2)
+	Span.sty("vertical-align: middle").text("Visit Pakai GitHub repository").up(anchor2)
 	Return div1
 End Sub
 
@@ -181,7 +174,6 @@ End Sub
 ' Search product using keyword
 Private Sub HandleSearch
 	Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
-	
 	Dim thead1 As Tag = table1.add(Thead.cls("table-light"))
 	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
 	thead1.add(Th.text("Code"))
@@ -189,7 +181,6 @@ Private Sub HandleSearch
 	thead1.add(Th.text("Category"))
 	thead1.add(Th.sty("text-align: right").text("Price"))
 	thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
-	
 	Dim tbody1 As Tag = table1.add(Tbody.init)
 
 	DB.SQL = Main.DBOpen
@@ -203,7 +194,6 @@ Private Sub HandleSearch
 	End If
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
-	
 	For Each row As Map In DB.Results
 		Dim id As Int = row.Get("id")
 		Dim code As String = row.Get("code")
@@ -217,7 +207,6 @@ Private Sub HandleSearch
 		tr1.add(Td.cls("align-middle").text(name))
 		tr1.add(Td.cls("align-middle").text(category))
 		tr1.add(Td.cls("align-middle").sty("text-align: right").text(NumberFormat2(price, 1, 2, 2, True)))
-		
 		Dim td1 As Tag = tr1.add(Td.cls("align-middle text-center px-1 py-1"))
 
 		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td1)
@@ -239,7 +228,6 @@ Private Sub HandleSearch
 		anchor2.attr("title", "Delete")
 	Next
 	DB.Close
-
 	App.WriteHtml(Response, table1.Build)
 End Sub
 
@@ -280,7 +268,6 @@ Private Sub HandleAddModal
 	Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 	modalFooter.add(Button.typeOf("submit").cls("btn btn-success px-3").text("Create"))
 	modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").attr("value", "Cancel"))
-
 	App.WriteHtml(Response, form1.Build)
 End Sub
 
@@ -337,7 +324,6 @@ Private Sub HandleEditModal
 		modalFooter.add(Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel"))
 	End If
 	DB.Close
-	
 	App.WriteHtml(Response, form1.Build)
 End Sub
 
@@ -345,13 +331,12 @@ Private Sub CreateCategoriesDropdown (selected As Int) As Tag
 	Dim select1 As Tag = Dropdown.cls("form-select")
 	select1.attr3("required")
 	select1.hxGet("/api/categories/list")
+	Option.valueOf("").text("Select Category").attr3(IIf(selected < 1, "selected", "")).attr3("disabled").up(select1)
 
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
 	DB.Query
-
-	Option.valueOf("").text("Select Category").attr3(IIf(selected < 1, "selected", "")).attr3("disabled").up(select1)
 	For Each row As Map In DB.Results
 		Dim catid As Int = row.Get("id")
 		Dim catname As String = row.Get("name")
@@ -397,7 +382,6 @@ Private Sub HandleDeleteModal
 		Input.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").valueOf("Cancel").up(modalFooter)
 	End If
 	DB.Close
-	
 	App.WriteHtml(Response, form1.Build)
 End Sub
 
@@ -425,8 +409,8 @@ Private Sub HandleProducts
 				DB.Parameters = Array(code)
 				DB.Query
 				If DB.Found Then
-					DB.Close
 					ShowAlert("Product Code already exists!", "warning")
+					DB.Close
 					Return
 				End If
 			Catch
@@ -439,11 +423,11 @@ Private Sub HandleProducts
 				DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "created_date")
 				DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
 				DB.Save
-				DB.Close
 				ShowToast("Product", "created", "Product created successfully!", "success")
 			Catch
 				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
+			DB.Close
 		Case "PUT"
 			' Update
 			Dim id As Int = Request.GetParameter("id")
@@ -483,11 +467,11 @@ Private Sub HandleProducts
 				DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
 				DB.Id = id
 				DB.Save
-				DB.Close
 				ShowToast("Product", "updated", "Product updated successfully!", "info")
 			Catch
 				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
+			DB.Close
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
@@ -506,11 +490,11 @@ Private Sub HandleProducts
 				DB.Table = "tbl_products"
 				DB.Id = id
 				DB.Delete
-				DB.Close
 				ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
 			Catch
 				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
 			End Try
+			DB.Close
 	End Select
 End Sub
 
@@ -552,7 +536,6 @@ Private Sub CreateProductsRow (data As Map) As Tag
 	tr1.add(Td.cls("align-middle").text(name))
 	tr1.add(Td.cls("align-middle").text(category))
 	tr1.add(Td.cls("align-middle").sty("text-align: right").text(NumberFormat2(price, 1, 2, 2, True)))
-
 	Dim td6 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
 
 	Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td6)

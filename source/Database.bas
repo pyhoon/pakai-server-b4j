@@ -5,10 +5,10 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Database class module
-'Version 6.00beta
+'Version 6.00
 Sub Class_Globals
-	Private conn 	As ORMConnector
-	Private info 	As ConnectionInfo
+	Private conn As ORMConnector
+	Private info As ConnectionInfo
 End Sub
 
 Public Sub Initialize
@@ -85,6 +85,7 @@ Public Sub ConnectDatabase
 		End Select
 		If DBFound Then
 			LogColor($"${Engine} database found!"$, Main.COLOR_BLUE)
+			'AddUsersTable
 			If Engine = "MariaDB" Or Engine = "MySQL" Then
 				conn.InitPool
 			End If
@@ -121,7 +122,7 @@ Private Sub CreateDatabase
 	DB.QueryAddToBatch = True
 	
 	DB.Table = "tbl_categories"
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_name")))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_name", "Null": False)))
 	DB.Create
 
 	DB.Columns = Array("category_name")
@@ -129,10 +130,10 @@ Private Sub CreateDatabase
 	DB.Insert2(Array("Toys"))
 
 	DB.Table = "tbl_products"
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_id", "Type": DB.INTEGER)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_code", "Length": "12")))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_name")))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Default": "0.00")))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_id", "Type": DB.INTEGER, "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_code", "Length": "12", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_name", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Null": False, "Default": "0.00")))
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_image", "Type": DB.BLOB)))
 	DB.Foreign("category_id", "id", "tbl_categories", "", "")
 	DB.Create
@@ -142,17 +143,43 @@ Private Sub CreateDatabase
 	DB.Insert2(Array(1, "H001", "Hammer", 15.75))
 	DB.Insert2(Array(2, "T002", "Optimus Prime", 1000))
 	
-	DB.Table = "tbl_inventories"
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "inventory_name")))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "inventory_price", "Type": DB.DECIMAL, "Length": "10,2", "Default": "0.00")))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "inventory_image", "Type": DB.BLOB)))
-	DB.Create
-	
 	Wait For (DB.ExecuteBatch) Complete (Success As Boolean)
 	If Success Then
 		LogColor("Database is created successfully!", Main.COLOR_BLUE)
 	Else
 		LogColor("Database creation failed!", Main.COLOR_RED)
+	End If
+	DB.Close
+End Sub
+
+' Add sample code for creating new table
+Public Sub AddUsersTable
+	LogColor("Creating users table...", Main.COLOR_BLUE)
+	If Engine = "MariaDB" Or Engine = "MySQL" Then
+		conn.InitPool
+	End If
+	
+	Dim DB As MiniORM
+	DB.Initialize(Engine, Open)
+	DB.ShowExtraLogs = True
+	DB.UseTimestamps = True
+	DB.QueryAddToBatch = True
+
+	DB.Table = "tbl_users"
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "first_name", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "last_name", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "email", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "hash", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "salt", "Null": False)))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "admin", "Null": False, "Type": DB.INTEGER, "Default": "0")))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "active", "Null": False, "Type": DB.INTEGER, "Default": "0")))
+	DB.Create
+	
+	Wait For (DB.ExecuteBatch) Complete (Success As Boolean)
+	If Success Then
+		LogColor("Table is created successfully!", Main.COLOR_BLUE)
+	Else
+		LogColor("Table creation failed!", Main.COLOR_RED)
 	End If
 	DB.Close
 End Sub
