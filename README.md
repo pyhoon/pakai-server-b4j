@@ -5,7 +5,7 @@ Version: 6.00
 Create Web Application using B4J project template
 
 ### Preview
-![Index](../v6.00/pakai-index.png)
+![Index](pakai-index.png)
 
 ---
 
