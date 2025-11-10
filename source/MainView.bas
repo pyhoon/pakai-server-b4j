@@ -75,7 +75,7 @@ End Sub
 Private Sub PageBody As Tag
 	Dim body1 As Tag = Body.cls("bg-white")
 	If mToast.IsInitialized Then mToast.up(body1)
-	Dim nav1 As Tag = Nav.cls("navbar navbar-expand-lg sticky-top yellow").up(body1)
+	Dim nav1 As Tag = Nav.cls("navbar navbar-light navbar-expand-lg sticky-top bg-info").up(body1)
 	Dim div1 As Tag = Div.cls("container-fluid").up(nav1)
 	Dim anchor1 As Tag = Anchor.cls("navbar-brand me-0 me-lg-2 pt-2").up(div1)
 	anchor1.hrefOf("#").add(Icon.cls("bi bi-infinity h3"))
