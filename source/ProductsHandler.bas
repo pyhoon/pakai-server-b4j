@@ -84,6 +84,12 @@ Private Sub ContentContainer As Tag
 	anchor1.add(Icon.cls("bi bi-list me-2"))
 	anchor1.text("Show Category")
 	
+	Dim anchor2 As Tag = Anchor.up(div2)
+	anchor2.hrefOf("$SERVER_URL$/inventories")
+	anchor2.cls("btn btn-primary me-2")
+	anchor2.add(Icon.cls("bi bi-list me-2"))
+	anchor2.text("Show Inventory")
+	
 	Dim button2 As Tag = Button.up(div2)
 	button2.cls("btn btn-success ml-2")
 	button2.hxGet("/api/products/add")

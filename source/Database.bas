@@ -142,6 +142,12 @@ Private Sub CreateDatabase
 	DB.Insert2(Array(1, "H001", "Hammer", 15.75))
 	DB.Insert2(Array(2, "T002", "Optimus Prime", 1000))
 	
+	DB.Table = "tbl_inventories"
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "inventory_name")))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "inventory_price", "Type": DB.DECIMAL, "Length": "10,2", "Default": "0.00")))
+	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "inventory_image", "Type": DB.BLOB)))
+	DB.Create
+	
 	Wait For (DB.ExecuteBatch) Complete (Success As Boolean)
 	If Success Then
 		LogColor("Database is created successfully!", Main.COLOR_BLUE)

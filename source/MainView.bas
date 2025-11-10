@@ -4,6 +4,8 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
+' Main View
+' Version 0.60
 Sub Class_Globals
 	Private mModal As Tag
 	Private mToast As Tag
@@ -72,54 +74,46 @@ End Sub
 
 Private Sub PageBody As Tag
 	Dim body1 As Tag = Body.cls("bg-white")
-	If mToast.IsInitialized Then body1.add(mToast)
-	Dim nav1 As Tag = body1.add(Nav.cls("navbar navbar-expand-lg sticky-top yellow"))
-	Dim div1 As Tag = nav1.add(Div.cls("container-fluid"))
-
-	div1.add(Anchor.cls("navbar-brand me-0 me-lg-2 pt-2").hrefOf("#")).add(Icon.cls("bi bi-infinity").sty("font-size: 1.8em"))
-	div1.add(Anchor.cls("navbar-brand d-none d-md-block").hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$"))
-	
-	Dim toggler1 As Tag = div1.add(Button.cls("navbar-toggler d-none d-lg-none d-md-block collapsed"))
-	toggler1.typeOf("button") _
-	.data("bs-toggle", "collapse") _
-	.data("bs-target", "#navbarCollapse") _
-	.sty("border: none") _
-	.add(Span.cls("navbar-toggler-icon"))
-	
-	Dim collapse1 As Tag = div1.add(Div.cls("collapse navbar-collapse").id("navbarCollapse"))
-	Dim ulist1 As Tag = collapse1.add(Ul.cls("navbar-nav navbar-brand ms-auto mb-md-0"))
-	Dim list1 As Tag = ulist1.add(Li.cls("nav-item d-none d-md-block"))
-	
-	Dim anchor1 As Tag = list1.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
-	anchor1.add(Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px"))
-	
+	If mToast.IsInitialized Then mToast.up(body1)
+	Dim nav1 As Tag = Nav.cls("navbar navbar-expand-lg sticky-top yellow").up(body1)
+	Dim div1 As Tag = Div.cls("container-fluid").up(nav1)
+	Dim anchor1 As Tag = Anchor.cls("navbar-brand me-0 me-lg-2 pt-2").up(div1)
+	anchor1.hrefOf("#").add(Icon.cls("bi bi-infinity").sty("font-size: 1.8em"))
+	Dim anchor2 As Tag = Anchor.cls("navbar-brand d-none d-md-block").up(div1)
+	anchor2.hrefOf("$SERVER_URL$").text("$APP_TRADEMARK$")
+	Dim toggler1 As Tag = Button.cls("navbar-toggler d-none d-lg-none d-md-block collapsed").up(div1)
+	toggler1.typeOf("button")
+	toggler1.data("bs-toggle", "collapse")
+	toggler1.data("bs-target", "#navbarCollapse")
+	toggler1.sty("border: none")
+	toggler1.add(Span.cls("navbar-toggler-icon"))
+	Dim collapse1 As Tag = Div.cls("collapse navbar-collapse").id("navbarCollapse").up(div1)
+	Dim ulist1 As Tag = Ul.cls("navbar-nav navbar-brand ms-auto mb-md-0").up(collapse1)
+	Dim list1 As Tag = Li.cls("nav-item d-none d-md-block").up(ulist1)
+	Dim anchor1 As Tag = Anchor.href("https://paypal.me/aeric80/").targetOf("_blank").up(list1)
+	Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px").up(anchor1)
 	Dim sponsor As Tag = Div.cls("text-center font-weight-bold d-block d-sm-block d-md-none").up(body1)
 	sponsor.sty("background-color: whitesmoke")
-	Dim anchor2 As Tag = sponsor.add(Anchor.href("https://paypal.me/aeric80/").targetOf("_blank"))
+	Dim anchor2 As Tag = Anchor.href("https://paypal.me/aeric80/").targetOf("_blank").up(sponsor)
 	anchor2.add(Img.src("/assets/img/sponsor.png").cls("mx-2").sty("width: 174px"))
-	
-	Dim content1 As Tag = body1.add(Div.cls("content m-3"))
-	Dim padding2 As Tag = content1.add(Div.cls("p-2"))
-	Dim row1 As Tag = padding2.add(Div.cls("row text-center align-items-center justify-content-center"))
-
-	Dim div1 As Tag = row1.add(Div.init)
-	div1.add(H3.cls("mb-0").sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")) _
-	.text("$HOME_TITLE$")
-	div1.add(Span.cls("small").text("Version: $VERSION$"))
-
-	If mContent.IsInitialized Then padding2.add(mContent)
-	If mSubContent.IsInitialized Then padding2.add(mSubContent)
-	If mModal.IsInitialized Then body1.add(mModal)
-	
-	body1.add(Div.cls("bottom"))
+	Dim content1 As Tag = Div.cls("content m-3").up(body1)
+	Dim padding2 As Tag = Div.cls("p-2").up(content1)
+	Dim row1 As Tag = Div.cls("row text-center align-items-center justify-content-center").up(padding2)
+	Dim div1 As Tag = Div.init.up(row1)
+	H3.cls("mb-0").sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif").up(div1).text("$HOME_TITLE$")
+	Span.cls("small").text("Version: $VERSION$").up(div1)
+	If mContent.IsInitialized Then mContent.up(padding2)
+	If mSubContent.IsInitialized Then mSubContent.up(padding2)
+	If mModal.IsInitialized Then mModal.up(body1)
+	Div.cls("bottom").up(body1)
 	Return body1
 End Sub
 
 Private Sub BodyFooter As Tag
 	Dim footer1 As Tag = Footer.cls("footer mt-auto py-3 bg-body-tertiary border-top")
-	Dim small1 As Tag = footer1.add(Div.cls("footer small text-center d-md-block") _
-	.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"))
-	Dim caption1 As Tag = small1.add(Caption.text("$APP_COPYRIGHT$"))
+	Dim small1 As Tag = Div.cls("footer small text-center d-md-block").up(footer1)
+	small1.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")
+	Dim caption1 As Tag = Caption.text("$APP_COPYRIGHT$").up(small1)
 	caption1.add(Br.init)
 	caption1.text("Pakai ")
 	Dim span1 As Tag = Span.sty("color: red").up(caption1)
