@@ -17,6 +17,7 @@ Library2=jcore
 Library3=minihtml
 Library4=minijs
 Library5=miniormutils
+Library6=webapiutils
 Module1=CategoriesHandler
 Module2=Database
 Module3=HttpsFilter
@@ -24,7 +25,7 @@ Module4=InventoriesHandler
 Module5=MainView
 Module6=ProductsHandler
 NumberOfFiles=4
-NumberOfLibraries=5
+NumberOfLibraries=6
 NumberOfModules=6
 Version=10.3
 @EndOfDesignText@
@@ -47,9 +48,9 @@ Version=10.3
 'For source
 '#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\css&args=Objects\www\assets\img&args=Objects\www\assets\js\*.min.js&args=Objects\www\assets\js\app.js
 '#Macro: Title, Create Template, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
-#Macro: Title, Create Template (starter), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta4starter).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
-#Macro: Title, Create Template (bundle), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta4bundle).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css&args=Objects\www\assets\js\app.js&args=Objects\www\assets\js\*.min.js
-#Macro: Title, Create Template (min), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta4min).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE
+#Macro: Title, Create Template (starter), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta5starter).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
+#Macro: Title, Create Template (bundle), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta5bundle).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css&args=Objects\www\assets\js\app.js&args=Objects\www\assets\js\*.min.js
+#Macro: Title, Create Template (min), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai%20Server%20(6.00beta5min).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE
 #Macro: Title, Release folder, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 #Macro: Title, Copy to AddLibs, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
 'For release

@@ -17,14 +17,16 @@ Library2=jcore
 Library3=minihtml
 Library4=minijs
 Library5=miniormutils
+Library6=webapiutils
 Module1=CategoriesHandler
 Module2=Database
 Module3=HttpsFilter
-Module4=MainView
-Module5=ProductsHandler
+Module4=InventoriesHandler
+Module5=MainView
+Module6=ProductsHandler
 NumberOfFiles=4
-NumberOfLibraries=5
-NumberOfModules=5
+NumberOfLibraries=6
+NumberOfModules=6
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
@@ -45,7 +47,7 @@ Version=10.3
 #Region Macros
 #Macro: Title, GetLibraries, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&args=false
 #Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
-#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-11-10_1205.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2025-11-10_2055.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
 #Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
 #Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
@@ -69,8 +71,10 @@ Sub AppStart (Args() As String)
 	#End If
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
+	App.Get("/inventories", "InventoriesHandler")
 	App.Rest("/api/products/*", "ProductsHandler")
 	App.Rest("/api/categories/*", "CategoriesHandler")
+	App.Rest("/api/inventories/*", "InventoriesHandler")
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", VERSION)
