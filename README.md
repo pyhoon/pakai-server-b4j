@@ -40,17 +40,25 @@ Create Web Application using B4J project template
 
 ### Code Example
 ```b4x
-Sub AppStart (Args() As String)
-	App.Initialize
-	App.LoadConfig
-	App.Get("", "ProductsHandler")
-	App.Get("/categories", "CategoriesHandler")
-	App.Rest("/api/products/*", "ProductsHandler")
-	App.Rest("/api/categories/*", "CategoriesHandler")
-	App.Start
-	DB.Initialize
-	DB.ConnectDatabase
-	StartMessageLoop
+Private Sub CreateCategoriesTable As Tag
+	Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
+	Dim thead1 As Tag = Thead.cls("table-light").up(table1)
+	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
+	thead1.add(Th.text("Name"))
+	thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
+	Dim tbody1 As Tag = Tbody.init.up(table1)
+	
+	DB.SQL = Main.DBOpen
+	DB.Table = "tbl_categories"
+	DB.Columns = Array("id", "category_name AS name")
+	DB.OrderBy = CreateMap("id": "")
+	DB.Query
+	For Each row As Map In DB.Results
+		Dim tr1 As Tag = CreateCategoriesRow(row)
+		tr1.up(tbody1)
+	Next
+	DB.Close
+	Return table1
 End Sub
 ```
 
