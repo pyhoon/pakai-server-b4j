@@ -56,10 +56,16 @@ Private Sub RenderPage
 	Dim container1 As Tag = nav1.Child(0)
 	Dim navbar1 As Tag = container1.Child(3)
 	Dim ulist1 As Tag = navbar1.Child(0)
-	Dim list2 As Tag = Li.cls("nav-item d-block d-lg-none").up(ulist1)
-	Dim anchor1 As Tag = Anchor.href("/inventories").up(list2)
+	
+	Dim list1 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
+	Dim anchor1 As Tag = Anchor.href("/categories").up(list1)
 	anchor1.cls("nav-link")
-	anchor1.text("Inventory")
+	anchor1.text("Categories")
+	
+	Dim list2 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
+	Dim anchor2 As Tag = Anchor.href("/inventories").up(list2)
+	anchor2.cls("nav-link")
+	anchor2.text("Inventory")
 	
 	Dim doc As Document
 	doc.Initialize

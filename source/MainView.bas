@@ -92,6 +92,12 @@ Private Sub PageBody As Tag
 	Dim list1 As Tag = Li.cls("nav-item d-block d-lg-none").up(ulist1)
 	Dim anchor1 As Tag = Anchor.href("https://paypal.me/aeric80/").targetOf("_blank").up(list1)
 	Img.src("/assets/img/coffee.png").cls("ml-2 mt-1").sty("height: 40px").up(anchor1)
+	
+	'Dim list2 As Tag = Li.cls("nav-item d-none d-lg-block").up(ulist1)
+	'Dim anchor2 As Tag = Anchor.href("/inventories").up(list2)
+	'anchor2.cls("nav-link")
+	'anchor2.text("Inventory")
+	
 	Dim sponsor As Tag = Div.cls("text-center font-weight-bold d-none d-lg-block").up(body1)
 	sponsor.sty("background-color: whitesmoke")
 	Dim anchor2 As Tag = Anchor.href("https://paypal.me/aeric80/").targetOf("_blank").up(sponsor)
