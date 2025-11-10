@@ -1,0 +1,56 @@
+/*!
+ * Pakai Server Framework B4J Project Template v6.00 by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
+ * Copyright (c) 2022-2025 Poon Yip Hoon (Aeric)
+ * Licensed under MIT (https://github.com/pyhoon/pakai-server-b4j/blob/main/LICENSE)
+ */
+body {
+    font-family: Arial, Helvetica, Tahoma, Times New Roman;
+}
+
+button {
+    border-radius: 3px;
+}
+
+button:focus {
+    outline: 0px;
+}
+
+.error {
+    font-size: 0.8em;
+    color: red;
+}
+
+.edit,
+.delete {
+    cursor: pointer;
+}
+
+.edit:hover,
+.delete:hover {
+    font-size: 1.2rem;
+}
+
+.table-hover {
+  --bs-table-hover-bg: #E5F3FD;
+}
+
+.bottom {
+    position: relative;
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 60px;
+}
+
+.footer {
+    position: fixed;
+    padding: 10px 10px 0px 10px;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+}
+
+@media screen and (max-width: 768px) {
+    .footer {
+        height: 60px;
+    }
+}
