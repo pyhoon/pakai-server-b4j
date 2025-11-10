@@ -9,6 +9,7 @@ Version=10.3
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
+	Private KVS As KeyValueStore
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -16,6 +17,7 @@ End Sub
 
 Public Sub Initialize
 	App = Main.App
+	KVS = Main.KVS
 	DB.Initialize(Main.DBType, Null)
 End Sub
 
@@ -29,13 +31,11 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 		RenderPage
 	Else If path = "/api/categories/table" Then
 		HandleTable
-	Else If path = "/api/categories/list" Then
-		HandleList
-	Else If path = "/api/categories/modal/add" Then
+	Else If path = "/api/categories/add" Then
 		HandleAddModal
-	Else If path.StartsWith("/api/categories/modal/edit/") Then
+	Else If path.StartsWith("/api/categories/edit/") Then
 		HandleEditModal
-	Else If path.StartsWith("/api/categories/modal/delete/") Then
+	Else If path.StartsWith("/api/categories/delete/") Then
 		HandleDeleteModal
 	Else
 		HandleCategories
@@ -43,20 +43,23 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 End Sub
 
 Private Sub RenderPage
-	Dim main1 As MainView
-	main1.Initialize
-	main1.LoadContent(ContentContainer)
-	main1.LoadModal(ModalContainer)
-	main1.LoadToast(ToastContainer)
+	If KVS.ContainsKey("/categories") = False Then
+		Dim main1 As MainView
+		main1.Initialize
+		main1.LoadContent(ContentContainer)
+		main1.LoadModal(ModalContainer)
+		main1.LoadToast(ToastContainer)
 	
-	Dim page1 As Tag = main1.Render
-	Dim doc As Document
-	doc.Initialize
-	doc.AppendDocType
-	doc.Append(page1.build)
-	
-	Response.ContentType = "text/html"
-	Response.Write(App.ReplaceMap(doc.ToString, App.ctx))
+		Dim page1 As Tag = main1.Render
+		Dim doc As Document
+		doc.Initialize
+		doc.AppendDocType
+		doc.Append(page1.build)
+
+		' Store for reuse
+		KVS.Put("/categories", App.ReplaceMap(doc.ToString, App.ctx))
+	End If
+	App.WriteHtml(Response, KVS.Get("/categories"))
 End Sub
 
 Private Sub ContentContainer As Tag
@@ -77,7 +80,7 @@ Private Sub ContentContainer As Tag
 
 	Dim button2 As Tag = Button.up(div2)
 	button2.cls("btn btn-success ml-2")
-	button2.hxGet("/api/categories/modal/add")
+	button2.hxGet("/api/categories/add")
 	button2.hxTarget("#modal-content")
 	button2.hxTrigger("click")
 	button2.data("bs-toggle", "modal")
@@ -122,30 +125,9 @@ End Sub
 
 ' Return table HTML
 Private Sub HandleTable
-	Response.ContentType = "text/html"
-	Response.Write(GenerateCategoriesTable.Build)
-End Sub
-
-' Return select option HTML
-Private Sub HandleList
-	Dim select1 As Tag = Dropdown.cls("form-select")
-	select1.attr3("required")
-	select1.hxGet("/api/categories/list")
-	Option.text("Select Category").attr3("disabled").up(select1)
-	
-	DB.SQL = Main.DBOpen
-	DB.Table = "tbl_categories"
-	DB.Columns = Array("id", "category_name AS name")
-	DB.Query
-	For Each row As Map In DB.Results
-		Dim id As Int = row.Get("id")
-		Dim name As String = row.Get("name")
-		Option.valueOf(id).text(name).up(select1)
-	Next
-	DB.Close
-
-	Response.ContentType = "text/html"
-	Response.Write(select1.Build)
+	'Dim s As String = GenerateCategoriesTable.Build
+	'File.WriteString(File.DirApp, "table.html", s)
+	App.WriteHtml(Response, GenerateCategoriesTable.Build)
 End Sub
 
 ' Add modal
@@ -170,13 +152,12 @@ Private Sub HandleAddModal
 	Button.typeOf("submit").cls("btn btn-success px-3").text("Create").up(modalFooter)
 	Button.typeOf("button").cls("btn btn-secondary px-3").data("bs-dismiss", "modal").text("Cancel").up(modalFooter)
 
-	Response.ContentType = "text/html"
-	Response.Write(form1.Build)
+	App.WriteHtml(Response, form1.Build)
 End Sub
 
 ' Edit modal
 Private Sub HandleEditModal
-	Dim id As String = Request.RequestURI.SubString("/api/categories/modal/edit/".Length)
+	Dim id As String = Request.RequestURI.SubString("/api/categories/edit/".Length)
 	Dim form1 As Tag = Form.init
 	form1.hxPut($"/api/categories"$)
 	form1.hxTarget("#modal-messages")
@@ -208,13 +189,12 @@ Private Sub HandleEditModal
 	End If
 	DB.Close
 
-	Response.ContentType = "text/html"
-	Response.Write(form1.Build)
+	App.WriteHtml(Response, form1.Build)
 End Sub
 
 ' Delete modal
 Private Sub HandleDeleteModal
-	Dim id As String = Request.RequestURI.SubString("/api/categories/modal/delete/".Length)
+	Dim id As String = Request.RequestURI.SubString("/api/categories/delete/".Length)
 	Dim form1 As Tag = Form.init
 	form1.hxDelete($"/api/categories"$)
 	form1.hxTarget("#modal-messages")
@@ -243,8 +223,7 @@ Private Sub HandleDeleteModal
 	End If
 	DB.Close
 
-	Response.ContentType = "text/html"
-	Response.Write(form1.Build)
+	App.WriteHtml(Response, form1.Build)
 End Sub
 
 ' Handle CRUD operations
@@ -356,13 +335,53 @@ Private Sub HandleCategories
 End Sub
 
 Private Sub GenerateCategoriesTable As Tag
-	Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
-	Dim thead1 As Tag = table1.add(Thead.cls("table-light"))
-	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
-	thead1.add(Th.text("Name"))
-	thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
-	Dim tbody1 As Tag = table1.add(Tbody.init)
+	'KVS.Remove("/categories/table")
+	'KVS.Remove("/categories/table/row")
+	'Avoid using KVS for small components
+	'If KVS.ContainsKey("/categories/table") Then
+	'	Dim table1 As Tag = Html.Parse(KVS.Get("/categories/table"))
+	'	Dim tbody1 As Tag = table1.Child(1)
+	'Else
+		Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
+		Dim thead1 As Tag = Thead.cls("table-light").up(table1)
+		thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
+		thead1.add(Th.text("Name"))
+		thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
+		Dim tbody1 As Tag = Tbody.init.up(table1)
+		
+	'	' Store for reuse
+	'	KVS.Put("/categories/table", table1.Build)
+	'End If
 
+	'Avoid using KVS for small components
+	'If KVS.ContainsKey("/categories/table/row") = False Then
+	'	Dim tr1 As Tag = Tr.init
+	'	Td.cls("align-middle").sty("text-align: right").up(tr1)
+	'	Td.cls("align-middle").up(tr1)
+	'	Dim td1 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
+	'	
+	'	Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td1)
+	'	anchor1.hxGet("")
+	'	anchor1.hxTarget("#modal-content")
+	'	anchor1.hxTrigger("click")
+	'	anchor1.data("bs-toggle", "modal")
+	'	anchor1.data("bs-target", "#modal-container")
+	'	anchor1.add(Icon.cls("bi bi-pencil"))
+	'	anchor1.attr("title", "Edit")
+	'	
+	'	Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td1)
+	'	anchor2.hxGet("")
+	'	anchor2.hxTarget("#modal-content")
+	'	anchor2.hxTrigger("click")
+	'	anchor2.data("bs-toggle", "modal")
+	'	anchor2.data("bs-target", "#modal-container")
+	'	anchor2.add(Icon.cls("bi bi-trash3"))
+	'	anchor2.attr("title", "Delete")
+	'	
+	'	' Store for reuse
+	'	KVS.Put("/categories/table/row", tr1.Build)
+	'End If
+	
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
@@ -371,29 +390,53 @@ Private Sub GenerateCategoriesTable As Tag
 	For Each row As Map In DB.Results
 		Dim id As Int = row.Get("id")
 		Dim name As String = row.Get("name")
-		Dim tr1 As Tag = tbody1.add(Tr.init)
-		tr1.add(Td.cls("align-middle").sty("text-align: right").text(id))
-		tr1.add(Td.cls("align-middle").text(name))
-
-		Dim td1 As Tag = tr1.add(Td.cls("align-middle text-center px-1 py-1"))
 		
-		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td1)
-		anchor1.hxGet($"/api/categories/modal/edit/${id}"$)
+		'Avoid using KVS for small components
+		'Dim tr1 As Tag = Html.Parse(KVS.Get("/categories/table/row"))
+		
+		'Dim td1 As Tag = tr1.Child(0)
+		'td1.text(id)
+		
+		'Dim td2 As Tag = tr1.Child(1)
+		'td2.text(name)
+		
+		'Dim td3 As Tag = tr1.Child(2)
+		
+		'Dim anchor1 As Tag = td3.Child(0)
+		'anchor1.hxGet($"/api/categories/edit/${id}"$)
+		
+		'Dim anchor2 As Tag = td3.Child(1)
+		'anchor2.hxGet($"/api/categories/delete/${id}"$)
+
+		Dim tr1 As Tag = Tr.init
+		
+		Dim td1 As Tag = Td.cls("align-middle").sty("text-align: right").up(tr1)
+		td1.text(id)
+		
+		Dim td2 As Tag = Td.cls("align-middle").up(tr1)
+		td2.text(name)
+		
+		Dim td3 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
+		
+		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td3)
+		anchor1.hxGet($"/api/categories/edit/${id}"$)
 		anchor1.hxTarget("#modal-content")
 		anchor1.hxTrigger("click")
 		anchor1.data("bs-toggle", "modal")
 		anchor1.data("bs-target", "#modal-container")
 		anchor1.add(Icon.cls("bi bi-pencil"))
 		anchor1.attr("title", "Edit")
-
-		Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td1)
-		anchor2.hxGet($"/api/categories/modal/delete/${id}"$)
+		
+		Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td3)
+		anchor2.hxGet($"/api/categories/delete/${id}"$)
 		anchor2.hxTarget("#modal-content")
 		anchor2.hxTrigger("click")
-		anchor2.data("bs-toggle", "modal")		
+		anchor2.data("bs-toggle", "modal")
 		anchor2.data("bs-target", "#modal-container")
 		anchor2.add(Icon.cls("bi bi-trash3"))
 		anchor2.attr("title", "Delete")
+
+		tbody1.add(tr1)
 	Next
 	DB.Close
 	Return table1
@@ -401,26 +444,22 @@ End Sub
 
 Private Sub ShowAlert (message As String, status As String)
 	Dim div1 As Tag = Div.cls("alert alert-" & status).text(message)
-	Response.ContentType = "text/html"
-	Response.Write(div1.Build)
+	App.WriteHtml(Response, div1.Build)
 End Sub
 
 Private Sub ShowToast (entity As String, action As String, message As String, status As String)
 	Dim div1 As Tag = Div.id("categories-container")
 	div1.hxSwapOob("true")
 	div1.add(GenerateCategoriesTable)
-	
-	Dim details As Map
-    details.Initialize
-    details.Put("entity", entity)
-    details.Put("action", action)
-    details.Put("message", message)
-    details.Put("status", status)
 
 	Dim script1 As MiniJs
 	script1.Initialize
-	script1.AddCustomEventDispatch($"entity:changed"$, details)
+	script1.AddCustomEventDispatch("entity:changed", _
+	CreateMap( _
+	"entity": entity, _
+	"action": action, _
+	"message": message, _
+	"status": status))
 
-	Response.ContentType = "text/html"
-	Response.Write(div1.Build & CRLF & script1.Generate)
+	App.WriteHtml(Response, div1.Build & CRLF & script1.Generate)
 End Sub

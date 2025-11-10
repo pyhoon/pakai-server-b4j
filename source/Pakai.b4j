@@ -17,13 +17,14 @@ Library2=jcore
 Library3=minihtml
 Library4=minijs
 Library5=miniormutils
+Library6=keyvaluestore
 Module1=CategoriesHandler
 Module2=Database
 Module3=HttpsFilter
 Module4=MainView
 Module5=ProductsHandler
 NumberOfFiles=4
-NumberOfLibraries=5
+NumberOfLibraries=6
 NumberOfModules=5
 Version=10.3
 @EndOfDesignText@
@@ -61,6 +62,7 @@ Version=10.3
 Sub Process_Globals
 	Public DB 					As Database
 	Public App 					As EndsMeet
+	Public KVS 					As KeyValueStore
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
 	Public Const VERSION 		As String = "6.00beta"
@@ -76,24 +78,20 @@ Sub AppStart (Args() As String)
 	App.ssl.Enabled = True
 	App.RedirectToHttps = True
 	#End If
-	
-	' *** Web handlers ***
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
-	
-	' *** Api handlers ***
 	App.Rest("/api/products/*", "ProductsHandler")
 	App.Rest("/api/categories/*", "CategoriesHandler")
-	
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", VERSION)
 	Log($"App version: ${VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
-
 	DB.Initialize
 	DB.ConnectDatabase
+	KVS.Initialize(App.RootPath, "kvs")
+	'KVS.DeleteAll
 	StartMessageLoop
 End Sub
 
