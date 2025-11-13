@@ -48,11 +48,7 @@ Private Sub RenderPage
 	main1.LoadToast(ToastContainer)
 
 	Dim page1 As Tag = main1.Render
-	Dim body1 As Tag = page1.Child(1)
-	Dim nav1 As Tag = body1.Child(1)
-	Dim container1 As Tag = nav1.Child(0)
-	Dim navbar1 As Tag = container1.Child(3)
-	Dim ulist1 As Tag = navbar1.Child(0)
+	Dim ulist1 As Tag = FindUListTag(page1)
 	Dim list1 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
 	Dim anchor1 As Tag = Anchor.href("#").up(list1)
 	anchor1.cls("nav-link")
@@ -69,6 +65,16 @@ Private Sub RenderPage
 	doc.AppendDocType
 	doc.Append(page1.build)
 	App.WriteHtml2(Response, doc.ToString, App.ctx)
+End Sub
+
+' Retrieve ulist tag from DOM
+Private Sub FindUListTag (dom As Tag) As Tag
+	Dim body1 As Tag = dom.Child(1)
+	Dim nav1 As Tag = body1.Child(1)
+	Dim container1 As Tag = nav1.Child(0)
+	Dim navbar1 As Tag = container1.Child(3)
+	Dim ulist1 As Tag = navbar1.Child(0)
+	Return ulist1
 End Sub
 
 Private Sub ContentContainer As Tag
