@@ -341,7 +341,7 @@ End Sub
 Private Sub CreateCategoriesDropdown (selected As Int) As Tag
 	Dim select1 As Tag = Dropdown.cls("form-select")
 	select1.attr3("required")
-	select1.hxGet("/api/categories/list")
+	'select1.hxGet("/api/categories/list")
 	Option.valueOf("").text("Select Category").attr3(IIf(selected < 1, "selected", "")).attr3("disabled").up(select1)
 
 	DB.SQL = Main.DBOpen
