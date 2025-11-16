@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.00
+' Version 6.10
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -41,30 +41,34 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 End Sub
 
 Private Sub RenderPage
-	Dim main1 As MainView
-	main1.Initialize
-	main1.LoadContent(ContentContainer)
-	main1.LoadModal(ModalContainer)
-	main1.LoadToast(ToastContainer)
+	If App.ctx.ContainsKey("/categories") = False Then
+		Dim main1 As MainView
+		main1.Initialize
+		main1.LoadContent(ContentContainer)
+		main1.LoadModal(ModalContainer)
+		main1.LoadToast(ToastContainer)
 
-	Dim page1 As Tag = main1.Render
-	Dim ulist1 As Tag = FindUListTag(page1)
-	Dim list1 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
-	Dim anchor1 As Tag = Anchor.href("#").up(list1)
-	anchor1.cls("nav-link")
-	anchor1.text("Categories")
+		Dim page1 As Tag = main1.Render
+		Dim ulist1 As Tag = FindUListTag(page1)
+		Dim list1 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
+		Dim anchor1 As Tag = Anchor.href("#").up(list1)
+		anchor1.cls("nav-link")
+		anchor1.text("Categories")
 
-	' Sample for adding additional menu link
-	'Dim list2 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
-	'Dim anchor2 As Tag = Anchor.href("/users").up(list2)
-	'anchor2.cls("nav-link")
-	'anchor2.text("Users")
+		' Sample for adding additional menu link
+		'Dim list2 As Tag = Li.cls("nav-item d-block d-lg-block").up(ulist1)
+		'Dim anchor2 As Tag = Anchor.href("/users").up(list2)
+		'anchor2.cls("nav-link")
+		'anchor2.text("Users")
 	
-	Dim doc As Document
-	doc.Initialize
-	doc.AppendDocType
-	doc.Append(page1.build)
-	App.WriteHtml2(Response, doc.ToString, App.ctx)
+		Dim doc As Document
+		doc.Initialize
+		doc.AppendDocType
+		doc.Append(page1.build)
+		App.ctx.Put("/categories", doc.ToString)
+	End If
+
+	App.WriteHtml2(Response, App.ctx.Get("/categories"), App.ctx)
 End Sub
 
 ' Retrieve ulist tag from DOM
@@ -159,7 +163,7 @@ Private Sub HandleAddModal
 	
 	Dim group1 As Tag = modalBody.add(Div.cls("form-group"))
 	Label.forId("name").text("Name ").up(group1).add(Span.cls("text-danger").text("*"))
-	Input.typeOf("text").up(group1).id("name").name("name").cls("form-control").attr3("required")
+	Input.typeOf("text").up(group1).id("name").name("name").cls("form-control").required
 
 	Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 	Button.typeOf("submit").cls("btn btn-success px-3").text("Create").up(modalFooter)
@@ -193,7 +197,7 @@ Private Sub HandleEditModal
 		
 		Dim group1 As Tag = Div.cls("form-group").up(modalBody)
 		Label.forId("name").text("Name ").up(group1).add(Span.cls("text-danger").text("*"))
-		Input.typeOf("text").cls("form-control").id("name").name("name").valueOf(name).attr3("required").up(group1)
+		Input.typeOf("text").cls("form-control").id("name").name("name").valueOf(name).required.up(group1)
 
 		Dim modalFooter As Tag = Div.cls("modal-footer").up(form1)
 		Button.typeOf("submit").cls("btn btn-primary px-3").text("Update").up(modalFooter)
@@ -345,54 +349,63 @@ Private Sub HandleCategories
 End Sub
 
 Private Sub CreateCategoriesTable As Tag
-	Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
-	Dim thead1 As Tag = Thead.cls("table-light").up(table1)
-	thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
-	thead1.add(Th.text("Name"))
-	thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
-	Dim tbody1 As Tag = Tbody.init.up(table1)
+	If App.ctx.ContainsKey("/categories/table") = False Then
+		Dim table1 As Tag = HtmlTable.cls("table table-bordered table-hover rounded small")
+		Dim thead1 As Tag = Thead.cls("table-light").up(table1)
+		thead1.add(Th.sty("text-align: right; width: 50px").text("#"))
+		thead1.add(Th.text("Name"))
+		thead1.add(Th.sty("text-align: center; width: 120px").text("Actions"))
+		Tbody.up(table1)
+		App.ctx.Put("/categories/table", table1.Build)
+	End If
 	
 	DB.SQL = Main.DBOpen
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
 	DB.OrderBy = CreateMap("id": "")
 	DB.Query
+
+	Dim table1 As Tag = Html.Parse(App.ctx.Get("/categories/table"))
+	Dim tbody1 As Tag = table1.Child(1)
 	For Each row As Map In DB.Results
-		Dim tr1 As Tag = CreateCategoriesRow(row)
+		Dim tr1 As Tag = Html.Parse(CreateCategoriesRow(row))
 		tr1.up(tbody1)
 	Next
 	DB.Close
 	Return table1
 End Sub
 
-Private Sub CreateCategoriesRow (data As Map) As Tag
-	Dim id As Int = data.Get("id")
-	Dim name As String = data.Get("name")
+Private Sub CreateCategoriesRow (data As Map) As String 'As Tag
+	If App.ctx.ContainsKey("/categories/table/row") = False Then
+		Dim tr1 As Tag = Tr.init
+		tr1.add(Td.cls("align-middle").sty("text-align: right")).text("$id$")
+		tr1.add(Td.cls("align-middle")).text("$name$")
+		Dim td3 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
 
-	Dim tr1 As Tag = Tr.init
-	tr1.add(Td.cls("align-middle").sty("text-align: right").text(id))
-	tr1.add(Td.cls("align-middle").text(name))
-	Dim td3 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
-
-	Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td3)
-	anchor1.hxGet($"/api/categories/edit/${id}"$)
-	anchor1.hxTarget("#modal-content")
-	anchor1.hxTrigger("click")
-	anchor1.data("bs-toggle", "modal")
-	anchor1.data("bs-target", "#modal-container")
-	anchor1.add(Icon.cls("bi bi-pencil"))
-	anchor1.attr("title", "Edit")
+		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td3)
+		anchor1.hxGet("/api/categories/edit/$id$")
+		anchor1.hxTarget("#modal-content")
+		anchor1.hxTrigger("click")
+		anchor1.data("bs-toggle", "modal")
+		anchor1.data("bs-target", "#modal-container")
+		anchor1.add(Icon.cls("bi bi-pencil"))
+		anchor1.attr("title", "Edit")
 		
-	Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td3)
-	anchor2.hxGet($"/api/categories/delete/${id}"$)
-	anchor2.hxTarget("#modal-content")
-	anchor2.hxTrigger("click")
-	anchor2.data("bs-toggle", "modal")
-	anchor2.data("bs-target", "#modal-container")
-	anchor2.add(Icon.cls("bi bi-trash3"))
-	anchor2.attr("title", "Delete")
-	
-	Return tr1
+		Dim anchor2 As Tag = Anchor.cls("delete text-danger mx-2").up(td3)
+		anchor2.hxGet("/api/categories/delete/$id$")
+		anchor2.hxTarget("#modal-content")
+		anchor2.hxTrigger("click")
+		anchor2.data("bs-toggle", "modal")
+		anchor2.data("bs-target", "#modal-container")
+		anchor2.add(Icon.cls("bi bi-trash3"))
+		anchor2.attr("title", "Delete")
+		
+		' Store for reuse
+		App.ctx.Put("/categories/table/row", tr1.Build)
+	End If
+
+	' Update tag with new data
+	Return App.ReplaceMap(App.ctx.Get("/categories/table/row"), data)
 End Sub
 
 Private Sub ShowAlert (message As String, status As String)
