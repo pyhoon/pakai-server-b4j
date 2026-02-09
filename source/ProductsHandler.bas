@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Index Handler class
-' Version 6.10
+' Version 6.20
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -410,13 +410,13 @@ End Sub
 
 Private Sub CreateProductsRow (data As Map) As String
 	If App.ctx.ContainsKey("/table/row") = False Then
-		Dim tr1 As Tag = Tr.init
-		tr1.add(Td.cls("align-middle").sty("text-align: right")).text("$id$")
-		tr1.add(Td.cls("align-middle")).text("$code$")
-		tr1.add(Td.cls("align-middle")).text("$name$")
-		tr1.add(Td.cls("align-middle")).text("$category$")
-		tr1.add(Td.cls("align-middle").sty("text-align: right")).text("$price$")
-		Dim td6 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
+		Dim tr1 As Tag = Trow.init
+		tr1.add(Tdata.cls("align-middle").sty("text-align: right")).text("$id$")
+		tr1.add(Tdata.cls("align-middle")).text("$code$")
+		tr1.add(Tdata.cls("align-middle")).text("$name$")
+		tr1.add(Tdata.cls("align-middle")).text("$category$")
+		tr1.add(Tdata.cls("align-middle").sty("text-align: right")).text("$price$")
+		Dim td6 As Tag = Tdata.cls("align-middle text-center px-1 py-1").up(tr1)
 
 		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td6)
 		anchor1.hxGet("/api/products/edit/$id$")

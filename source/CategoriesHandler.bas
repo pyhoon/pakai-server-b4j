@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.10
+' Version 6.20
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -377,10 +377,10 @@ End Sub
 
 Private Sub CreateCategoriesRow (data As Map) As String 'As Tag
 	If App.ctx.ContainsKey("/categories/table/row") = False Then
-		Dim tr1 As Tag = Tr.init
-		tr1.add(Td.cls("align-middle").sty("text-align: right")).text("$id$")
-		tr1.add(Td.cls("align-middle")).text("$name$")
-		Dim td3 As Tag = Td.cls("align-middle text-center px-1 py-1").up(tr1)
+		Dim tr1 As Tag = Trow.init
+		tr1.add(Tdata.cls("align-middle").sty("text-align: right")).text("$id$")
+		tr1.add(Tdata.cls("align-middle")).text("$name$")
+		Dim td3 As Tag = Tdata.cls("align-middle text-center px-1 py-1").up(tr1)
 
 		Dim anchor1 As Tag = Anchor.cls("edit text-primary mx-2").up(td3)
 		anchor1.hxGet("/api/categories/edit/$id$")

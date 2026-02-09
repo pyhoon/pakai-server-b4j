@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Main View
-' Version 6.10
+' Version 6.20
 Sub Class_Globals
 	Private mModal As Tag
 	Private mToast As Tag

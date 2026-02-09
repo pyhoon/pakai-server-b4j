@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 'Database class module
-'Version 6.10
+'Version 6.20
 Sub Class_Globals
 	Private conn As ORMConnector
 	Private info As ConnectionInfo
