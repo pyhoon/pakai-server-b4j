@@ -1,6 +1,6 @@
 /*!
- * Pakai Server Framework B4J Project Template v6.00 by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
- * Copyright (c) 2022-2025 Poon Yip Hoon (Aeric)
+ * Pakai Server Framework B4J Project Template v6.30 by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
+ * Copyright (c) 2022-2026 Poon Yip Hoon (Aeric)
  * Licensed under MIT (https://github.com/pyhoon/pakai-server-b4j/blob/main/LICENSE)
  */
 document.addEventListener('entity:changed', (e) => {
