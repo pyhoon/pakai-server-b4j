@@ -4,8 +4,8 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-'Https Filter class
-'Version 6.20
+' Https Filter class
+' Version 6.30
 Sub Class_Globals
 
 End Sub

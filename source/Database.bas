@@ -4,11 +4,13 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-'Database class module
-'Version 6.20
+' Database class module
+' Version 6.30
 Sub Class_Globals
-	Private conn As ORMConnector
-	Private info As ConnectionInfo
+' Private conn As ORMConnector
+' Private info As ConnectionInfo
+	Private DB As MiniORM
+	Private MS As ORMSettings
 End Sub
 
 Public Sub Initialize
@@ -23,75 +25,76 @@ Public Sub Initialize
 		File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)
 	End If
 	Dim ctx As Map = File.ReadMap(File.DirApp, $"${dbvar}.ini"$)
-	info.Initialize
-	info.DBType = ctx.GetDefault("DbType", "")
-	Select info.DBType
-		Case "SQLite"
-			info.DBDir = ctx.GetDefault("DbDir", "")
-			info.DBFile = ctx.GetDefault("DbFile", "")
-			info.JournalMode = "WAL"
-		Case "MariaDB", "MySQL"
-			info.DBHost = ctx.GetDefault("DbHost", "")
-			info.DBPort = ctx.GetDefault("DbPort", "")
-			info.DBName = ctx.GetDefault("DbName", "")
-			info.DriverClass = ctx.GetDefault("DriverClass", "")
-			info.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
-			info.User = ctx.GetDefault("User", "")
-			info.Password = ctx.GetDefault("Password", "")
-			info.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
+	DB.Initialize
+	MS.Initialize
+	MS.DBType = ctx.GetDefault("DbType", "")
+	Select MS.DBType
+		Case DB.MARIADB, DB.MYSQL
+			MS.DBHost = ctx.GetDefault("DbHost", "")
+			MS.DBPort = ctx.GetDefault("DbPort", "")
+			MS.DBName = ctx.GetDefault("DbName", "")
+			MS.DriverClass = ctx.GetDefault("DriverClass", "")
+			MS.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
+			MS.User = ctx.GetDefault("User", "")
+			MS.Password = ctx.GetDefault("Password", "")
+			MS.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
+		Case DB.SQLITE
+			MS.DBDir = ctx.GetDefault("DbDir", "")
+			MS.DBFile = ctx.GetDefault("DbFile", "")
+			MS.JournalMode = "WAL"			
 		Case Else
-			LogColor($"${info.DBType} not supported!"$, Main.COLOR_RED)
+			LogColor($"${MS.DBType} not supported!"$, Main.COLOR_RED)
 			Log("Application is terminated.")
 			ExitApplication
 	End Select
-	conn.Initialize(info)
+	DB.Settings = MS
 End Sub
 
-Public Sub Engine As String
-	Return conn.DBType
-End Sub
-
-Public Sub Open As SQL
-	Return conn.DBOpen
-End Sub
-
-Public Sub Close
-	conn.DBClose
-End Sub
+'Public Sub Engine As String
+'	Return conn.DBType
+'End Sub
+'
+'Public Sub Open As SQL
+'	Return conn.DBOpen
+'End Sub
+'
+'Public Sub Close
+'	conn.DBClose
+'End Sub
 
 ' Make Connection to Database
 Public Sub ConnectDatabase
 	Try
-		If conn.IsInitialized = False Then Return
+		If DB.Opened Then Return
 		LogColor("Checking database...", Main.COLOR_BLUE)		
-		Select Engine
-			Case "SQLite"
-				Dim DBFound As Boolean = conn.DBExist			
-			Case "MariaDB", "MySQL"
-				Wait For (conn.InitSchema) Complete (Success As Boolean)
+		Select DB.DbType
+			Case DB.SQLITE
+				Dim DBFound As Boolean = DB.Exist
+			Case DB.MARIADB, DB.MYSQL
+				Wait For (DB.InitSchema) Complete (Success As Boolean)
 				If Success = False Then
 					LogColor("Database initilialization failed!", Main.COLOR_RED)
 					Log("Application is terminated.")
 					ExitApplication
 				End If
-				If conn.Test = False Then
+				If DB.Test = False Then
 					LogColor("Database connection failed!", Main.COLOR_RED)
 					Log("Application is terminated.")
 					ExitApplication
 				End If
-				Wait For (conn.DBExist2) Complete (DBFound As Boolean)
+				Wait For (DB.ExistAsync) Complete (DBFound As Boolean)
 			Case Else
 				Return
 		End Select
-		If DBFound Then
-			LogColor($"${Engine} database found!"$, Main.COLOR_BLUE)
+		If DB.Found Then
+			LogColor($"${DB.DbType} database found!"$, Main.COLOR_BLUE)
 			'AddUsersTable
-			If Engine = "MariaDB" Or Engine = "MySQL" Then
-				conn.InitPool
+			If UsePool(DB.DbType) Then
+				DB.InitPool
 			End If
 			Return
 		End If
-		LogColor($"${Engine} database not found!"$, Main.COLOR_RED)
+		LogColor($"${DB.DbType} database not found!"$, Main.COLOR_RED)
 		CreateDatabase
 	Catch
 		LogError(LastException.Message)
@@ -101,22 +104,28 @@ Public Sub ConnectDatabase
 	End Try
 End Sub
 
+Private Sub UsePool (Name As String) As Boolean
+	Dim DbArray() As String = Array As String(DB.MARIADB, DB.MYSQL)
+	Return DbArray.As(List).IndexOf(Name) > -1
+End Sub
+
 ' Create Database Tables and Populate Data
 Private Sub CreateDatabase
 	LogColor("Creating database...", Main.COLOR_BLUE)
-	Wait For (conn.DBCreate) Complete (Success As Boolean)
+	Wait For (DB.Create) Complete (Success As Boolean)
 	If Not(Success) Then
 		LogColor("Database creation failed!", Main.COLOR_RED)
 		Return
 	End If
 	
 	LogColor("Creating tables...", Main.COLOR_BLUE)
-	If Engine = "MariaDB" Or Engine = "MySQL" Then
-		conn.InitPool
+	If UsePool(DB.DbType) Then
+		DB.InitPool
 	End If
 	
-	Dim DB As MiniORM
-	DB.Initialize(Engine, Open)
+	'Dim DB As MiniORM
+	'DB.Initialize'(Engine, Open)
+	'DB.Settings = MS
 	DB.ShowExtraLogs = True
 	DB.UseTimestamps = True
 	DB.QueryAddToBatch = True
@@ -143,7 +152,7 @@ Private Sub CreateDatabase
 	DB.Insert2(Array(1, "H001", "Hammer", 15.75))
 	DB.Insert2(Array(2, "T002", "Optimus Prime", 1000))
 	
-	Wait For (DB.ExecuteBatch) Complete (Success As Boolean)
+	Wait For (DB.ExecuteBatchAsync) Complete (Success As Boolean)
 	If Success Then
 		LogColor("Database is created successfully!", Main.COLOR_BLUE)
 	Else
@@ -155,12 +164,13 @@ End Sub
 ' Add sample code for creating new table
 Public Sub AddUsersTable
 	LogColor("Creating users table...", Main.COLOR_BLUE)
-	If Engine = "MariaDB" Or Engine = "MySQL" Then
-		conn.InitPool
+	If UsePool(DB.DbType) Then
+		DB.InitPool
 	End If
 	
-	Dim DB As MiniORM
-	DB.Initialize(Engine, Open)
+	'Dim DB As MiniORM
+	'DB.Initialize'(Engine, Open)
+	'DB.Settings = MS
 	DB.ShowExtraLogs = True
 	DB.UseTimestamps = True
 	DB.QueryAddToBatch = True
@@ -175,7 +185,7 @@ Public Sub AddUsersTable
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "active", "Null": False, "Type": DB.INTEGER, "Default": "0")))
 	DB.Create
 	
-	Wait For (DB.ExecuteBatch) Complete (Success As Boolean)
+	Wait For (DB.ExecuteBatchAsync) Complete (Success As Boolean)
 	If Success Then
 		LogColor("Table is created successfully!", Main.COLOR_BLUE)
 	Else
@@ -185,10 +195,10 @@ Public Sub AddUsersTable
 End Sub
 
 Public Sub CurrentTimeStamp As String
-	Select Engine
-		Case "SQLite"
+	Select DB.DbType
+		Case DB.SQLITE
 			Return "datetime('Now')"		
-		Case "MariaDB", "MySQL"
+		Case DB.MARIADB, DB.MYSQL
 			Return "NOW()"
 		Case Else
 			Return ""
@@ -196,10 +206,10 @@ Public Sub CurrentTimeStamp As String
 End Sub
 
 Public Sub CurrentTimeStampAddMinute (Value As Int) As String
-	Select Engine
-		Case "SQLite"
+	Select DB.DbType
+		Case DB.SQLITE
 			Return $"datetime('Now', '+${Value} minute')"$		
-		Case "MariaDB", "MySQL"
+		Case DB.MARIADB, DB.MYSQL
 			Return $"DATE_ADD(NOW(), INTERVAL ${Value} MINUTE)"$
 		Case Else
 			Return ""

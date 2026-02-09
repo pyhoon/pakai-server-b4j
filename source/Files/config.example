@@ -1,5 +1,5 @@
 # Product:      Pakai Server (formerly known as Web API Server)
-# Version:      6.00
+# Version:      6.30
 # License:      MIT License
 # Developer:    Poon Yip Hoon (Aeric)
 # Description:  B4J project template for building JSON and XML formats API backend
@@ -18,7 +18,7 @@
 APP_TITLE=Pakai
 APP_TRADEMARK=PAKAI
 HOME_TITLE=PAKAI FRAMEWORK
-APP_COPYRIGHT=Copyright Computerise System Solutions 2025
+APP_COPYRIGHT=Copyright Computerise System Solutions 2026
 
 # Server Path
 ROOT_URL=http://127.0.0.1
