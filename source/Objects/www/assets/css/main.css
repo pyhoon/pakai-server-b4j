@@ -1,5 +1,5 @@
 /*!
- * Pakai Server Framework B4J Project Template v6.30 by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
+ * Pakai Server Framework B4J Project Template v6.33 by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
  * Copyright (c) 2022-2026 Poon Yip Hoon (Aeric)
  * Licensed under MIT (https://github.com/pyhoon/pakai-server-b4j/blob/main/LICENSE)
  */
