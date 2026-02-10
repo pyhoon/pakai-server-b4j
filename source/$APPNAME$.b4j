@@ -28,7 +28,7 @@ Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 6.30
+' Version: 6.33
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -54,7 +54,7 @@ Sub Process_Globals
 	Public MS 					As ORMSettings
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "6.30"
+	Public Const VERSION 		As String = "6.33"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -167,7 +167,11 @@ End Sub
 ' Create Database Tables and Populate Data
 Private Sub CreateDatabase
 	LogColor("Creating database...", COLOR_BLUE)
-	Wait For (DB.Create) Complete (Success As Boolean)
+	If UsePool(DB.DbType) Then
+		Wait For (DB.CreateDatabaseAsync) Complete (Success As Boolean)
+	Else
+		Dim Success As Boolean = DB.InitializeSQLite
+	End If
 	If Not(Success) Then
 		LogColor("Database creation failed!", COLOR_RED)
 		Return

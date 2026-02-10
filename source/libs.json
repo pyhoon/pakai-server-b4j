@@ -1,5 +1,5 @@
 {
-    "Version": "6.30",
+    "Version": "6.33",
     "Libraries": [
         {
             "Name": "EndsMeet.b4xlib",
@@ -22,8 +22,8 @@
         {
             "Name": "MiniORMUtils.v4.b4xlib",
             "Platform": "B4X",
-            "Version": 4.00,
-            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v4.00/MiniORMUtils.v4.b4xlib"
+            "Version": 4.03,
+            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v4.03/MiniORMUtils.v4.b4xlib"
         },
         {
             "Name": "mysql-connector-j-9.3.0.jar",
