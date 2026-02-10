@@ -3,51 +3,51 @@
     "Resources": [
         {
             "File": "www\\assets\\img\\coffee.png",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/img/coffee.png"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/coffee.png"
         },
         {
             "File": "www\\assets\\img\\favicon.png",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/img/favicon.png"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/favicon.png"
         },
         {
             "File": "www\\assets\\img\\sponsor.png",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/img/sponsor.png"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/sponsor.png"
         },
         {
             "File": "www\\assets\\css\\bootstrap.min.css",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/css/bootstrap.min.css"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/bootstrap.min.css"
         },
         {
             "File": "www\\assets\\css\\bootstrap-icons.min.css",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/css/bootstrap-icons.min.css"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/bootstrap-icons.min.css"
         },
         {
             "File": "www\\assets\\css\\main.css",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/css/main.css"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/main.css"
         },
         {
             "File": "www\\assets\\css\\fonts\\bootstrap-icons.woff",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/css/fonts/bootstrap-icons.woff"
+            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/main/source/Objects/www/assets/css/fonts/bootstrap-icons.woff"
         },
         {
             "File": "www\\assets\\css\\fonts\\bootstrap-icons.woff2",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/css/fonts/bootstrap-icons.woff2"
+            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/main/source/Objects/www/assets/css/fonts/bootstrap-icons.woff2"
         },
         {
             "File": "www\\assets\\css\\LICENSE\\bootstrap\\LICENSE.txt",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/css/LICENSE/bootstrap/LICENSE.txt"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/LICENSE/bootstrap/LICENSE.txt"
         },
         {
             "File": "www\\assets\\js\\bootstrap.min.js",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/js/bootstrap.min.js"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/bootstrap.min.js"
         },
         {
             "File": "www\\assets\\js\\htmx.min.js",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/js/htmx.min.js"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/htmx.min.js"
         },
         {
             "File": "www\\assets\\js\\app.js",
-            "Link": "https://github.com/pyhoon/pakai-server-b4j/raw/refs/heads/v6.33/source/Objects/www/assets/js/app.js"
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/app.js"
         }
     ]
 }
