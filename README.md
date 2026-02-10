@@ -1,6 +1,6 @@
 # Pakai Server - Web Application framework
 
-Version: 6.30
+Version: 6.33
 
 Create Web Application using B4J project template
 
