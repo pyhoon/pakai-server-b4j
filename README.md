@@ -1,6 +1,6 @@
 # Pakai Server - Web Application framework
 
-Version: 6.30
+Version: 6.33
 
 Create Web Application using B4J project template
 
@@ -10,9 +10,9 @@ Create Web Application using B4J project template
 ---
 
 ## Templates
-- Pakai Server (6.30) **min**.b4xtemplate (assets excluded)
-- Pakai Server (6.30) **starter**.b4xtemplate **_recommended_**
-- Pakai Server (6.30) **bundle**.b4xtemplate (local css/js)
+- Pakai Server (6.33) **min**.b4xtemplate (assets excluded)
+- Pakai Server (6.33) **starter**.b4xtemplate **_recommended_**
+- Pakai Server (6.33) **bundle**.b4xtemplate (local css/js)
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
