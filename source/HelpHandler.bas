@@ -116,9 +116,12 @@ Private Sub ShowHelpPage
 	strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
 	strMain = WebApiUtils.BuildHtml(strMain, Main.app.ctx)
 	'strMain = WebApiUtils.BuildScript(strMain, $"<script src="${Main.app.ServerUrl}/assets/scripts/help.js"></script>"$)	
-	WebApiUtils.WriteTextFile("help.html", strMain)
+	'WebApiUtils.WriteTextFile("help.html", strMain)
+	File.WriteString(File.DirApp, "help.html", strMain)
+	'File.WriteString(Main.App.staticfiles.Folder, "help.html", strMain)
 	#Else
 	Dim strMain As String = File.ReadString(File.DirApp, "help.html")
+	'Dim strMain As String = File.ReadString(Main.App.staticfiles.Folder, "help.html")
 	#End If
 	WebApiUtils.ReturnHtml(strMain, Response)
 End Sub
@@ -146,16 +149,17 @@ Private Sub GenerateHtml As String 'ignore
 	Dim link1 As MiniHtml = CreateTag("link").up(head1)
 	link1.attr("rel", "icon")
 	link1.attr("type", "image/png")
+	#If Bundle
+	link1.attr("href", "/assets/img/favicon.png")
+	head1.cdn2("style", "/assets/css/bootstrap.min.css", "", "")
+	head1.cdn2("style", "/assets/css/bootstrap-icons.min.css", "", "")
+	#Else
 	link1.attr("href", "$SERVER_URL$/assets/img/favicon.png")
-	'head1.cdn2("style", "$SERVER_URL$/assets/css/bootstrap.min.css", "", "")
-	'head1.cdn2("style", "$SERVER_URL$/assets/css/fontawesome.min.css", "", "")
-	'head1.cdn2("style", "$SERVER_URL$/assets/css/solid.min.css", "", "")
-	'head1.cdn2("style", "$SERVER_URL$/assets/css/help.css", "", "")
 	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
 	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB")
 	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css", "")
-	'head1.cdn("style", "$SERVER_URL$/assets/css/help.css?v=$VERSION$", "")
-	
+	#End If
+
 	Dim css1 As MiniCss
 	css1.Initialize(Me)
 	'css1.IndentSize = 2
@@ -267,38 +271,49 @@ Private Sub GenerateHtml As String 'ignore
 	'span1.cls("navbar-toggler-icon")
 	
 	Dim nav1 As MiniHtml = CreateTag("nav").up(body1)
-	nav1.cls("navbar navbar-light navbar-expand-lg sticky-top pt-1 pb-1")
+	nav1.cls("navbar navbar-light navbar-expand-lg sticky-top py-1")
 	nav1.sty("background-color: yellow")
 	nav1.multiline
-	Dim a1 As MiniHtml = Anchor.up(nav1)
+	
+	Dim div1 As MiniHtml = Div.up(nav1)
+	div1.cls("container-fluid")
+	
+	Dim a1 As MiniHtml = Anchor.up(div1)
 	a1.cls("navbar-brand me-0 me-lg-2")
 	a1.attr("href", "#")
 	Dim i1 As MiniHtml = Icon.up(a1)
-	'i1.cls("bi bi-infinity h3 ms-3")
-	'i1.cls("bi bi-cloud h3 ms-3")
 	i1.cls("bi bi-gear h3 ms-3")
-	Dim a2 As MiniHtml = Anchor.up(nav1)
+	Dim a2 As MiniHtml = Anchor.up(div1)
 	a2.cls("navbar-brand font-weight-bold")
-	'a2.attr("href", "$SERVER_URL$")
-	'a2.text("$APP_TRADEMARK$")
 	a2.attr("href", "#")
 	a2.text("API Documentation")
-	Dim button1 As MiniHtml = Button.up(nav1)
-	button1.cls("navbar-toggler")
-	button1.attr("type", "button")
-	button1.attr("data-toggle", "collapse")
-	button1.attr("data-target", "#navbarCollapse")
-	button1.sty("border: none")
-	button1.FormatAttributes = True
-	button1.multiline
-	Dim span1 As MiniHtml = Span.up(button1)
+	
+	Dim toggler1 As MiniHtml = Button.up(div1)
+	toggler1.cls("navbar-toggler d-md-block d-lg-none collapsed")
+	toggler1.attr("type", "button")
+	toggler1.attr("data-bs-toggle", "collapse")
+	toggler1.attr("data-bs-target", "#navbarCollapse")
+	toggler1.sty("border: none")
+	Dim span1 As MiniHtml = Span.up(toggler1)
 	span1.cls("navbar-toggler-icon")
-	Dim div1 As MiniHtml = Div.up(nav1)
-	div1.cls("collapse navbar-collapse")
-	div1.attr("id", "navbarCollapse")
-	div1.multiline
-	Dim ul1 As MiniHtml = CreateTag("ul").up(div1)
-	'ul1.cls("navbar-nav ms-auto")
+	
+	
+'	Dim button1 As MiniHtml = Button.up(div1)
+'	button1.cls("navbar-toggler d-md-block d-lg-none collapsed")
+'	button1.attr("type", "button")
+'	button1.attr("data-toggle", "collapse")
+'	button1.attr("data-target", "#navbarCollapse")
+'	button1.sty("border: none")
+'	button1.FormatAttributes = True
+'	button1.multiline
+'	Dim span1 As MiniHtml = Span.up(button1)
+'	span1.cls("navbar-toggler-icon")
+	
+	Dim div2 As MiniHtml = Div.up(div1)
+	div2.cls("collapse navbar-collapse")
+	div2.attr("id", "navbarCollapse")
+	div2.multiline
+	Dim ul1 As MiniHtml = CreateTag("ul").up(div2)
 	ul1.cls("navbar-nav navbar-brand ms-auto mb-md-0")
 	ul1.multiline
 	'ul1.text("@HELP@")
@@ -313,15 +328,27 @@ Private Sub GenerateHtml As String 'ignore
 	'i0.cls("bi bi-files mr-2")
 	
 	Dim li1 As MiniHtml = CreateTag("li").up(ul1)
-	li1.cls("nav-item font-weight-bold d-none d-sm-none d-md-block")
+	li1.cls("nav-item d-none d-sm-none d-md-block")
 	li1.multiline
 	Dim a3 As MiniHtml = Anchor.up(li1)
 	a3.attr("href", "https://paypal.me/aeric80/")
 	a3.attr("target", "_blank")
 	Dim img1 As MiniHtml = CreateTag("img").up(a3)
 	img1.attr("src", "/assets/img/coffee.png")
-	img1.cls("ms-2 mt-1")
-	img1.sty("height: 40px")
+	'img1.cls("ms-2 mt-1")
+	img1.cls("my-1")
+	img1.sty("height: 36px")
+	
+	Dim li2 As MiniHtml = CreateTag("li").up(ul1)
+	li2.cls("nav-item d-block d-lg-block")
+	Dim a5 As MiniHtml = Anchor.up(li2)
+	a5.text("Home")
+	a5.attr("href", "/")
+	a5.cls("nav-link text-dark float-end")
+	Dim i2 As MiniHtml = Icon.up(a5)
+	i2.cls("bi bi-house me-2")
+	i2.attr("title", "Home")
+	
 	Dim div2 As MiniHtml = Div.up(body1)
 	div2.cls("text-center font-weight-bold d-block d-sm-block d-md-none")
 	div2.sty("background-color: whitesmoke")
@@ -333,16 +360,6 @@ Private Sub GenerateHtml As String 'ignore
 	img2.attr("src", "/assets/img/sponsor.png")
 	img2.cls("mx-2")
 	img2.sty("width: 174px")
-	
-	Dim li2 As MiniHtml = CreateTag("li").up(ul1)
-	li2.cls("nav-item d-block d-lg-block")
-	Dim a5 As MiniHtml = Anchor.up(li2)
-	a5.attr("href", "/")
-	a5.cls("nav-link text-dark")
-	Dim i2 As MiniHtml = Icon.up(a5)
-	i2.cls("bi bi-house me-2")
-	i2.attr("title", "Home")
-	a5.text("Home")
 	
 	Dim div3 As MiniHtml = Div.up(body1)
 	div3.cls("content m-3")
@@ -363,11 +380,11 @@ Private Sub GenerateHtml As String 'ignore
 	'img3.attr("height", "60px")
 	'Dim div7 As MiniHtml = Div.up(div5)
 	'div7.multiline
-	Dim h31 As MiniHtml = CreateTag("h3").up(div5)'.up(div7)
+	Dim h31 As MiniHtml = CreateTag("h3").up(div5)
 	h31.cls("mb-0")
 	h31.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;")
 	h31.text("$HOME_TITLE$")
-	Dim span2 As MiniHtml = Span.up(div5)'.up(div7)
+	Dim span2 As MiniHtml = Span.up(div5)
 	span2.cls("small")
 	span2.text("Version: $VERSION$")
 	'div4.text("@DOCVIEW@")
@@ -417,16 +434,15 @@ Private Sub GenerateHtml As String 'ignore
 	span3.sty("color: red")
 	span3.text("❤")
 	caption1.text("in B4X")
-	'body1.cdn2("script", "$SERVER_URL$/assets/js/jquery.min.js", "", "")
-	'body1.cdn2("script", "$SERVER_URL$/assets/js/jquery.validate.min.js", "", "")
-	'body1.cdn2("script", "$SERVER_URL$/assets/js/bootstrap.bundle.min.js", "", "")
-	'body1.cdn2("script", "$SERVER_URL$/assets/js/help.js", "", "")
-
+	#If Bundle
+	body1.cdn2("script", "/assets/js/bootstrap.min.js", "", "")
+	body1.cdn2("script", "/assets/js/htmx.min.js", "", "")
+	#Else
 	body1.cdn("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
 	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y")
 	body1.cdn("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
 	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz")
-	'body1.cdn("script", "$SERVER_URL$/assets/js/app.js", "")
+	#End If
 
 	Dim script1 As String = AddEventListener("htmx:configRequest", "btn")
 	'Log(script1)
@@ -480,7 +496,7 @@ Private Sub RemoveMethodAndReAdd (Method As Map)
 	AllMethods.Add(Method) ' Add at the end of list
 End Sub
 
-Private Sub BuildMethods
+Private Sub BuildMethods 'ignore
 	Dim Method As Map = RetrieveMethod("Categories", "GetCategories")
 	Method.Put("Desc", "List All Categories")
 	ReplaceMethod(Method)
@@ -590,7 +606,7 @@ Private Sub BuildMethods
 	ReplaceMethod(Method)
 End Sub
 
-Private Sub ReadHandlers
+Private Sub ReadHandlers 'ignore
 	Dim verbs() As String = Array As String("GET", "POST", "PUT", "DELETE")
 	For Each Handler As String In Handlers
 		Dim Methods As List
@@ -1257,7 +1273,7 @@ Private Sub AddEventListener (eventName As String, buttonClass As String) As Str
 	script1.AddLine("")
 	script1.AddLine("document.addEventListener('" & eventName & "', (event) => {")
 	script1.IncreaseIndent
-	script1.DeclareVariable("btn", "event.detail.elt;", True)
+	script1.DeclareVariable("btn", "event.detail.elt", True)
 	script1.AddLine("")
 	script1.AddComment("Only apply to buttons with our specific class")
 	script1.StartIf("btn.classList.contains('" & buttonClass & "')")
@@ -1266,7 +1282,7 @@ Private Sub AddEventListener (eventName As String, buttonClass As String) As Str
 	script1.DeclareVariable("container", $"btn.closest('.accordion-collapse')"$, True)
 	script1.AddLine("")
 	script1.AddComment("Grab values from inputs INSIDE this container only")
-	script1.DeclareVariable("urlValue", $"container.querySelector('.path').value;"$, True)
+	script1.DeclareVariable("urlValue", $"container.querySelector('.path').value"$, True)
 	'script1.DeclareVariable("urlValue", "document.getElementById('path'+id).value", True)
 	'script1.DeclareVariable("tokenValue", "document.getElementById('api-token').value", True)
 	script1.AddLine("")
@@ -1283,6 +1299,6 @@ Private Sub AddEventListener (eventName As String, buttonClass As String) As Str
 	'script1.EndCondition
 	script1.EndIf
 	script1.DecreaseIndent
-	script1.AddLine("});")
+	script1.AddLine("})")
 	Return script1.Generate2
 End Sub
