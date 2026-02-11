@@ -571,7 +571,7 @@ Private Sub CreateCategoriesRow As MiniHtml
 
 		App.ctx.Put("/categories/table/row", tr1.ConvertToBytes)
 	End If
-	Return CreateTag("").ConvertFromBytes(App.ctx.Get("/categories/table/row"))
+	Return Tr.ConvertFromBytes(App.ctx.Get("/categories/table/row"))
 End Sub
 
 Private Sub ShowAlert (message As String, status As String)

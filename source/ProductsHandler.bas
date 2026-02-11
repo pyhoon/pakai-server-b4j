@@ -555,7 +555,7 @@ Private Sub CreateProductsRow As MiniHtml
 
 		App.ctx.Put("/products/table/row", tr1.ConvertToBytes)
 	End If
-	Return CreateTag("").ConvertFromBytes(App.ctx.Get("/products/table/row"))
+	Return Tr.ConvertFromBytes(App.ctx.Get("/products/table/row"))
 End Sub
 
 Private Sub CreateAddModal As String
