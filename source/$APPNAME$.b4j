@@ -14,21 +14,23 @@ FileGroup4=config
 Group=App
 Library1=endsmeet
 Library2=jcore
-Library3=minihtml2
-Library4=minijs
-Library5=miniormutils.v4
+Library3=minicss
+Library4=minihtml2
+Library5=minijs
+Library6=miniormutils.v4
+Library7=webapiutils
 Module1=CategoriesHandler
 Module2=HttpsFilter
 Module3=MainView
 Module4=ProductsHandler
 NumberOfFiles=4
-NumberOfLibraries=5
+NumberOfLibraries=7
 NumberOfModules=4
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 6.33
+' Version: 6.36
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -49,12 +51,13 @@ Version=10.3
 #Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
-	Public App 					As EndsMeet
 	Public DB 					As MiniORM
 	Public MS 					As ORMSettings
+	Public App 					As EndsMeet
+	Public Api 					As ApiSettings
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "6.33"
+	Public Const VERSION 		As String = "6.36"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -72,6 +75,18 @@ Sub AppStart (Args() As String)
 	App.Get("/categories", "CategoriesHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
 	App.Rest("/hx/categories/*", "CategoriesHandler")
+	#If Debug
+	Api = App.api
+	Api.EnableHelp = True
+	App.Get("/help", "HelpHandler")
+	App.Get("/api/find", "FindApiHandler")
+	App.Post("/api/find", "FindApiHandler")
+	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
+	App.Get("/api/products", "ProductsApiHandler")
+	App.Get("/api/categories", "CategoriesApiHandler")	
+	App.Rest("/api/products/*", "ProductsApiHandler")
+	App.Rest("/api/categories/*", "CategoriesApiHandler")
+	#End If	
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", VERSION)
@@ -80,6 +95,14 @@ Sub AppStart (Args() As String)
 	Log(App.ServerUrl)
 	ConfigureDatabase
 	StartMessageLoop
+End Sub
+
+' Set global ApiSettings from Main to HttpResponseMessage
+Public Sub SetApiMessage (Message As HttpResponseMessage)
+	Message.VerboseMode = Api.VerboseMode
+	Message.OrderedKeys = Api.OrderedKeys
+	Message.ContentType = Api.ContentType
+	Message.PayloadType = Api.PayloadType
 End Sub
 
 Public Sub ConfigureDatabase

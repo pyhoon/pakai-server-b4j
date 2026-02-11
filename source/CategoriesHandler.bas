@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.33
+' Version 6.36
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -124,10 +124,30 @@ Private Sub RenderPage
 
 		Dim page1 As MiniHtml = main1.Render
 		Dim ulist1 As MiniHtml = FindUListTag(page1)
-		Dim list1 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
-		Dim a1 As MiniHtml = Anchor.up(list1).attr("href", "#")
+		
+		'Dim list1 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
+		'Dim a1 As MiniHtml = Anchor.up(list1).attr("href", "#")
+		'a1.cls("nav-link")
+		'a1.text("Categories")
+
+		Dim list1 As MiniHtml = Li.up(ulist1)
+		list1.cls("nav-item d-block d-lg-block")
+		Dim a1 As MiniHtml = Anchor.up(list1)
+		a1.attr("href", "/")
 		a1.cls("nav-link")
-		a1.text("Categories")
+		Dim i1 As MiniHtml = Icon.up(a1)
+		i1.cls("bi bi-house me-2")
+		i1.attr("title", "Home")
+		a1.text("Home")
+
+		Dim list2 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
+		Dim a2 As MiniHtml = Anchor.up(list2)
+		a2.attr("href", "/help")
+		a2.cls("nav-link")
+		Dim i2 As MiniHtml = Icon.up(a2)
+		i2.cls("bi bi-gear me-2")
+		i2.attr("title", "API")
+		a2.text("API")
 
 		' Sample for adding additional menu link
 		'Dim list2 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
@@ -173,11 +193,11 @@ Private Sub ContentContainer As MiniHtml
 	Dim div2 As MiniHtml = Div.up(div1)
 	div2.cls("text-end mt-2")
 	
-	Dim a1 As MiniHtml = Anchor.up(div2)
-	a1.attr("href", "$SERVER_URL$")
-	a1.cls("btn btn-primary me-2")
-	Icon.up(a1).cls("bi bi-house me-2")
-	a1.text("Home")
+	'Dim a1 As MiniHtml = Anchor.up(div2)
+	'a1.attr("href", "$SERVER_URL$")
+	'a1.cls("btn btn-primary me-2")
+	'Icon.up(a1).cls("bi bi-house me-2")
+	'a1.text("Home")
 
 	Dim button2 As MiniHtml = Button.up(div2)
 	button2.cls("btn btn-success ml-2")

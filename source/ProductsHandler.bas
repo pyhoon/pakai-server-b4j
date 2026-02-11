@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Index Handler class
-' Version 6.33
+' Version 6.36
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -128,12 +128,25 @@ Private Sub RenderPage
 
 		Dim page1 As MiniHtml = main1.Render
 		Dim ulist1 As MiniHtml = FindUListTag(page1)
+		
 		Dim list1 As MiniHtml = Li.up(ulist1)
 		list1.cls("nav-item d-block d-lg-block")
 		Dim a1 As MiniHtml = Anchor.up(list1)
 		a1.attr("href", "/categories")
 		a1.cls("nav-link")
+		Dim i1 As MiniHtml = Icon.up(a1)
+		i1.cls("bi bi-tag me-2")
+		i1.attr("title", "Categories")
 		a1.text("Categories")
+
+		Dim list2 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
+		Dim a2 As MiniHtml = Anchor.up(list2)
+		a2.attr("href", "/help")
+		a2.cls("nav-link")
+		Dim i2 As MiniHtml = Icon.up(a2)
+		i2.cls("bi bi-gear me-2")
+		i2.attr("title", "API")
+		a2.text("API")
 
 		' Sample for adding additional menu link
 		'Dim list2 As MiniHtml = Li.cls("nav-item d-block d-lg-block").up(ulist1)

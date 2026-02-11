@@ -17,18 +17,24 @@ Library2=jcore
 Library3=minihtml2
 Library4=minijs
 Library5=miniormutils.v4
-Module1=CategoriesHandler
-Module2=HttpsFilter
-Module3=MainView
-Module4=ProductsHandler
+Library6=webapiutils
+Library7=minicss
+Module1=CategoriesApiHandler
+Module2=CategoriesHandler
+Module3=FindApiHandler
+Module4=HelpHandler
+Module5=HttpsFilter
+Module6=MainView
+Module7=ProductsApiHandler
+Module8=ProductsHandler
 NumberOfFiles=4
-NumberOfLibraries=5
-NumberOfModules=4
+NumberOfLibraries=7
+NumberOfModules=8
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 6.33
+' Version: 6.36
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -43,11 +49,11 @@ Version=10.3
 #End If
 #Region Macros
 'For source
-#Macro: Title, Create Template (min), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.33)+min.b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE
-#Macro: Title, Create Template (starter), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.33)+starter.b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
-#Macro: Title, Create Template (bundle), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.33)+bundle.b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css&args=Objects\www\assets\js\app.js&args=Objects\www\assets\js\*.min.js
-#Macro: Title, Release folder, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
-#Macro: Title, Copy to AddLibs, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
+'#Macro: Title, Create Template (starter), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.36)+starter.b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
+'#Macro: Title, Create Template (bundle), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.36)+bundle.b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css&args=Objects\www\assets\js\app.js&args=Objects\www\assets\js\*.min.js
+'#Macro: Title, Create Template (min), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.36)+min.b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE
+'#Macro: Title, Release folder, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
+'#Macro: Title, Copy to AddLibs, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
 'For release
 '#Macro: Title, GetLibraries, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&args=false
 '#Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
@@ -56,12 +62,13 @@ Version=10.3
 '#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
-	Public App 					As EndsMeet
 	Public DB 					As MiniORM
 	Public MS 					As ORMSettings
+	Public App 					As EndsMeet
+	Public Api 					As ApiSettings
 	Public Const COLOR_RED 		As Int = -65536
 	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "6.33"
+	Public Const VERSION 		As String = "6.36"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -79,6 +86,18 @@ Sub AppStart (Args() As String)
 	App.Get("/categories", "CategoriesHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
 	App.Rest("/hx/categories/*", "CategoriesHandler")
+	#If Debug
+	Api = App.api
+	Api.EnableHelp = True
+	App.Get("/help", "HelpHandler")
+	App.Get("/api/find", "FindApiHandler")
+	App.Post("/api/find", "FindApiHandler")
+	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
+	App.Get("/api/products", "ProductsApiHandler")
+	App.Get("/api/categories", "CategoriesApiHandler")	
+	App.Rest("/api/products/*", "ProductsApiHandler")
+	App.Rest("/api/categories/*", "CategoriesApiHandler")
+	#End If	
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", VERSION)
@@ -87,6 +106,14 @@ Sub AppStart (Args() As String)
 	Log(App.ServerUrl)
 	ConfigureDatabase
 	StartMessageLoop
+End Sub
+
+' Set global ApiSettings from Main to HttpResponseMessage
+Public Sub SetApiMessage (Message As HttpResponseMessage)
+	Message.VerboseMode = Api.VerboseMode
+	Message.OrderedKeys = Api.OrderedKeys
+	Message.ContentType = Api.ContentType
+	Message.PayloadType = Api.PayloadType
 End Sub
 
 Public Sub ConfigureDatabase
