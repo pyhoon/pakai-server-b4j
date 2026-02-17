@@ -146,7 +146,7 @@ Private Sub CreateNewCategory
 	' Check conflict category name
 	DB.SQL = DB.Open
 	DB.Table = "tbl_categories"
-	DB.Where = Array("category_name = ?")
+	DB.Conditions = Array("category_name = ?")
 	DB.Parameters = Array(data.Get("category_name"))
 	DB.Query
 	If DB.Found Then
@@ -195,7 +195,7 @@ Private Sub UpdateCategoryById (id As Int)
 	' Check conflict category name
 	DB.SQL = DB.Open
 	DB.Table = "tbl_categories"
-	DB.Where = Array("category_name = ?", "id <> ?")
+	DB.Conditions = Array("category_name = ?", "id <> ?")
 	DB.Parameters = Array(data.Get("category_name"), id)
 	DB.Query
 	If DB.Found Then

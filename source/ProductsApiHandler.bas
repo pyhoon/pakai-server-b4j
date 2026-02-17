@@ -147,7 +147,7 @@ Private Sub PostProduct
 	' Check conflict product code
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products"
-	DB.Where = Array("product_code = ?")
+	DB.Conditions = Array("product_code = ?")
 	DB.Parameters = Array(data.Get("product_code"))
 	DB.Query
 	If DB.Found Then
@@ -205,7 +205,7 @@ Private Sub PutProductById (id As Int)
 	' Check conflict product code
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products"
-	DB.Where = Array("product_code = ?", "id <> ?")
+	DB.Conditions = Array("product_code = ?", "id <> ?")
 	DB.Parameters = Array(data.Get("product_code"), id)
 	DB.Query
 	If DB.Found Then

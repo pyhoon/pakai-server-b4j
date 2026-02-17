@@ -14,11 +14,11 @@ FileGroup4=config
 Group=App
 Library1=endsmeet
 Library2=jcore
-Library3=minihtml2
-Library4=minijs
-Library5=miniormutils.v4
+Library3=minicss
+Library4=minihtml2
+Library5=minijs
 Library6=webapiutils
-Library7=minicss
+Library7=miniormutils
 Module1=CategoriesApiHandler
 Module2=CategoriesHandler
 Module3=FindApiHandler
@@ -130,7 +130,7 @@ Public Sub ConfigureDatabase
 		End If
 		Dim ctx As Map = File.ReadMap(File.DirApp, $"${dbvar}.ini"$)
 		DB.Initialize
-		'DB.ShowExtraLogs = True
+		DB.ShowExtraLogs = True
 		MS.Initialize
 		MS.DBType = ctx.GetDefault("DbType", "")
 		Select MS.DBType
@@ -234,7 +234,9 @@ Private Sub CreateDatabase
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_name", "Null": False)))
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Null": False, "Default": "0.00")))
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_image", "Type": DB.BLOB)))
-	DB.Foreign("category_id", "id", "tbl_categories", "", "")
+	'DB.Foreign("category_id", "id", "tbl_categories", "", "")
+	DB.Foreign = "category_id"
+	DB.References("tbl_categories", "id")
 	DB.Create
 	
 	DB.Columns = Array("category_id", "product_code", "product_name", "product_price")

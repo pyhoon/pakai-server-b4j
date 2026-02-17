@@ -434,7 +434,7 @@ Private Sub HandleCategories
 			Try
 				DB.SQL = DB.Open
 				DB.Table = "tbl_categories"
-				DB.Where = Array("category_name = ?")
+				DB.Conditions = Array("category_name = ?")
 				DB.Parameters = Array(name)
 				DB.Query
 				If DB.Found Then
@@ -473,7 +473,7 @@ Private Sub HandleCategories
 			End If
 
 			DB.Reset
-			DB.Where = Array("category_name = ?", "id <> ?")
+			DB.Conditions = Array("category_name = ?", "id <> ?")
 			DB.Parameters = Array(name, id)
 			DB.Query
 			If DB.Found Then

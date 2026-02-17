@@ -311,10 +311,11 @@ Private Sub HandleSearch
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
+	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
+	DB.Join("tbl_categories c", "p.category_id = c.id", "")
 	Dim keyword As String = Request.GetParameter("keyword")
 	If keyword <> "" Then
-		DB.Where = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
+		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
 		DB.Parameters = Array("%" & keyword & "%", "%" & keyword.ToUpperCase & "%", "%" & keyword.ToUpperCase & "%")
 	End If
 	DB.OrderBy = CreateMap("p.id": "")
@@ -401,7 +402,7 @@ Private Sub HandleProducts
 			Try
 				DB.SQL = DB.Open
 				DB.Table = "tbl_products"
-				DB.Where = Array("product_code = ?")
+				DB.Conditions = Array("product_code = ?")
 				DB.Parameters = Array(code)
 				DB.Query
 				If DB.Found Then
@@ -451,7 +452,7 @@ Private Sub HandleProducts
 			End If
 
 			DB.Reset
-			DB.Where = Array("product_code = ?", "id <> ?")
+			DB.Conditions = Array("product_code = ?", "id <> ?")
 			DB.Parameters = Array(code, id)
 			DB.Query
 			If DB.Found Then
@@ -515,7 +516,8 @@ Private Sub CreateProductsTable As MiniHtml
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
+	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
+	DB.Join("tbl_categories c", "p.category_id = c.id", "")
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	
