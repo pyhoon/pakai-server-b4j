@@ -122,6 +122,7 @@ End Sub
 Private Sub CreateNewCategory
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	Dim str As String = WebApiUtils.RequestDataText(Request)
+	'Log($"str=[${str}]"$)
 	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$

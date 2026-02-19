@@ -23,8 +23,6 @@ Public Sub Initialize
 	App = Main.App
 	HRM.Initialize
 	Main.SetApiMessage(HRM)
-	HRM.ResponseKeys = Array("m", "a", "r")
-	HRM.ResponseKeysAlias = Array("message", "code", "data")
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)

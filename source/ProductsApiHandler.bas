@@ -115,7 +115,6 @@ Private Sub GetProductById (id As Int)
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
 	End If
-	HRM.ResponseKeys = Array("s", "r")
 	ReturnApiResponse
 	DB.Close
 End Sub
