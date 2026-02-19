@@ -4,8 +4,8 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-'Help Handler class
-'Version 6.36
+' Help Handler class
+' Version 6.36
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
@@ -14,14 +14,14 @@ Sub Class_Globals
 	Private AllGroups As Map
 	Type VerbSection (Verb As String, Color As String, ElementId As String, Link As String, FileUpload As String, Authenticate As String, Description As String, Params As String, Format As String, Body As String, Expected As String, InputDisabled As Boolean, DisabledBackground As String, Raw As Boolean, Noapi As Boolean)
 	Private Api	As ApiSettings
-	Private ContentType As String
+	Private ContentType As String 'ignore
 	Private Verbose As Boolean
 	Private Const RESPONSE_ELEMENT_MESSAGE 	As String = "m"
 	Private Const RESPONSE_ELEMENT_CODE 	As String = "a"
-	Private Const RESPONSE_ELEMENT_STATUS 	As String = "s"
+	Private Const RESPONSE_ELEMENT_STATUS 	As String = "s" 'ignore
 	Private Const RESPONSE_ELEMENT_TYPE 	As String = "t" 'ignore
 	Private Const RESPONSE_ELEMENT_ERROR 	As String = "e"
-	Private Const RESPONSE_ELEMENT_RESULT 	As String = "r"	
+	Private Const RESPONSE_ELEMENT_RESULT 	As String = "r"	'ignore
 End Sub
 
 Public Sub Initialize
@@ -32,7 +32,7 @@ Public Sub Initialize
 	Handlers.Add("CategoriesApiHandler")
 	Handlers.Add("ProductsApiHandler")
 	Handlers.Add("FindApiHandler")
-	Api = Main.App.api
+	Api = Main.Api
 	Verbose = Api.VerboseMode
 	ContentType = Api.ContentType	
 End Sub
@@ -1144,8 +1144,10 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	Dim div13 As MiniHtml = Div.up(div12)
 	div13.attr("id", $"alert${section.ElementId}"$)
 	'div13.cls($"alert alert-success"$)
+	div13.cls("alert")
 	div13.attr("role", "alert")
 	'div13.sty("display: none")
+	div13.attr3("x-transition")
 	div13.FormatAttributes = True
 	div13.multiline
 	
@@ -1519,7 +1521,7 @@ Private Sub HtmxAfterRequest As String
 	script1.AddLine("")
 	script1.DeclareVariable("responseData", "", False)
 	script1.AddLine("try { responseData = JSON.parse(xhr.responseText); } catch(e) { responseData = e; }")
-	script1.AddLine("console.log(responseData);")
+	script1.ConsoleLog("responseData")
 	script1.AddLine("")
 	script1.AddComment("Logic for success/error styling")
 	If Verbose Then

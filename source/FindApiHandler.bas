@@ -4,8 +4,8 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-'Api Handler class
-'Version 6.36
+' Find Api Handler class
+' Version 6.36
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -44,8 +44,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 		End If
 		ReturnMethodNotAllow
 		Return
-	End If
-	If ElementMatch("key/id") Then
+	Else If ElementMatch("key/id") Then
 		If App.MethodAvailable2(Method, "/api/find/products-by-category_id/*", Me) Then
 			If ElementKey = "products-by-category_id" Then
 				GetProductsByCategoryId(ElementId)
@@ -95,18 +94,21 @@ Private Sub ReturnMethodNotAllow
 	WebApiUtils.ReturnMethodNotAllow(HRM, Response)
 End Sub
 
-Public Sub GetAllProducts
+Private Sub GetAllProducts
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products p"
-	' Construct results with new column name alias
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
-	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results2
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+	Else
+		HRM.ResponseCode = 200
+		HRM.ResponseData = DB.Results2
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub
@@ -115,22 +117,24 @@ Public Sub GetProductsByCategoryId (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products p"
-	' Construct results with new column name alias
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
 	DB.WhereParam("c.id = ?", id)
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
-	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results2
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+	Else
+		HRM.ResponseCode = 200
+		HRM.ResponseData = DB.Results2
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub
 
 Public Sub SearchByKeywords
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	
 	Dim str As String = WebApiUtils.RequestDataText(Request)
 	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
@@ -153,9 +157,7 @@ Public Sub SearchByKeywords
 	Dim SearchForText As String = data.Get("keyword")
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products p"
-	' Construct results with new column name alias
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
 	If SearchForText <> "" Then
 		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
@@ -163,8 +165,13 @@ Public Sub SearchByKeywords
 	End If
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
-	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results2
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+	Else
+		HRM.ResponseCode = 200
+		HRM.ResponseData = DB.Results2
+	End If
 	DB.Close
 	ReturnApiResponse
 End Sub

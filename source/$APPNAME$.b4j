@@ -17,15 +17,19 @@ Library2=jcore
 Library3=minicss
 Library4=minihtml2
 Library5=minijs
-Library6=miniormutils.v4
+Library6=miniormutils
 Library7=webapiutils
-Module1=CategoriesHandler
-Module2=HttpsFilter
-Module3=MainView
-Module4=ProductsHandler
+Module1=CategoriesApiHandler
+Module2=CategoriesHandler
+Module3=FindApiHandler
+Module4=HelpHandler
+Module5=HttpsFilter
+Module6=MainView
+Module7=ProductsApiHandler
+Module8=ProductsHandler
 NumberOfFiles=4
 NumberOfLibraries=7
-NumberOfModules=4
+NumberOfModules=8
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
@@ -61,7 +65,7 @@ Sub Process_Globals
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
-' <link>Donate|https://paypal.me/aeric80/</link> | <link>Forum|https://www.b4x.com/android/forum/threads/project-template-pakai-server-v5.167788/)</link> | <link>GitHub|https://github.com/pyhoon/pakai-server-b4j</link>
+' <link>Donate|https://paypal.me/aeric80/</link> | <link>Forum|https://www.b4x.com/android/forum/threads/web-project-template-pakai-server-v6.169224/</link> | <link>GitHub|https://github.com/pyhoon/pakai-server-b4j</link>
 Sub AppStart (Args() As String)
 	App.Initialize
 	'App.ctx = App.srvr.CreateThreadSafeMap
@@ -78,12 +82,16 @@ Sub AppStart (Args() As String)
 	#If Debug
 	Api = App.api
 	Api.EnableHelp = True
+	'Api.VerboseMode = False
+	
 	App.Get("/help", "HelpHandler")
 	App.Get("/api/find", "FindApiHandler")
 	App.Post("/api/find", "FindApiHandler")
 	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
 	App.Get("/api/products", "ProductsApiHandler")
-	App.Get("/api/categories", "CategoriesApiHandler")	
+	App.Post("/api/products", "ProductsApiHandler")
+	App.Get("/api/categories", "CategoriesApiHandler")
+	App.Post("/api/categories", "CategoriesApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
 	App.Rest("/api/categories/*", "CategoriesApiHandler")
 	#End If	
@@ -223,7 +231,8 @@ Private Sub CreateDatabase
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_name", "Null": False)))
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Null": False, "Default": "0.00")))
 	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_image", "Type": DB.BLOB)))
-	DB.Foreign("category_id", "id", "tbl_categories", "", "")
+	DB.Foreign = "category_id"
+	DB.References("tbl_categories", "id")
 	DB.Create
 	
 	DB.Columns = Array("category_id", "product_code", "product_name", "product_price")

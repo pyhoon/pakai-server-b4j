@@ -4,8 +4,8 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-'Api Handler class
-'Version 6.36
+' Products Api Handler class
+' Version 6.36
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -97,8 +97,13 @@ Private Sub GetProducts
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products"
 	DB.Query
-	HRM.ResponseCode = 200
-	HRM.ResponseData = DB.Results2
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+	Else
+		HRM.ResponseCode = 200
+		HRM.ResponseData = DB.Results2
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub
@@ -108,12 +113,17 @@ Private Sub GetProductById (id As Int)
 	DB.SQL = DB.Open
 	DB.Table = "tbl_products"
 	DB.Find(id)
-	If DB.Found Then
-		HRM.ResponseCode = 200
-		HRM.ResponseObject = DB.First2
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
 	Else
-		HRM.ResponseCode = 404
-		HRM.ResponseError = "Product not found"
+		If DB.Found Then
+			HRM.ResponseCode = 200
+			HRM.ResponseObject = DB.First2
+		Else
+			HRM.ResponseCode = 404
+			HRM.ResponseError = "Product not found"
+		End If
 	End If
 	ReturnApiResponse
 	DB.Close
@@ -149,6 +159,13 @@ Private Sub PostProduct
 	DB.Conditions = Array("product_code = ?")
 	DB.Parameters = Array(data.Get("product_code"))
 	DB.Query
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+		ReturnApiResponse
+		DB.Close
+		Return
+	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Product already exist"
@@ -169,10 +186,15 @@ Private Sub PostProduct
 	data.GetDefault("product_price", 0), _
 	data.GetDefault("created_date", WebApiUtils.CurrentDateTime))
 	DB.Save
-	' Retrieve new row
-	HRM.ResponseCode = 201
-	HRM.ResponseObject = DB.First2
-	HRM.ResponseMessage = "Product created successfully"
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+	Else
+		' Retrieve new row
+		HRM.ResponseCode = 201
+		HRM.ResponseObject = DB.First2
+		HRM.ResponseMessage = "Product created successfully"
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub
@@ -207,6 +229,13 @@ Private Sub PutProductById (id As Int)
 	DB.Conditions = Array("product_code = ?", "id <> ?")
 	DB.Parameters = Array(data.Get("product_code"), id)
 	DB.Query
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+		ReturnApiResponse
+		DB.Close
+		Return
+	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Product Code already exist"
@@ -216,6 +245,13 @@ Private Sub PutProductById (id As Int)
 	End If
 	' Find row by id
 	DB.Find(id)
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+		ReturnApiResponse
+		DB.Close
+		Return
+	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
@@ -237,10 +273,15 @@ Private Sub PutProductById (id As Int)
 	data.GetDefault("modified_date", WebApiUtils.CurrentDateTime))
 	DB.Id = id
 	DB.Save
-	' Return updated row
-	HRM.ResponseCode = 200
-	HRM.ResponseMessage = "Product updated successfully"
-	HRM.ResponseObject = DB.First2
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+	Else
+		' Return updated row
+		HRM.ResponseCode = 200
+		HRM.ResponseMessage = "Product updated successfully"
+		HRM.ResponseObject = DB.First2
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub
@@ -251,6 +292,13 @@ Private Sub DeleteProductById (id As Int)
 	DB.Table = "tbl_products"
 	' Find row by id
 	DB.Find(id)
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+		ReturnApiResponse
+		DB.Close
+		Return
+	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
@@ -262,8 +310,13 @@ Private Sub DeleteProductById (id As Int)
 	DB.Reset
 	DB.Id = id
 	DB.Delete
-	HRM.ResponseCode = 200
-	HRM.ResponseMessage = "Product deleted successfully"
+	If DB.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = DB.Error.Message
+	Else
+		HRM.ResponseCode = 200
+		HRM.ResponseMessage = "Product deleted successfully"
+	End If
 	ReturnApiResponse
 	DB.Close
 End Sub

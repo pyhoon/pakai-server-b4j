@@ -4,7 +4,7 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-' Index Handler class
+' Products Handler class
 ' Version 6.36
 Sub Class_Globals
 	Private DB As MiniORM
@@ -476,7 +476,6 @@ Private Sub HandleProducts
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
-			
 			DB.SQL = DB.Open
 			DB.Table = "tbl_products"
 			DB.Find(id)
@@ -673,7 +672,6 @@ Private Sub CreateAddModal As String
 		Option.up(select1).attr("value", catid).text(catname)
 	Next
 	DB.Close
-	
 	Return form1.build
 End Sub
 
