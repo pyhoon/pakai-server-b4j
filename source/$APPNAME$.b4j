@@ -49,8 +49,10 @@ Version=10.3
 #End If
 #Region Macros
 #Macro: Title, GetLibraries, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&args=false
+#if Bundle
 #Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
-#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2026-02-10_0712.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+#End If
+#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2026-02-20_0020.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
 #Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
 #Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region

@@ -1,11 +1,17 @@
 {
-    "Version": "6.33",
+    "Version": "6.36",
     "Libraries": [
         {
             "Name": "EndsMeet.b4xlib",
             "Platform": "B4J",
             "Version": 1.80,
             "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v1.80/EndsMeet.b4xlib"
+        },
+        {
+            "Name": "MiniCSS.b4xlib",
+            "Platform": "B4X",
+            "Version": 0.20,
+            "Link": "https://github.com/pyhoon/MiniCSS-B4X/raw/refs/heads/main/prerelease/MiniCss.b4xlib"
         },
         {
             "Name": "MiniHtml2.b4xlib",
@@ -16,14 +22,20 @@
         {
             "Name": "MiniJS.b4xlib",
             "Platform": "B4X",
-            "Version": 0.20,
-            "Link": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.20/MiniJs.b4xlib"
+            "Version": 0.40,
+            "Link": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.40/MiniJs.b4xlib"
         },
         {
-            "Name": "MiniORMUtils.v4.b4xlib",
+            "Name": "MiniORMUtils.b4xlib",
             "Platform": "B4X",
-            "Version": 4.03,
-            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v4.03/MiniORMUtils.v4.b4xlib"
+            "Version": 4.30,
+            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v4.30/MiniORMUtils.b4xlib"
+        },
+        {
+            "Name": "WebApiUtils.b4xlib",
+            "Platform": "B4J",
+            "Version": 5.60,
+            "Link": "https://github.com/pyhoon/WebApiUtils-B4J/releases/download/v5.60/WebApiUtils.b4xlib"
         },
         {
             "Name": "mysql-connector-j-9.3.0.jar",

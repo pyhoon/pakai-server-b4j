@@ -1,5 +1,5 @@
 {
-    "Version": "6.33",
+    "Version": "6.36",
     "Resources": [
         {
             "File": "www\\assets\\img\\coffee.png",
@@ -42,8 +42,24 @@
             "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/bootstrap.min.js"
         },
         {
+            "File": "www\\assets\\js\\bootstrap.min.js.map",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/bootstrap.min.js.map"
+        },
+        {
+            "File": "www\\assets\\js\\cdn.min.js",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/cdn.min.js"
+        },
+        {
             "File": "www\\assets\\js\\htmx.min.js",
             "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/htmx.min.js"
+        },
+        {
+            "File": "www\\assets\\js\\json-enc.min.js",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/json-enc.min.js"
+        },
+        {
+            "File": "www\\assets\\js\\response-targets.min.js",
+            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/response-targets.min.js"
         },
         {
             "File": "www\\assets\\js\\app.js",
