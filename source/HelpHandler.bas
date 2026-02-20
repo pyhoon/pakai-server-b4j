@@ -165,15 +165,15 @@ Private Sub GenerateHtml As String 'ignore
 	link1.attr("type", "image/png")
 	#If Bundle
 	link1.attr("href", "/assets/img/favicon.png")
-	head1.cdn2("style", "/assets/css/bootstrap.min.css", "", "")
-	head1.cdn2("style", "/assets/css/bootstrap-icons.min.css", "", "")
+	head1.cdn("style", "/assets/css/bootstrap.min.css")
+	head1.cdn("style", "/assets/css/bootstrap-icons.min.css")
 	#Else
 	link1.attr("href", "$SERVER_URL$/assets/img/favicon.png")
-	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
-	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB")
-	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css", "")
+	head1.cdn2("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
+	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB", "anonymous")
+	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")
 	#End If
-
+	
 	Dim sty1 As MiniHtml = CreateTag("style").up(head1)
 	'sty1.text(css1.GenerateCSS)
 	sty1.text(GetStyles)
@@ -371,23 +371,23 @@ Private Sub GenerateHtml As String 'ignore
 	span3.text("❤")
 	caption1.text("in B4X")
 	#If Bundle
-	body1.cdn2("script", "/assets/js/bootstrap.min.js", "", "")
-	body1.cdn2("script", "/assets/js/htmx.min.js", "", "")
-	body1.cdn2("script", "/assets/js/response-targets.min.js", "", "")
-	body1.cdn2("script", "/assets/js/json-enc.min.js", "", "")
-	body1.cdn2("script", "/assets/js/cdn.min.js", "", "")
+	body1.cdn("script", "/assets/js/bootstrap.min.js")
+	body1.cdn("script", "/assets/js/htmx.min.js")
+	body1.cdn("script", "/assets/js/response-targets.min.js")
+	body1.cdn("script", "/assets/js/json-enc.min.js")
+	body1.cdn("script", "/assets/js/cdn.min.js")
 	#Else
-	body1.cdn("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
-	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y")
-	body1.cdn("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
-	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz")
-	body1.cdn("script", "https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@2.0.4", _
-	"sha384-T41oglUPvXLGBVyRdZsVRxNWnOOqCynaPubjUVjxhsjFTKrFJGEMm3/0KGmNQ+Pg")	
+	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
+	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y", "anonymous")
+	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
+	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz", "anonymous")
+	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@2.0.4", _
+	"sha384-T41oglUPvXLGBVyRdZsVRxNWnOOqCynaPubjUVjxhsjFTKrFJGEMm3/0KGmNQ+Pg", "anonymous")	
 	body1.cdn3("script", "https://cdn.jsdelivr.net/npm/htmx-ext-json-enc@2.0.3/dist/json-enc.min.js", CreateMap())
 	body1.cdn3("script", "https://cdn.jsdelivr.net/npm/alpinejs@3.15.8/dist/cdn.min.js", CreateMap("defer": ""))	
 	#End If
 
-	Dim script1 As String = AddEventListener("htmx:configRequest", "btn")
+	Dim script1 As String = HtmxConfigRequest
 	'Log(script1)
 	CreateTag("script").up(body1).text(script1.SubString2(0, script1.LastIndexOf(CRLF))).multiline
 	
@@ -1435,22 +1435,25 @@ Private Sub GetStyles As String
 	Return css1.GenerateCSS
 End Sub
 
-' output: <code>document.addEventListener('eventName', (event) => {...})</code>
-Private Sub AddEventListener (eventName As String, buttonClass As String) As String
+' document.addEventListener('htmx:configRequest', (evt) => {...})
+Private Sub HtmxConfigRequest As String
 	Dim script1 As MiniJs
 	script1.Initialize
 	script1.IncreaseIndent
 	script1.AddLine("")
-	script1.AddLine("document.addEventListener('" & eventName & "', (event) => {")
+	script1.AddLine("document.addEventListener('htmx:configRequest', (evt) => {")
 	script1.IncreaseIndent
-	script1.DeclareVariable("btn", "event.detail.elt", True)
+	'script1.DeclareVariable("btn", "event.detail.elt", True)
+	script1.DeclareVariable("el", "evt.detail.elt", True)
+	script1.DeclareVariable("id", "el.getAttribute('data-api-id')", True)
+	script1.AddConditionalCall("!id", "return")
 	script1.AddLine("")
-	script1.AddComment("1. Target buttons with 'btn' class")
-	script1.StartIf("btn.classList.contains('" & buttonClass & "')")
-	'script1.AddLine("")
-	'script1.AddComment("Find the parent container for THIS specific button")
-	script1.DeclareVariable("container", $"btn.closest('.accordion-collapse')"$, True)
-	'script1.AddLine("")
+	script1.AddComment("1. Dynamic Path")
+	'script1.DeclareVariable("container", $"btn.closest('.accordion-collapse')"$, True)
+	script1.DeclareVariable("pathVal", "document.getElementById(`path${id}`)?.value", True)
+	script1.AddConditionalCall("pathVal", "evt.detail.path = pathVal")
+	script1.AddLine("")
+	script1.AddComment("2. Headers (Global)")
 	'script1.AddComment("Grab values from inputs INSIDE this container only")
 	script1.DeclareVariable("urlInput", $"container.querySelector('.data-path')"$, True)
 	script1.DeclareVariable("bodyInput", $"container.querySelector('.data-body')"$, True)
@@ -1505,22 +1508,23 @@ Private Sub AddEventListener (eventName As String, buttonClass As String) As Str
 	Return script1.Generate2
 End Sub
 
+' document.addEventListener('htmx:afterRequest', (evt) => {...})
 Private Sub HtmxAfterRequest As String
 	Dim script1 As MiniJs
 	script1.Initialize
 	script1.IncreaseIndent
 	script1.AddLine("")
-	script1.AddLine("document.addEventListener('htmx:afterRequest', (event) => {")
+	script1.AddLine("document.addEventListener('htmx:afterRequest', (evt) => {")
 	script1.IncreaseIndent
-	script1.DeclareVariable("target", "event.detail.target", True)
-	script1.DeclareVariable("xhr", "event.detail.xhr", True)
+	script1.DeclareVariable("target", "evt.detail.target", True)
+	script1.DeclareVariable("xhr", "evt.detail.xhr", True)
 	script1.DeclareVariable("id", "target.id.replace('response', 'alert')", True)
 	script1.DeclareVariable("alertEl", "document.getElementById(id)", True)
 	script1.AddLine("")
 	script1.AddLine("if (!alertEl) return;")
 	script1.AddLine("")
 	script1.DeclareVariable("responseData", "", False)
-	script1.AddLine("try { responseData = JSON.parse(xhr.responseText); } catch(e) { responseData = e; }")
+	script1.AddLine("try { responseData = JSON.parse(xhr.responseText); } catch(evt) { responseData = evt; }")
 	script1.ConsoleLog("responseData")
 	script1.AddLine("")
 	script1.AddComment("Logic for success/error styling")

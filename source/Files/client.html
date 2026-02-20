@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HTMX + Alpine API Client</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.8"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.15.8/dist/cdn.min.js"></script>
+
+    <style>
+        .bg-success {
+            @apply bg-green-500 text-white p-2 rounded;
+        }
+
+        .bg-danger {
+            @apply bg-red-500 text-white p-2 rounded;
+        }
+    </style>
+</head>
+
+<body class="p-8 bg-gray-100" x-data="apiApp">
+
+    <div class="max-w-2xl mx-auto space-y-8">
+        <h1 class="text-2xl font-bold">API Test Client</h1>
+
+        <div class="p-6 bg-white rounded shadow">
+            <h2 class="font-bold mb-4">1. POST with Basic Auth (Login)</h2>
+            <div class="space-y-2">
+                <input type="text" id="path1" value="/api/login" class="w-full border p-2">
+                <textarea id="body1" class="w-full border p-2 font-mono text-sm">{"username": "admin"}</textarea>
+
+                <button class="basic px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" data-api-id="1"
+                    hx-post="/api/login" hx-ext="json-enc" hx-target="#response1"
+                    @htmx:after-request="handleResponse($event, '1')">
+                    Login (Basic Auth)
+                </button>
+            </div>
+
+            <div x-show="alerts['1'].show" x-transition.duration.300ms :class="alerts['1'].type" class="mt-4"
+                x-text="alerts['1'].message">
+            </div>
+
+            <pre id="response1"
+                class="mt-4 p-2 bg-gray-900 text-green-400 text-xs overflow-auto max-h-40 rounded"></pre>
+        </div>
+
+        <div class="p-6 bg-white rounded shadow">
+            <h2 class="font-bold mb-4">2. GET with Bearer Token</h2>
+            <div class="space-y-2">
+                <input type="text" id="path2" value="/api/secure-data" class="w-full border p-2">
+
+                <button class="token px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700" data-api-id="2"
+                    hx-get="/api/secure-data" hx-target="#response2" @htmx:after-request="handleResponse($event, '2')">
+                    Fetch Secure Data
+                </button>
+            </div>
+
+            <div x-show="alerts['2'].show" x-transition :class="alerts['2'].type" class="mt-4"
+                x-text="alerts['2'].message"></div>
+            <pre id="response2" class="mt-4 p-2 bg-gray-900 text-green-400 text-xs rounded"></pre>
+        </div>
+    </div>
+
+    <script>
+        // 1. Define the extension once at the top of your script
+        htmx.defineExtension('raw-body', {
+            encodeParameters: function (xhr, parameters, elt) {
+                const id = elt.getAttribute('data-api-id');
+                const bodyValue = document.getElementById('body' + id)?.value;
+
+                // We return the raw string exactly as it is in the textarea.
+                // HTMX will then pass this string directly into its own xhr.send() call.
+                return bodyValue;
+            }
+        });
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('apiApp', () => ({
+                // Shared state for alerts
+                alerts: {
+                    '1': { show: false, message: '', type: '' },
+                    '2': { show: false, message: '', type: '' }
+                },
+
+                handleResponse(evt, id) {
+                    const xhr = evt.detail.xhr;
+                    let data = {};
+                    try { data = JSON.parse(xhr.responseText); } catch (e) { }
+
+                    console.log("Raw response for API ID", id, data);
+
+                    const isSuccess = xhr.status >= 200 && xhr.status < 300 && (data.s === 'ok' || data.s === 'success');
+
+                    // Token logic (replaces your access_token storage block)
+                    const token = data.r?.[0]?.access_token;
+                    if (token) {
+                        localStorage.setItem("access_token", token);
+                        console.log("Access token stored!");
+                    }
+
+                    // Update UI Alert state
+                    this.alerts[id].message = isSuccess ? `${data.a || xhr.status} ${data.m || 'Success'}` : `${xhr.status} ${data.e || 'Error'}`;
+                    this.alerts[id].type = isSuccess ? 'bg-success' : 'bg-danger';
+                    this.alerts[id].show = true;
+
+                    // Pretty print the response in the target
+                    document.getElementById(`response${id}`).textContent = JSON.stringify(data, null, 2);
+                }
+            }));
+        });
+
+        // CENTRALIZED CONFIGURATION (The "Brain")
+        document.addEventListener('htmx:configRequest', (evt) => {
+            const el = evt.detail.elt;
+            const id = el.getAttribute('data-api-id');
+            if (!id) return;
+
+            // 1. Dynamic Path
+            const pathVal = document.getElementById(`path${id}`)?.value;
+            if (pathVal) evt.detail.path = pathVal;
+
+            // 2. Dynamic Headers
+            evt.detail.headers['Accept'] = 'application/json';
+
+            if (el.classList.contains('basic')) {
+                const creds = btoa(`${localStorage.getItem('client_id')}:${localStorage.getItem('client_secret')}`);
+                evt.detail.headers['Authorization'] = `Basic ${creds}`;
+            } else if (el.classList.contains('token')) {
+                evt.detail.headers['Authorization'] = `Bearer ${localStorage.getItem('access_token')}`;
+            }
+
+            // 3. Dynamic Body (for POST/PUT)
+            // const bodyEl = document.getElementById(`body${id}`);
+            // const method = (evt.detail.verb || el.getAttribute('hx-post') ? 'POST' :
+            //     el.getAttribute('hx-put') ? 'PUT' :
+            //         el.getAttribute('hx-get') ? 'GET' :
+            //             el.getAttribute('hx-delete') ? 'DELETE' : '').toUpperCase();
+            // console.log("Method:", method);
+
+            // if (bodyEl && (method === 'POST' || method === 'PUT')) {
+            //     try {
+            //         // evt.detail.parameters = JSON.parse(bodyEl.value);
+            //         evt.detail.parameters = null;
+
+            //         evt.detail.rawBody = JSON.parse(bodyEl.value);
+
+            //         console.log("Raw body for API ID", id, evt.detail.rawBody);
+            //     } catch (e) {
+            //         console.error("Invalid JSON in body");
+            //     }
+            // }
+
+            // 4. THE FIX: Clear parameters so HTMX doesn't try to form-encode the body
+            const bodyVal = document.getElementById(`body${id}`)?.value;
+            if (bodyVal && (evt.detail.verb === 'post' || evt.detail.verb === 'put')) {
+                // We tell HTMX not to process parameters
+                evt.detail.parameters = null;
+
+                // We attach the raw string to the event so we can grab it in the next step
+                evt.detail.rawBody = bodyVal;
+            }
+        });
+
+        // 5. Inject the raw body into the XHR right before it sends
+        document.addEventListener('htmx:beforeSend', (evt) => {
+            const rawBody = evt.detail.requestConfig.rawBody;
+            if (rawBody) {
+                evt.detail.xhr.send(rawBody);
+            }
+        });
+    </script>
+</body>
+
+</html>

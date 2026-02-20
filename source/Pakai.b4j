@@ -3,22 +3,26 @@ Build1=Bundle,b4j.pakai,SQLite,hu2_acceptall,Bundle
 Build2=Default,b4j.pakai,SQLite,hu2_acceptall
 Build3=MariaDB,b4j.pakai,MariaDB,hu2_acceptall
 Build4=MySQL,b4j.pakai,MySQL,hu2_acceptall
-File1=config.example
-File2=mariadb.example
-File3=mysql.example
-File4=sqlite.example
-FileGroup1=config
+File1=client.html
+File2=config.example
+File3=mariadb.example
+File4=mysql.example
+File5=sqlite.example
+File6=test.html
+FileGroup1=Default Group
 FileGroup2=config
 FileGroup3=config
 FileGroup4=config
+FileGroup5=config
+FileGroup6=Default Group
 Group=App
 Library1=endsmeet
 Library2=jcore
 Library3=minicss
-Library4=minihtml2
+Library4=minihtml
 Library5=minijs
-Library6=webapiutils
-Library7=miniormutils
+Library6=miniormutils
+Library7=webapiutils
 Module1=CategoriesApiHandler
 Module2=CategoriesHandler
 Module3=FindApiHandler
@@ -27,9 +31,10 @@ Module5=HttpsFilter
 Module6=MainView
 Module7=ProductsApiHandler
 Module8=ProductsHandler
-NumberOfFiles=4
+Module9=UsersApiHandler
+NumberOfFiles=6
 NumberOfLibraries=7
-NumberOfModules=8
+NumberOfModules=9
 Version=10.3
 @EndOfDesignText@
 #Region Project Attributes
@@ -91,7 +96,9 @@ Sub AppStart (Args() As String)
 	#If Debug
 	Api = App.api
 	Api.EnableHelp = True
-	'Api.VerboseMode = False
+	Api.VerboseMode = False
+	'Api.PayloadType = WebApiUtils.MIME_TYPE_XML
+	Api.ContentType = WebApiUtils.MIME_TYPE_XML
 	
 	App.Get("/help", "HelpHandler")
 	App.Get("/api/find", "FindApiHandler")
@@ -103,6 +110,10 @@ Sub AppStart (Args() As String)
 	App.Post("/api/categories", "CategoriesApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
 	App.Rest("/api/categories/*", "CategoriesApiHandler")
+	
+	App.Get("/client", "UsersApiHandler")
+	App.Post("/api/login", "UsersApiHandler")
+	App.Get("/api/secure-data", "UsersApiHandler")
 	#End If	
 	App.Start
 	App.LogStartupMessage

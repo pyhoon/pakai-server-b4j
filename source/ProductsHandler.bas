@@ -46,7 +46,6 @@ Sub Anchor As MiniHtml
 	Return CreateTag("a")
 End Sub
 
-
 Sub Li As MiniHtml
 	Return CreateTag("li")
 End Sub

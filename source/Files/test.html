@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTMX + Alpine API Client</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.8"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.15.8/dist/cdn.min.js"></script>
+
+    <style>
+        .bg-success { @apply bg-green-500 text-white p-2 rounded; }
+        .bg-danger { @apply bg-red-500 text-white p-2 rounded; }
+    </style>
+</head>
+
+<body class="p-8 bg-gray-100" x-data="apiApp">
+
+    <div class="max-w-2xl mx-auto space-y-8">
+        <h1 class="text-2xl font-bold">API Test Client</h1>
+
+        <div class="p-6 bg-white rounded shadow">
+            <h2 class="font-bold mb-4">Request Configuration</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium">Format</label>
+                    <select id="type1" class="w-full border p-2 rounded">
+                        <option value="json">JSON</option>
+                        <option value="xml">XML</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium">Endpoint</label>
+                    <input type="text" id="path1" value="/api/login" class="w-full border p-2 rounded">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium">Body</label>
+                    <textarea id="body1" rows="1" class="w-full border p-2 font-mono text-sm rounded">{"username": "admin"}</textarea>
+                </div>
+
+                <button 
+                    class="basic px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-full" 
+                    data-api-id="1"
+                    hx-post="/api/login" 
+                    hx-ext="raw-body" 
+                    hx-target="#response1"
+                    @htmx:after-request="handleResponse($event, '1')"
+                    @click="alerts['1'].show = false">
+                    Execute Request
+                </button>
+            </div>
+
+            <div 
+            x-show="alerts['1'].show"
+            x-transition
+            :class="alerts['1'].type"
+            class="mt-4 bg-emerald-400 text-white border p-3 rounded"             
+            x-text="alerts['1'].message">
+            </div>
+
+            <pre id="response1" class="mt-4 p-4 bg-gray-900 text-green-400 text-xs overflow-auto rounded"></pre>
+        </div>
+
+        <div class="p-6 bg-white rounded shadow">
+            <h2 class="font-bold mb-4">2. GET with Bearer Token</h2>
+            <div class="space-y-2">
+                <input type="text" id="path2" value="/api/secure-data" class="w-full border p-2">
+
+                <button class="token px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700" data-api-id="2"
+                    hx-get="/api/secure-data"
+                    hx-target="#response2"
+                    @htmx:after-request="handleResponse($event, '2')"
+                    @click="alerts['2'].show = false">
+                    Fetch Secure Data
+                </button>
+            </div>
+
+            <div 
+            x-show="alerts['2'].show" 
+            x-transition:enter.scale.80
+            x-transition:leave.scale.90
+            :class="alerts['2'].type" class="mt-4 bg-emerald-400 text-white border p-3 rounded"
+                x-text="alerts['2'].message"></div>
+            <pre id="response2" class="mt-4 p-4 bg-gray-900 text-green-400 text-xs rounded"></pre>
+        </div>
+    </div>
+
+    <script>
+        // 1. THE EXTENSION: This tells HTMX how to get the body content
+        // This runs INSTEAD of HTMX's default form-encoding logic.
+        htmx.defineExtension('raw-body', {
+            encodeParameters: function (xhr, parameters, elt) {
+                const id = elt.getAttribute('data-api-id');
+                const bodyValue = document.getElementById('body' + id)?.value;
+                
+                // Return the raw string. HTMX will call xhr.send(bodyValue) for you.
+                return bodyValue;
+            }
+        });
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('apiApp', () => ({
+                alerts: {
+                    '1': { show: false, message: '', type: '' },
+                    '2': { show: false, message: '', type: '' }
+                },
+
+                handleResponse(evt, id) {
+                    const xhr = evt.detail.xhr;
+                    let contentToShow = xhr.responseText;
+                    let isSuccess = xhr.status >= 200 && xhr.status < 300;
+
+                    // Try to pretty-print if it's JSON
+                    try {
+                        const parsed = JSON.parse(xhr.responseText);
+                        contentToShow = JSON.stringify(parsed, null, 2);
+                        if (parsed.s && parsed.s !== 'ok' && parsed.s !== 'success') isSuccess = false;
+                        
+                        // Token Storage Logic
+                        // const token = parsed.r?.[0]?.access_token;
+                        const token = parsed.r?.access_token;
+                        if (token) localStorage.setItem("access_token", token);
+                    } catch (e) {
+                        // Not JSON, leave as raw (likely XML or text)
+                    }
+
+                    this.alerts[id].message = isSuccess ? `Status ${xhr.status}: Success` : `Error ${xhr.status} ${xhr.statusText} `;
+                    this.alerts[id].type = isSuccess ? 'bg-emerald-400' : 'bg-rose-400';
+                    this.alerts[id].show = true;
+                    document.getElementById(`response${id}`).textContent = contentToShow;
+                }
+            }));
+        });
+
+        // 2. THE BRAIN: Handles Headers and URL
+        document.addEventListener('htmx:configRequest', (evt) => {
+            const el = evt.detail.elt;
+            const id = el.getAttribute('data-api-id');
+            if (!id) return;
+
+            // Update URL
+            const pathVal = document.getElementById(`path${id}`)?.value;
+            if (pathVal) evt.detail.path = pathVal;
+
+            // Set Content-Type and Accept based on dropdown
+            const type = document.getElementById(`type${id}`)?.value || 'json';
+            evt.detail.headers['Content-Type'] = type === 'json' ? 'application/json' : 'application/xml';
+            evt.detail.headers['Accept'] = 'application/json, application/xml';
+
+            // Auth Logic
+            if (el.classList.contains('basic')) {
+                const creds = btoa(`${localStorage.getItem('client_id')}:${localStorage.getItem('client_secret')}`);
+                evt.detail.headers['Authorization'] = `Basic ${creds}`;
+            } else if (el.classList.contains('token')) {
+                evt.detail.headers['Authorization'] = `Bearer ${localStorage.getItem('access_token')}`;
+            }
+        });
+    </script>
+</body>
+</html>
