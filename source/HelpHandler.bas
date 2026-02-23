@@ -29,9 +29,9 @@ Public Sub Initialize
 	AllGroups.Initialize
 	Handlers.Initialize
 	'Handlers.Add("TokensAuthHandler")
-	Handlers.Add("CategoriesApiHandler")
+	'Handlers.Add("CategoriesApiHandler")
 	Handlers.Add("ProductsApiHandler")
-	Handlers.Add("FindApiHandler")
+	'Handlers.Add("FindApiHandler")
 	Api = Main.Api
 	Verbose = Api.VerboseMode
 	ContentType = Api.ContentType	
@@ -183,6 +183,7 @@ Private Sub GenerateHtml As String 'ignore
 	Dim body1 As MiniHtml = CreateTag("body").up(html1)
 	body1.cls("bg-dark text-light")
 	body1.attr("hx-ext", "response-targets")
+	body1.attr("x-data", "apiApp")
 	body1.multiline
 	
 	'Dim nav1 As MiniHtml = CreateTag("nav").up(body1).cls("navbar navbar-light navbar-expand-lg sticky-top bg-info")
@@ -373,26 +374,26 @@ Private Sub GenerateHtml As String 'ignore
 	#If Bundle
 	body1.cdn("script", "/assets/js/bootstrap.min.js")
 	body1.cdn("script", "/assets/js/htmx.min.js")
-	body1.cdn("script", "/assets/js/response-targets.min.js")
-	body1.cdn("script", "/assets/js/json-enc.min.js")
+	'body1.cdn("script", "/assets/js/response-targets.min.js")
+	'body1.cdn("script", "/assets/js/json-enc.min.js")
 	body1.cdn("script", "/assets/js/cdn.min.js")
 	#Else
 	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
 	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y", "anonymous")
 	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
 	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz", "anonymous")
-	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@2.0.4", _
-	"sha384-T41oglUPvXLGBVyRdZsVRxNWnOOqCynaPubjUVjxhsjFTKrFJGEMm3/0KGmNQ+Pg", "anonymous")	
-	body1.cdn3("script", "https://cdn.jsdelivr.net/npm/htmx-ext-json-enc@2.0.3/dist/json-enc.min.js", CreateMap())
+	'body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@2.0.4", _
+	'"sha384-T41oglUPvXLGBVyRdZsVRxNWnOOqCynaPubjUVjxhsjFTKrFJGEMm3/0KGmNQ+Pg", "anonymous")	
+	'body1.cdn3("script", "https://cdn.jsdelivr.net/npm/htmx-ext-json-enc@2.0.3/dist/json-enc.min.js", CreateMap())
 	body1.cdn3("script", "https://cdn.jsdelivr.net/npm/alpinejs@3.15.8/dist/cdn.min.js", CreateMap("defer": ""))	
 	#End If
 
-	Dim script1 As String = HtmxConfigRequest
-	'Log(script1)
-	CreateTag("script").up(body1).text(script1.SubString2(0, script1.LastIndexOf(CRLF))).multiline
-	
-	Dim script2 As String = HtmxAfterRequest
+	Dim script2 As String = AlpineHtmx
+	'Log(script2)
 	CreateTag("script").up(body1).text(script2.SubString2(0, script2.LastIndexOf(CRLF))).multiline
+	
+	'Dim script2 As String = HtmxAfterRequest
+	'CreateTag("script").up(body1).text(script2.SubString2(0, script2.LastIndexOf(CRLF))).multiline
 	
 	Dim doc As MiniHtml
 	doc.Initialize("")
@@ -443,36 +444,36 @@ Private Sub RemoveMethodAndReAdd (Method As Map)
 End Sub
 
 Private Sub BuildMethods 'ignore
-	Dim Method As Map = RetrieveMethod("Categories", "GetCategories")
-	Method.Put("Desc", "List All Categories")
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Categories", "GetCategoryById (id As Int)")
-	Method.Put("Desc", "Read one Category by id")
-	Method.Put("Elements", $"["{id}"]"$)
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Categories", "CreateNewCategory '#POST")
-	Method.Put("Desc", "Add new Category")
-	Dim FormatMap As Map = CreateMap("category_name": "category_name")
-	Method.Put("Format", FormatMap.As(JSON).ToString)
-	FormatMap.Put("category_name", "Testing")
-	Method.Put("Body", FormatMap.As(JSON).ToString)
-	ReplaceMethod(Method)
-
-	Dim Method As Map = RetrieveMethod("Categories", "UpdateCategoryById (id As Int) '#PUT")
-	Method.Put("Desc", "Update Category by id")
-	Method.Put("Elements", $"["{id}"]"$)	
-	Dim FormatMap As Map = CreateMap("category_name": "category_name")
-	Method.Put("Format", FormatMap.As(JSON).ToString)
-	Method.Put("Body", FormatMap.As(JSON).ToString)
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Categories", "DeleteCategoryById (id As Int)")
-	Method.Put("Desc", "Delete Category by id")
-	Method.Put("Elements", $"["{id}"]"$)
-	'Method.Put("Authenticate", "token")
-	RemoveMethodAndReAdd(Method)
+'	Dim Method As Map = RetrieveMethod("Categories", "GetCategories")
+'	Method.Put("Desc", "List All Categories")
+'	ReplaceMethod(Method)
+'	
+'	Dim Method As Map = RetrieveMethod("Categories", "GetCategoryById (id As Int)")
+'	Method.Put("Desc", "Read one Category by id")
+'	Method.Put("Elements", $"["{id}"]"$)
+'	ReplaceMethod(Method)
+'	
+'	Dim Method As Map = RetrieveMethod("Categories", "CreateNewCategory '#POST")
+'	Method.Put("Desc", "Add new Category")
+'	Dim FormatMap As Map = CreateMap("category_name": "category_name")
+'	Method.Put("Format", FormatMap.As(JSON).ToString)
+'	FormatMap.Put("category_name", "Testing")
+'	Method.Put("Body", FormatMap.As(JSON).ToString)
+'	ReplaceMethod(Method)
+'
+'	Dim Method As Map = RetrieveMethod("Categories", "UpdateCategoryById (id As Int) '#PUT")
+'	Method.Put("Desc", "Update Category by id")
+'	Method.Put("Elements", $"["{id}"]"$)	
+'	Dim FormatMap As Map = CreateMap("category_name": "category_name")
+'	Method.Put("Format", FormatMap.As(JSON).ToString)
+'	Method.Put("Body", FormatMap.As(JSON).ToString)
+'	ReplaceMethod(Method)
+'	
+'	Dim Method As Map = RetrieveMethod("Categories", "DeleteCategoryById (id As Int)")
+'	Method.Put("Desc", "Delete Category by id")
+'	Method.Put("Elements", $"["{id}"]"$)
+'	'Method.Put("Authenticate", "token")
+'	RemoveMethodAndReAdd(Method)
 	
 	Dim Method As Map = RetrieveMethod("Products", "GetProducts")
 	Method.Put("Desc", "Read all Products")
@@ -525,27 +526,27 @@ Private Sub BuildMethods 'ignore
 	Method.Put("Elements", $"["{id}"]"$)
 	ReplaceMethod(Method)
 	
-	Dim Method As Map = RetrieveMethod("Find", "GetAllProducts")
-	Method.Put("Desc", "Get all Products (with Category name)")
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Find", "GetProductsByCategoryId")
-	Method.Put("Desc", "Filter Products (with Category Id)")
-	Method.Put("Params", "id [Int]")
-	Method.Put("Elements", $"["products-by-category_id", "{id}"]"$)
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Find", "SearchByKeywords ' #post")
-	'Dim BodyMap As Map = CreateMap("keywords": "search words")
-	'Method.Put("Body", BodyMap.As(JSON).ToString)
-	Dim FormatMap As Map = CreateMap("keyword": "text")
-	Dim BodytMap As Map = CreateMap("keyword": "")
-	Method.Put("Format", FormatMap.As(JSON).ToString)
-	Method.Put("Body", BodytMap.As(JSON).ToString)
-	Method.Put("Desc", "Filter Products (with Category name)")
-	'Method.Put("Expected", GetExpectedResponse(Method.Get("Verb"))) ' POST
-	Method.Put("Expected", GetExpectedResponse(""))
-	ReplaceMethod(Method)
+'	Dim Method As Map = RetrieveMethod("Find", "GetAllProducts")
+'	Method.Put("Desc", "Get all Products (with Category name)")
+'	ReplaceMethod(Method)
+'	
+'	Dim Method As Map = RetrieveMethod("Find", "GetProductsByCategoryId")
+'	Method.Put("Desc", "Filter Products (with Category Id)")
+'	Method.Put("Params", "id [Int]")
+'	Method.Put("Elements", $"["products-by-category_id", "{id}"]"$)
+'	ReplaceMethod(Method)
+'	
+'	Dim Method As Map = RetrieveMethod("Find", "SearchByKeywords ' #post")
+'	'Dim BodyMap As Map = CreateMap("keywords": "search words")
+'	'Method.Put("Body", BodyMap.As(JSON).ToString)
+'	Dim FormatMap As Map = CreateMap("keyword": "text")
+'	Dim BodytMap As Map = CreateMap("keyword": "")
+'	Method.Put("Format", FormatMap.As(JSON).ToString)
+'	Method.Put("Body", BodytMap.As(JSON).ToString)
+'	Method.Put("Desc", "Filter Products (with Category name)")
+'	'Method.Put("Expected", GetExpectedResponse(Method.Get("Verb"))) ' POST
+'	Method.Put("Expected", GetExpectedResponse(""))
+'	ReplaceMethod(Method)
 End Sub
 
 Private Sub ReadHandlers 'ignore
@@ -858,6 +859,7 @@ Private Sub GenerateAccordionHead (section As VerbSection) As MiniHtml
 	button1.attr("data-bs-toggle", "collapse")
 	button1.attr("data-bs-target", $"#${section.ElementId}-collapse"$)
 	button1.attr("aria-controls", $"${section.ElementId}-collapse"$)
+	'button1.attr("x-data", $"{ apiId: '${section.ElementId}' }"$)
 	button1.FormatAttributes = True
 	button1.multiline
 	Dim span1 As MiniHtml = Span.up(button1)
@@ -883,6 +885,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	div1.multiline
 	Dim div2 As MiniHtml = Div.up(div1)
 	div2.cls("accordion-body")
+	div2.attr("x-data", $"{ apiId: '${section.ElementId}' }"$)
 	div2.multiline
 
 	'Dim div3 As MiniHtml = Div.up(div2)
@@ -929,10 +932,10 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	div6.text(section.Expected)
 	'Dim first As Boolean = True
 	'For Each CodeText In section.Expected
-		'If first = False Then CreateTag("br").up(div6)
+	'If first = False Then CreateTag("br").up(div6)
 	'	CreateTag("br").up(div6)
 	'	div6.text(CodeText)
-		'first = False
+	'first = False
 	'Next
 	
 	Dim div7 As MiniHtml = Div.up(div4)
@@ -971,7 +974,8 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	'input1.FormatAttributes = True
 	'input1.multiline
 	Dim input1 As MiniHtml = Input.up(p3)
-	input1.attr("id", $"path${section.ElementId}"$)
+	'input1.attr("id", $"path${section.ElementId}"$)
+	input1.attr(":id", "'path-' + apiId")
 	input1.attr("type", "text")
 	'input1.cls("path")
 	input1.cls("form-control data-path text-light")
@@ -990,7 +994,8 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 		Dim strong5 As MiniHtml = Strong.up(p4)
 		strong5.text("Body:")
 		Dim textarea1 As MiniHtml = Textarea.up(p4)
-		textarea1.attr("id", $"body${section.ElementId}"$)
+		'textarea1.attr("id", $"body${section.ElementId}"$)
+		textarea1.attr(":id", "'body-' + apiId")
 		textarea1.attr("rows", "6")
 		textarea1.cls("form-control data-body")
 		textarea1.sty("background-color: #363636")
@@ -1021,60 +1026,78 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 		'button1.cls("post basic")
 		button1.cls("btn submit-button-" & section.Color & " text-white col-md-6 col-lg-4 p-2 float-end")
 		button1.sty("cursor: pointer; padding-bottom: 60px")
+		'button1.attr("id", section.ElementId)
+		button1.attr(":data-api-id", "apiId")
 		'button1.attr("hx-post", "/api/login")
 		button1.attr("hx-" & section.Verb.ToLowerCase, "dynamic")
 		'button1.attr("hx-swap", "innerHTML")
 		'button1.attr("hx-include", "#body-login, #path-login")
 		'button1.attr("hx-include", $"#body${section.ElementId}, #path${section.ElementId}"$)
-		button1.attr("hx-ext", "json-enc")
+		'button1.attr("hx-ext", "json-enc")
+		button1.attr("hx-ext", "raw-body")
 		'button1.attr("hx-vals", $"'js:{ "custom": "logic" }'"$)
 		'button1.attr("hx-before-request", "this.setAttribute('hx-post', document.getElementById('path-login').value)")
 		'button1.attr("@hx-before-request", $"this.setAttribute('hx-${section.Verb.ToLowerCase}', encodeURIComponent(htmx.process(htmx.find('#path${section.ElementId}').value)))"$)
-		Select section.Authenticate
-			Case "Basic"
-				button1.attr("@hx-on::before-send", "event.detail.xhr.setRequestHeader('Authorization', 'Basic ' + btoa(localStorage.getItem('client_id') + ':' + localStorage.getItem('client_secret')))")
-				button1.attr("@hx-on::after-request", "saveToken(event.detail.xhr)")
-		End Select
+		'Select section.Authenticate
+		'	Case "Basic"
+		'		button1.attr("@hx-on::before-send", "event.detail.xhr.setRequestHeader('Authorization', 'Basic ' + btoa(localStorage.getItem('client_id') + ':' + localStorage.getItem('client_secret')))")
+		'		button1.attr("@hx-on::after-request", "saveToken(event.detail.xhr)")
+		'End Select
 		'button1.attr("hx-target", "#response-login")
-		button1.attr("hx-target", $"#response${section.ElementId}"$)
-		button1.attr("hx-target-error", $"#response${section.ElementId}"$)
-		button1.attr("hx-indicator", $"#spinner-${section.ElementId}"$)
+		'button1.attr("hx-target", $"#response${section.ElementId}"$)
+		'button1.attr(":hx-target", "'#response-' + apiId")
+		button1.attr("hx-target", "this")
+		button1.attr("hx-swap", "none")
+		'button1.attr("hx-target-error", $"#response${section.ElementId}"$)
+		'button1.attr("@click", "if(alerts[apiId]) alerts[apiId].show = false")
+		button1.attr("@click", "resetUI(apiId)")
+		button1.attr("@htmx:after-request", $"handleResponse($event, apiId)"$)
+		'button1.attr("hx-indicator", $"#spinner-${section.ElementId}"$)
 		'button1.attr("hx-on::click", $"this.setAttribute('hx-${section.Verb.ToLowerCase}', encodeURIComponent(htmx.process(htmx.find('.data-path').value)))"$)
 		'button1.attr("hx-trigger", "click")
 		button1.FormatAttributes = True
 		button1.multiline
 		'button1.text("Run POST")
+		Dim span3 As MiniHtml = Span.up(button1)
+		span3.cls("htmx-indicator spinner-border spinner-border-sm me-2")
 		Dim strong6 As MiniHtml = Strong.up(button1)
 		strong6.text("Submit")
-		GenerateSpinner(section).up(div9)
+		'GenerateSpinner(section).up(div9)
 	Else
 		Dim button1 As MiniHtml = Button.up(div9)
 		'button1.attr("id", $"btn${section.ElementId}"$)
 		button1.cls("btn submit-button-" & section.Color & " text-white col-md-6 col-lg-4 p-2 float-end")
 		button1.sty("cursor: pointer; padding-bottom: 60px")
+		button1.attr(":data-api-id", "apiId")
 		button1.attr("hx-" & section.Verb.ToLowerCase, "dynamic")
-		button1.attr("hx-swap", "innerHTML")
+		'button1.attr("hx-swap", "innerHTML")
 		''button1.attr("@hx-before-request", $"this.setAttribute('hx-${section.Verb.ToLowerCase}', document.getElementById('path-data').value)"$)
-		'button1.attr("@hx-before-request", $"this.setAttribute('hx-${section.Verb.ToLowerCase}', encodeURIComponent(htmx.process(htmx.find('#path${section.ElementId}').value)))"$)
+		'button1.attr("@hx-before-request", $"this.setAttribute('hx-${section.Verb.ToLowerCase}', encodeURIComponent(htmx.process(htmx.find('#path-${section.ElementId}').value)))"$)
 		Select section.Authenticate
 			Case "Basic"
 				button1.attr("@hx-on::before-send", "event.detail.xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken)")
 		End Select
 		'button1.attr("hx-ext", "response-targets")
-		button1.attr("hx-target", $"#response${section.ElementId}"$)
-		button1.attr("hx-target-error", $"#response${section.ElementId}"$)
+		'button1.attr("hx-target", $"#response-${section.ElementId}"$)
+		'button1.attr(":hx-target", "'#response-' + apiId")
+		button1.attr("hx-target", "this")
+		button1.attr("hx-swap", "none")
+		'button1.attr("hx-target-error", $"#response-${section.ElementId}"$)
+		button1.attr("@click", "resetUI(apiId)")
+		button1.attr("@htmx:after-request", $"handleResponse($event, apiId)"$)
 		'button1.attr("hx-indicator", $"#spinner-${section.ElementId}"$)
 		'button1.attr("hx-on::click", $"this.setAttribute('hx-${section.Verb.ToLowerCase}', encodeURIComponent(htmx.process(htmx.find('#path${section.ElementId}').value)))"$)
 		'button1.attr("hx-on::click", $"this.setAttribute('hx-${section.Verb.ToLowerCase}', encodeURIComponent(htmx.process(htmx.find('.data-path').value)))"$)
 		'button1.attr("hx-trigger", "click")
 		button1.FormatAttributes = True
 		button1.multiline
+		Dim span3 As MiniHtml = Span.up(button1)
+		span3.cls("htmx-indicator spinner-border spinner-border-sm me-2")
 		Dim strong6 As MiniHtml = Strong.up(button1)
 		strong6.text("Submit")
 		'GenerateSpinner(section).up(div9)
 	End If
 
-	
 	'Dim div10 As MiniHtml = Div.up(div9)
 	'div10.attr("id", "alert-login")
 	'div10.cls("alert")
@@ -1095,7 +1118,6 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	'button2.text("Fetch Data")
 	'Dim textarea3 As MiniHtml = CreateTag("textarea").up(div11)
 	'textarea3.attr("id", "response-data")
-
 
 	'Dim button1 As MiniHtml = Button.up(form1)
 	'button1.attr("id", $"btn${section.ElementId}"$)
@@ -1135,23 +1157,26 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	CreateTag("br").up(p5)
 	Dim textarea2 As MiniHtml = Textarea.up(p5)
 	textarea2.attr("rows", "10")
-	textarea2.attr("id", $"response${section.ElementId}"$)
+	'textarea2.attr("id", $"response${section.ElementId}"$)
+	textarea2.attr(":id", "'response-' + apiId")
 	textarea2.cls("form-control")
 	textarea2.sty("background-color: #363636")
-	textarea2.sty("color: white; font-size: small")
+	textarea2.sty("color: #68d391; font-size: small") ' text-green-400
 	textarea2.FormatAttributes = True
 	'textarea2.multiline
 	Dim div13 As MiniHtml = Div.up(div12)
-	div13.attr("id", $"alert${section.ElementId}"$)
+	'div13.attr("id", $"alert${section.ElementId}"$)
+	div13.attr("x-show", "alerts[apiId]?.show")
 	'div13.cls($"alert alert-success"$)
+	div13.attr(":class", "alerts[apiId]?.type")
 	div13.cls("alert")
-	div13.attr("role", "alert")
+	div13.attr("x-text", "alerts[apiId]?.message")
+	'div13.attr("role", "alert")
 	'div13.sty("display: none")
 	div13.attr3("x-transition")
 	div13.FormatAttributes = True
 	div13.multiline
-	
-	
+
 	'Dim div7 As MiniHtml = Div.up(div4)
 	'div7.cls("col-md-3 p-3")
 	'div7.multiline
@@ -1436,34 +1461,161 @@ Private Sub GetStyles As String
 End Sub
 
 ' document.addEventListener('htmx:configRequest', (evt) => {...})
-Private Sub HtmxConfigRequest As String
+'Private Sub HtmxConfigRequest As String
+
+Private Sub AlpineHtmx As String
 	Dim script1 As MiniJs
 	script1.Initialize
 	script1.IncreaseIndent
+	script1.IncreaseIndent
 	script1.AddLine("")
-	script1.AddLine("document.addEventListener('htmx:configRequest', (evt) => {")
+	script1.AddComment("1. THE EXTENSION: This tells HTMX how to get the body content")
+	script1.AddComment("This runs INSTEAD of HTMX's default form-encoding logic.")
+	script1.AddLine("htmx.defineExtension('raw-body', {")
+	script1.IncreaseIndent
+	script1.AddLine("encodeParameters: function (xhr, parameters, elt) {")
+	script1.IncreaseIndent
+	script1.DeclareVariable("apiId", "elt.getAttribute('data-api-id')", True)
+	'script1.DeclareVariable("bodyValue", "document.getElementById('body' + id)?.value", True)
+	script1.DeclareVariable("bodyValue", $"document.getElementById('body-' + apiId)?.value || "";"$, True)
+	script1.AddLine("")
+	script1.AddComment("Return the raw string. HTMX will call xhr.send(bodyValue) for you.")
+	script1.AddLine("return bodyValue;")
+	script1.DecreaseIndent
+	script1.AddLine("}")
+	script1.DecreaseIndent
+	script1.AddLine("});")
+	script1.AddLine("")
+	script1.AddEventListener("alpine:init", "")
+	script1.IncreaseIndent
+	script1.AddLine("Alpine.data('apiApp', () => ({")
+	script1.IncreaseIndent
+	script1.AddLine("resetUI(apiId) {")
+	script1.IncreaseIndent
+	script1.AddComment("1. Clear the textarea")
+	script1.DeclareVariable("respEl", "document.getElementById(`response-${apiId}`);", True)
+	script1.AddConditionalCall("respEl", "respEl.value = '';")
+	script1.AddLine("")
+	script1.AddComment("2. Hide the alert")
+	script1.StartIf("this.alerts[apiId]")
+	script1.AddLine("this.alerts[apiId].show = false;")
+	script1.EndIf
+	script1.AddLine("},")
+	script1.AddLine("")
+	script1.AddComment("Start with an empty object")
+	script1.AddLine("alerts: {},")
+	'script1.AddLine("alerts: {")
+	'script1.IncreaseIndent
+	'script1.AddLine("'1': { show: false, message: '', type: '' },")
+	'script1.AddLine("'2': { show: false, message: '', type: '' },")
+	'script1.DecreaseIndent
+	'script1.AddLine("},")
+	script1.AddLine("")
+	script1.AddLine("handleResponse(evt, apiId) {")
+	script1.IncreaseIndent
+	script1.DeclareVariable("xhr", "evt.detail.xhr", True)
+	script1.DeclareVariable("parsed", "''", False)
+	script1.DeclareVariable("contentToShow", "xhr.responseText", False)
+	script1.DeclareVariable("isSuccess", "xhr.status >= 200 && xhr.status < 300", False)
+	'script1.DeclareVariable("isSuccess", "false", False)
+	script1.AddLine("")
+	script1.AddComment("Try to pretty-print if it's JSON")
+	script1.StartTry
+	'script1.DeclareVariable("parsed", "JSON.parse(xhr.responseText)", True)
+	script1.AddLine("parsed = JSON.parse(xhr.responseText)")
+	script1.AddLine("contentToShow = JSON.stringify(parsed, null, 2);")
+	' Verbose
+	'script1.AddConditionalCall("parsed.s && parsed.s !== 'ok' && parsed.s !== 'success'", "isSuccess = false;")
+	script1.AddLine("")
+	script1.AddComment("Token Storage Logic")
+	' Verbose
+	'script1.DeclareVariable("token", "parsed.r?.[0]?.access_token", True)
+	script1.DeclareVariable("token", "parsed.r?.access_token", True)
+	script1.AddConditionalCall("token", $"localStorage.setItem("access_token", token);"$)
+	script1.AddCatch("e")
+	'script1.IncreaseIndent
+	script1.AddComment("Not JSON, leave as raw (likely XML or text)")
+	script1.EndTry
+	script1.AddLine("")
+	'script1.AddTernary("this.alerts[id].message = isSuccess", "`Status ${xhr.status}: Success`", "`Error ${xhr.status} ${xhr.statusText} `;")
+	'script1.AddTernary("this.alerts[id].type = isSuccess", "'bg-emerald-400'", "'bg-rose-400';")
+	'script1.AddLine("this.alerts[id].show = true;")
+	script1.AddComment("Dynamic Alert Assignment")
+	If Verbose Then
+		'script1.DeclareVariable("isSuccess", "parsed.s && parsed.s !== 'ok' && parsed.s !== 'success'", False)
+		script1.AddLine("isSuccess = parsed.s && parsed.s !== 'ok' && parsed.s !== 'success'")
+	Else
+		'script1.DeclareVariable("isSuccess", "xhr.status >= 200 && xhr.status < 300", False)
+		script1.AddLine("isSuccess = xhr.status >= 200 && xhr.status < 300")
+	End If	
+	script1.AddLine("this.alerts[apiId] = {")
+	script1.IncreaseIndent
+	script1.AddLine("show: true,")
+	If Verbose Then
+		script1.AddLine("message: parsed.a + ' ' + parsed.m,")
+		'script1.AddLine("error: parsed.e,")
+		script1.AddLine("status: parsed.a,")
+		script1.AddTernary("type: isSuccess", "'bg-success'", "'bg-danger'")
+	Else
+		script1.AddTernary("message: isSuccess", "`Success (${xhr.status})`", "`Error (${xhr.status})`,")
+		script1.AddLine("status: xhr.status,")
+		script1.AddTernary("type: isSuccess", "'bg-success'", "'bg-danger'")
+	End If
+	script1.DecreaseIndent
+	script1.AddLine("};")
+	script1.AddLine("")
+	'script1.AddLine("document.getElementById(`response-${apiId}`).textContent = contentToShow;") ' htmx
+	script1.AddComment("Use .value for Textareas (textContent is for <div> or <pre>)")
+	script1.DeclareVariable("responseEl", "document.getElementById(`response-${apiId}`)", True)
+	script1.StartIf("responseEl")
+	script1.AddLine("responseEl.value = contentToShow;")
+	script1.EndIf
+	script1.DecreaseIndent
+	script1.AddLine("}")
+	script1.DecreaseIndent
+	script1.AddLine("}));")
+	script1.DecreaseIndent
+	script1.AddLine("});")
+	script1.AddLine("")
+	script1.AddComment("2. THE BRAIN: Handles Headers and URL")
+	script1.AddEventListener("htmx:configRequest", "evt")
 	script1.IncreaseIndent
 	'script1.DeclareVariable("btn", "event.detail.elt", True)
 	script1.DeclareVariable("el", "evt.detail.elt", True)
-	script1.DeclareVariable("id", "el.getAttribute('data-api-id')", True)
-	script1.AddConditionalCall("!id", "return")
+	'script1.DeclareVariable("id", "el.getAttribute('data-api-id')", True)
+	script1.DeclareVariable("apiId", "el.getAttribute('data-api-id')", True)
+	'script1.ConsoleLog("'apiId='+apiId")
+	script1.AddConditionalCall("!apiId", "return;")
 	script1.AddLine("")
-	script1.AddComment("1. Dynamic Path")
+	script1.AddComment("Update URL")
 	'script1.DeclareVariable("container", $"btn.closest('.accordion-collapse')"$, True)
-	script1.DeclareVariable("pathVal", "document.getElementById(`path${id}`)?.value", True)
-	script1.AddConditionalCall("pathVal", "evt.detail.path = pathVal")
+	script1.DeclareVariable("pathVal", "document.getElementById(`path-${apiId}`)?.value", True)
+	'script1.ConsoleLog("'pathVal='+pathVal")
+	script1.AddConditionalCall("pathVal", "evt.detail.path = pathVal;")
 	script1.AddLine("")
-	script1.AddComment("2. Headers (Global)")
+	'script1.AddComment("Set Content-Type and Accept based on dropdown")
 	'script1.AddComment("Grab values from inputs INSIDE this container only")
-	script1.DeclareVariable("urlInput", $"container.querySelector('.data-path')"$, True)
-	script1.DeclareVariable("bodyInput", $"container.querySelector('.data-body')"$, True)
+	'script1.DeclareVariable("type", "document.getElementById(`type-${apiId}`)?.value || 'json';", True)
+	'script1.AddTernary("evt.detail.headers['Content-Type'] = type === 'json'", "'application/json'", "'application/xml';")
+	script1.AddLine("evt.detail.headers['Accept'] = 'application/json, application/xml';")
+	script1.AddLine("")
+	script1.AddComment("Auth Logic")
+	script1.StartIf("el.classList.contains('basic')")
+	script1.DeclareVariable("creds", "btoa(`${localStorage.getItem('client_id')}:${localStorage.getItem('client_secret')}`)", True)
+	script1.AddLine("evt.detail.headers['Authorization'] = `Basic ${creds}`;")
+	script1.ElseIf("el.classList.contains('token')")
+	script1.AddLine("evt.detail.headers['Authorization'] = `Bearer ${localStorage.getItem('access_token')}`;")
+	script1.EndIf
+	
+	'script1.DeclareVariable("urlInput", $"container.querySelector('.data-path')"$, True)
+	'script1.DeclareVariable("bodyInput", $"container.querySelector('.data-body')"$, True)
 	'script1.DeclareVariable("urlInput", "document.getElementById('path'+id).value", True)
 	'script1.DeclareVariable("tokenValue", "document.getElementById('api-token').value", True)
-	script1.AddLine("")
-	script1.AddComment("2. Set the Dynamic URL")
-	script1.StartIf("urlInput && urlInput.value")
-	script1.AddLine("event.detail.path = urlInput.value;")
-	script1.EndIf
+	'script1.AddLine("")
+	'script1.AddComment("2. Set the Dynamic URL")
+	'script1.StartIf("urlInput && urlInput.value")
+	'script1.AddLine("event.detail.path = urlInput.value;")
+	'script1.EndIf
 	'script1.AddConditionalCall("urlInput", "event.detail.path = urlInput;")
 	'script1.AddLine("")
 	'script1.AddComment("2. Inject the Authentication Header")
@@ -1471,95 +1623,96 @@ Private Sub HtmxConfigRequest As String
 	'script1.AddLine("event.detail.path = urlInput;")
 	'script1.EndCondition
 	'script1.EndIf
-	script1.AddLine("")
-	script1.AddComment("3. Handle the JSON Body for POST/PUT")
-	script1.AddComment("If there's a body textarea, manually add its content to the parameters")
+	'script1.AddLine("")
+	'script1.AddComment("3. Handle the JSON Body for POST/PUT")
+	'script1.AddComment("If there's a body textarea, manually add its content to the parameters")
 	'script1.DeclareVariable("method", "event.detail.method", True)
-	script1.AddComment("Resolve the Method (HTMX uses event.detail.verb in newer versions)")
-	script1.AddLine("const method = (event.detail.verb || btn.getAttribute('hx-post') ? 'POST' :")
-	script1.AddLine("               btn.getAttribute('hx-put') ? 'PUT' :")
-	script1.AddLine("               btn.getAttribute('hx-get') ? 'GET' :")
-	script1.AddLine("               btn.getAttribute('hx-delete') ? 'DELETE' : '').toUpperCase();")
+	'script1.AddComment("Resolve the Method (HTMX uses event.detail.verb in newer versions)")
+	'script1.AddLine("const method = (event.detail.verb || btn.getAttribute('hx-post') ? 'POST' :")
+	'script1.AddLine("               btn.getAttribute('hx-put') ? 'PUT' :")
+	'script1.AddLine("               btn.getAttribute('hx-get') ? 'GET' :")
+	'script1.AddLine("               btn.getAttribute('hx-delete') ? 'DELETE' : '').toUpperCase();")
 	'script1.ConsoleLog("'method='+method")
-	script1.StartIf("(method === 'POST' || method === 'PUT') && bodyInput")
+	'script1.StartIf("(method === 'POST' || method === 'PUT') && bodyInput")
 	'script1.ConsoleLog($""bodyInput=["+bodyInput+"]""$)
-	script1.StartTry
-	script1.AddComment("Only parse if there is actually text in the box")
-	script1.StartIf($"bodyInput.value.trim() !== """$)
-	script1.AddLine("event.detail.parameters = JSON.parse(bodyInput.value);")
+	'script1.StartTry
+	'script1.AddComment("Only parse if there is actually text in the box")
+	'script1.StartIf($"bodyInput.value.trim() !== """$)
+	'script1.AddLine("event.detail.parameters = JSON.parse(bodyInput.value);")
 	'script1.DeclareVariable("rawJson", "JSON.parse(bodyInput.value)", True)
 	'script1.AddComment("We clear existing parameters to ensure ONLY the JSON from the textarea is sent")
 	'script1.AddLine("event.detail.parameters = rawJson;")
-	script1.EndIf
-	script1.AddCatch("e")
-	script1.ConsoleError($""Invalid JSON in body textarea""$, "e")
-	script1.AddLine("event.preventDefault();")
-	script1.EndTry
-	script1.EndIf
-	script1.AddLine("")
-	script1.AddComment("4. Inject Authorization Token from LocalStorage")
-	script1.DeclareVariable("token", "localStorage.getItem('access_token')", True)
-	script1.StartIf("token")
-	script1.AddLine("event.detail.headers['Authorization'] = `Bearer ${token}`;")
-	script1.EndIf
-	script1.EndIf
+	'script1.EndIf
+	'script1.AddCatch("e")
+	'script1.ConsoleError($""Invalid JSON in body textarea""$, "e")
+	'script1.AddLine("event.preventDefault();")
+	'script1.EndTry
+	'script1.EndIf
+	'script1.AddLine("")
+	'script1.AddComment("4. Inject Authorization Token from LocalStorage")
+	'script1.DeclareVariable("token", "localStorage.getItem('access_token')", True)
+	'script1.StartIf("token")
+	'script1.AddLine("event.detail.headers['Authorization'] = `Bearer ${token}`;")
+	'script1.EndIf
+	'script1.EndIf
 	script1.DecreaseIndent
 	script1.AddLine("});")
 	Return script1.Generate2
 End Sub
 
 ' document.addEventListener('htmx:afterRequest', (evt) => {...})
-Private Sub HtmxAfterRequest As String
-	Dim script1 As MiniJs
-	script1.Initialize
-	script1.IncreaseIndent
-	script1.AddLine("")
-	script1.AddLine("document.addEventListener('htmx:afterRequest', (evt) => {")
-	script1.IncreaseIndent
-	script1.DeclareVariable("target", "evt.detail.target", True)
-	script1.DeclareVariable("xhr", "evt.detail.xhr", True)
-	script1.DeclareVariable("id", "target.id.replace('response', 'alert')", True)
-	script1.DeclareVariable("alertEl", "document.getElementById(id)", True)
-	script1.AddLine("")
-	script1.AddLine("if (!alertEl) return;")
-	script1.AddLine("")
-	script1.DeclareVariable("responseData", "", False)
-	script1.AddLine("try { responseData = JSON.parse(xhr.responseText); } catch(evt) { responseData = evt; }")
-	script1.ConsoleLog("responseData")
-	script1.AddLine("")
-	script1.AddComment("Logic for success/error styling")
-	If Verbose Then
-		script1.DeclareVariable("code", $"responseData.${RESPONSE_ELEMENT_CODE}"$, True)
-		script1.DeclareVariable("error", $"responseData.${RESPONSE_ELEMENT_ERROR}"$, True)
-		script1.DeclareVariable("message", $"responseData.${RESPONSE_ELEMENT_MESSAGE}"$, True)
-		'script1.DeclareVariable("status", $"responseData.${RESPONSE_ELEMENT_STATUS}"$, True)
-		'script1.DeclareVariable("content", "JSON.stringify(responseData, undefined, 2)", True)		
-		'script1.DeclareVariable("isSuccess", "code >= 200 && code < 300 && (status === 'ok' || status === 'success')", True)
-		script1.DeclareVariable("isSuccess", "code >= 200 && code < 300", True)
-	Else
-		script1.DeclareVariable("isSuccess", "xhr.status >= 200 && xhr.status < 300", True)
-	End If
-	script1.AddLine("")
-	'script1.AddLine("alertEl.style.display = 'none'; // Prepare for fade")
-	script1.AddLine("alertEl.innerHTML = isSuccess")
-	script1.IncreaseIndent
-	If Verbose Then
-		script1.AddLine("? `${code} ${message}`")
-		script1.AddLine(": `${code} ${error || 'Error'}`;")
-	Else
-		script1.AddLine("? `${xhr.status} Success`")
-		script1.AddLine(": `${xhr.status} ${xhr.statusText || 'Error'}`;")
-	End If
-	script1.DecreaseIndent
-	script1.AddLine("")
-	script1.AddLine("alertEl.className = isSuccess ? 'alert bg-success p-2 mb-0' : 'alert bg-danger p-2 mb-0';")
-	script1.AddLine("")
-	script1.AddComment("Simple fade in using standard CSS or Alpine")
-	'script1.AddLine("alertEl.style.display = 'block';")
-	script1.DecreaseIndent
-	script1.AddLine("});")
-	Return script1.Generate2
-End Sub
+'Private Sub HtmxAfterRequest As String
+'	Dim script1 As MiniJs
+'	script1.Initialize
+'	script1.IncreaseIndent
+'	script1.AddLine("")
+'	'script1.AddLine("document.addEventListener('htmx:afterRequest', (evt) => {")
+'	script1.AddEventListener("htmx:afterRequest", "evt")
+'	script1.IncreaseIndent
+'	script1.DeclareVariable("target", "evt.detail.target", True)
+'	script1.DeclareVariable("xhr", "evt.detail.xhr", True)
+'	script1.DeclareVariable("id", "target.id.replace('response', 'alert')", True)
+'	script1.DeclareVariable("alertEl", "document.getElementById(id)", True)
+'	script1.AddLine("")
+'	script1.AddLine("if (!alertEl) return;")
+'	script1.AddLine("")
+'	script1.DeclareVariable("responseData", "", False)
+'	script1.AddLine("try { responseData = JSON.parse(xhr.responseText); } catch(evt) { responseData = evt; }")
+'	script1.ConsoleLog("responseData")
+'	script1.AddLine("")
+'	script1.AddComment("Logic for success/error styling")
+'	If Verbose Then
+'		script1.DeclareVariable("code", $"responseData.${RESPONSE_ELEMENT_CODE}"$, True)
+'		script1.DeclareVariable("error", $"responseData.${RESPONSE_ELEMENT_ERROR}"$, True)
+'		script1.DeclareVariable("message", $"responseData.${RESPONSE_ELEMENT_MESSAGE}"$, True)
+'		'script1.DeclareVariable("status", $"responseData.${RESPONSE_ELEMENT_STATUS}"$, True)
+'		'script1.DeclareVariable("content", "JSON.stringify(responseData, undefined, 2)", True)		
+'		'script1.DeclareVariable("isSuccess", "code >= 200 && code < 300 && (status === 'ok' || status === 'success')", True)
+'		script1.DeclareVariable("isSuccess", "code >= 200 && code < 300", True)
+'	Else
+'		script1.DeclareVariable("isSuccess", "xhr.status >= 200 && xhr.status < 300", True)
+'	End If
+'	script1.AddLine("")
+'	'script1.AddLine("alertEl.style.display = 'none'; // Prepare for fade")
+'	script1.AddLine("alertEl.innerHTML = isSuccess")
+'	script1.IncreaseIndent
+'	If Verbose Then
+'		script1.AddLine("? `${code} ${message}`")
+'		script1.AddLine(": `${code} ${error || 'Error'}`;")
+'	Else
+'		script1.AddLine("? `${xhr.status} Success`")
+'		script1.AddLine(": `${xhr.status} ${xhr.statusText || 'Error'}`;")
+'	End If
+'	script1.DecreaseIndent
+'	script1.AddLine("")
+'	script1.AddLine("alertEl.className = isSuccess ? 'alert bg-success p-2 mb-0' : 'alert bg-danger p-2 mb-0';")
+'	script1.AddLine("")
+'	script1.AddComment("Simple fade in using standard CSS or Alpine")
+'	'script1.AddLine("alertEl.style.display = 'block';")
+'	script1.DecreaseIndent
+'	script1.AddLine("});")
+'	Return script1.Generate2
+'End Sub
 
 Private Sub SaveToken As String
 	Dim script1 As MiniJs
