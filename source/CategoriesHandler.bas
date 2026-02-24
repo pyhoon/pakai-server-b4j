@@ -40,12 +40,26 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	End If
 End Sub
 
+Sub CreateTag (Name As String) As MiniHtml
+	Dim tag1 As MiniHtml
+	tag1.Initialize(Name)
+	Return tag1
+End Sub
+
 Sub Anchor As MiniHtml
 	Return CreateTag("a")
 End Sub
 
-Sub Li As MiniHtml
-	Return CreateTag("li")
+Sub Button As MiniHtml
+	Return CreateTag("button")
+End Sub
+
+Sub Div As MiniHtml
+	Return CreateTag("div")
+End Sub
+
+Sub Form As MiniHtml
+	Return CreateTag("form")
 End Sub
 
 Sub H3 As MiniHtml
@@ -60,14 +74,6 @@ Sub Icon As MiniHtml
 	Return CreateTag("icon")
 End Sub
 
-Sub Button As MiniHtml
-	Return CreateTag("button")
-End Sub
-
-Sub Form As MiniHtml
-	Return CreateTag("form")
-End Sub
-
 Sub Input As MiniHtml
 	Return CreateTag("input")
 End Sub
@@ -76,42 +82,36 @@ Sub Label As MiniHtml
 	Return CreateTag("label")
 End Sub
 
-Sub Table As MiniHtml
-	Return CreateTag("table")
-End Sub
-
-Sub Thead As MiniHtml
-	Return CreateTag("thead")
-End Sub
-
-Sub Tbody As MiniHtml
-	Return CreateTag("tbody")
-End Sub
-
-Sub Th As MiniHtml
-	Return CreateTag("th")
-End Sub
-
-Sub Tr As MiniHtml
-	Return CreateTag("tr")
-End Sub
-
-Sub Td As MiniHtml
-	Return CreateTag("td")
-End Sub
-
-Sub Div As MiniHtml
-	Return CreateTag("div")
+Sub Li As MiniHtml
+	Return CreateTag("li")
 End Sub
 
 Sub Span As MiniHtml
 	Return CreateTag("span")
 End Sub
 
-Sub CreateTag (Name As String) As MiniHtml
-	Dim tag1 As MiniHtml
-	tag1.Initialize(Name)
-	Return tag1
+Sub Table As MiniHtml
+	Return CreateTag("table")
+End Sub
+
+Sub Tbody As MiniHtml
+	Return CreateTag("tbody")
+End Sub
+
+Sub Td As MiniHtml
+	Return CreateTag("td")
+End Sub
+
+Sub Th As MiniHtml
+	Return CreateTag("th")
+End Sub
+
+Sub Thead As MiniHtml
+	Return CreateTag("thead")
+End Sub
+
+Sub Tr As MiniHtml
+	Return CreateTag("tr")
 End Sub
 
 Private Sub RenderPage
@@ -124,12 +124,6 @@ Private Sub RenderPage
 
 		Dim page1 As MiniHtml = main1.Render
 		Dim ulist1 As MiniHtml = FindUListTag(page1)
-		
-		'Dim list1 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
-		'Dim a1 As MiniHtml = Anchor.up(list1).attr("href", "#")
-		'a1.cls("nav-link")
-		'a1.text("Categories")
-
 		Dim list1 As MiniHtml = Li.up(ulist1)
 		list1.cls("nav-item d-block d-lg-block")
 		Dim a1 As MiniHtml = Anchor.up(list1)
@@ -139,7 +133,6 @@ Private Sub RenderPage
 		Dim i1 As MiniHtml = Icon.up(a1)
 		i1.cls("bi bi-house me-2")
 		i1.attr("title", "Home")
-		'a1.text("Home")
 
 		Dim list2 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
 		Dim a2 As MiniHtml = Anchor.up(list2)
@@ -149,7 +142,6 @@ Private Sub RenderPage
 		Dim i2 As MiniHtml = Icon.up(a2)
 		i2.cls("bi bi-gear me-2")
 		i2.attr("title", "API")
-		'a2.text("API")
 
 		' Sample for adding additional menu link
 		'Dim list2 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
@@ -194,12 +186,6 @@ Private Sub ContentContainer As MiniHtml
 	div1.cls("col-md-6 col-lg-6")
 	Dim div2 As MiniHtml = Div.up(div1)
 	div2.cls("text-end mt-2")
-	
-	'Dim a1 As MiniHtml = Anchor.up(div2)
-	'a1.attr("href", "$SERVER_URL$")
-	'a1.cls("btn btn-primary me-2")
-	'Icon.up(a1).cls("bi bi-house me-2")
-	'a1.text("Home")
 
 	Dim button2 As MiniHtml = Button.up(div2)
 	button2.cls("btn btn-success ml-2")
@@ -277,7 +263,7 @@ Private Sub HandleAddModal
 
 	Dim modalBody As MiniHtml = Div.up(form1)
 	modalBody.cls("modal-body")
-	Div.up(modalBody).attr("id", "modal-messages") '.hxSwapOob("true")
+	Div.up(modalBody).attr("id", "modal-messages")
 	
 	Dim group1 As MiniHtml = Div.up(modalBody).cls("form-group")
 	Dim label1 As MiniHtml = Label.up(group1)

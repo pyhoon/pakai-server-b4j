@@ -98,7 +98,7 @@ Sub AppStart (Args() As String)
 	Api.EnableHelp = True
 	'Api.VerboseMode = False
 	'Api.PayloadType = WebApiUtils.MIME_TYPE_XML
-	Api.ContentType = WebApiUtils.MIME_TYPE_XML
+	'Api.ContentType = WebApiUtils.MIME_TYPE_XML
 	
 	App.Get("/help", "HelpHandler")
 	App.Get("/api/find", "FindApiHandler")

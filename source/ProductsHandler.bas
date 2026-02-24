@@ -42,12 +42,26 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	End If
 End Sub
 
+Sub CreateTag (Name As String) As MiniHtml
+	Dim tag1 As MiniHtml
+	tag1.Initialize(Name)
+	Return tag1
+End Sub
+
 Sub Anchor As MiniHtml
 	Return CreateTag("a")
 End Sub
 
-Sub Li As MiniHtml
-	Return CreateTag("li")
+Sub Button As MiniHtml
+	Return CreateTag("button")
+End Sub
+
+Sub Div As MiniHtml
+	Return CreateTag("div")
+End Sub
+
+Sub Form As MiniHtml
+	Return CreateTag("form")
 End Sub
 
 Sub H5 As MiniHtml
@@ -58,14 +72,6 @@ Sub Icon As MiniHtml
 	Return CreateTag("icon")
 End Sub
 
-Sub Button As MiniHtml
-	Return CreateTag("button")
-End Sub
-
-Sub Form As MiniHtml
-	Return CreateTag("form")
-End Sub
-
 Sub Input As MiniHtml
 	Return CreateTag("input")
 End Sub
@@ -74,46 +80,40 @@ Sub Label As MiniHtml
 	Return CreateTag("label")
 End Sub
 
-Sub Table As MiniHtml
-	Return CreateTag("table")
-End Sub
-
-Sub Thead As MiniHtml
-	Return CreateTag("thead")
-End Sub
-
-Sub Tbody As MiniHtml
-	Return CreateTag("tbody")
-End Sub
-
-Sub Th As MiniHtml
-	Return CreateTag("th")
-End Sub
-
-Sub Tr As MiniHtml
-	Return CreateTag("tr")
-End Sub
-
-Sub Td As MiniHtml
-	Return CreateTag("td")
-End Sub
-
-Sub Div As MiniHtml
-	Return CreateTag("div")
-End Sub
-
-Sub Span As MiniHtml
-	Return CreateTag("span")
+Sub Li As MiniHtml
+	Return CreateTag("li")
 End Sub
 
 Sub Option As MiniHtml
 	Return CreateTag("option")
 End Sub
 
-Sub CreateTag (Name As String) As MiniHtml
-	Dim tag1 As MiniHtml
-	tag1.Initialize(Name)
-	Return tag1
+Sub Span As MiniHtml
+	Return CreateTag("span")
+End Sub
+
+Sub Table As MiniHtml
+	Return CreateTag("table")
+End Sub
+
+Sub Tbody As MiniHtml
+	Return CreateTag("tbody")
+End Sub
+
+Sub Td As MiniHtml
+	Return CreateTag("td")
+End Sub
+
+Sub Th As MiniHtml
+	Return CreateTag("th")
+End Sub
+
+Sub Thead As MiniHtml
+	Return CreateTag("thead")
+End Sub
+
+Sub Tr As MiniHtml
+	Return CreateTag("tr")
 End Sub
 
 Private Sub RenderPage
@@ -541,11 +541,11 @@ End Sub
 Private Sub CreateProductsRow As MiniHtml
 	If App.ctx.ContainsKey("/products/table/row") = False Then
 		Dim tr1 As MiniHtml = Tr
-		Td.up(tr1).cls("align-middle").sty("text-align: right").text("$id$")
-		Td.up(tr1).cls("align-middle").text("$code$")
-		Td.up(tr1).cls("align-middle").text("$name$")
-		Td.up(tr1).cls("align-middle").text("$category$")
-		Td.up(tr1).cls("align-middle").sty("text-align: right").text("$price$")
+		Td.up(tr1).cls("align-middle").sty("text-align: right").text("%id%")
+		Td.up(tr1).cls("align-middle").text("%code%")
+		Td.up(tr1).cls("align-middle").text("%name%")
+		Td.up(tr1).cls("align-middle").text("%category%")
+		Td.up(tr1).cls("align-middle").sty("text-align: right").text("%price%")
 		Dim td6 As MiniHtml = Td.up(tr1)
 		td6.cls("align-middle text-center px-1 py-1")
 

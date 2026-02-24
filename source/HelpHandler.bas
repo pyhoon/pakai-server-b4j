@@ -328,7 +328,7 @@ Private Sub GenerateHtml As String 'ignore
 	Dim script3 As String = SaveToken
 	div6.attr("x-data", script3.SubString2(0, script3.LastIndexOf(CRLF)))
 	div6.attr("@token-updated.window", "accessToken = localStorage.getItem('access_token')")
-	div6.FormatAttributes = True
+	'div6.FormatAttributes = True
 	'div6.multiline
 	
 	For Each method As Map In AllMethods ' Avoid duplicate groups
@@ -1467,8 +1467,7 @@ Private Sub AlpineHtmx As String
 	Dim script1 As MiniJs
 	script1.Initialize
 	script1.IncreaseIndent
-	script1.IncreaseIndent
-	script1.AddLine("")
+	'script1.IncreaseIndent
 	script1.AddComment("1. THE EXTENSION: This tells HTMX how to get the body content")
 	script1.AddComment("This runs INSTEAD of HTMX's default form-encoding logic.")
 	script1.AddLine("htmx.defineExtension('raw-body', {")
@@ -1477,7 +1476,7 @@ Private Sub AlpineHtmx As String
 	script1.IncreaseIndent
 	script1.DeclareVariable("apiId", "elt.getAttribute('data-api-id')", True)
 	'script1.DeclareVariable("bodyValue", "document.getElementById('body' + id)?.value", True)
-	script1.DeclareVariable("bodyValue", $"document.getElementById('body-' + apiId)?.value || "";"$, True)
+	script1.DeclareVariable("bodyValue", $"document.getElementById('body-' + apiId)?.value || """$, True)
 	script1.AddLine("")
 	script1.AddComment("Return the raw string. HTMX will call xhr.send(bodyValue) for you.")
 	script1.AddLine("return bodyValue;")
@@ -1493,13 +1492,14 @@ Private Sub AlpineHtmx As String
 	script1.AddLine("resetUI(apiId) {")
 	script1.IncreaseIndent
 	script1.AddComment("1. Clear the textarea")
-	script1.DeclareVariable("respEl", "document.getElementById(`response-${apiId}`);", True)
+	script1.DeclareVariable("respEl", "document.getElementById(`response-${apiId}`)", True)
 	script1.AddConditionalCall("respEl", "respEl.value = '';")
 	script1.AddLine("")
 	script1.AddComment("2. Hide the alert")
 	script1.StartIf("this.alerts[apiId]")
 	script1.AddLine("this.alerts[apiId].show = false;")
 	script1.EndIf
+	script1.DecreaseIndent
 	script1.AddLine("},")
 	script1.AddLine("")
 	script1.AddComment("Start with an empty object")
@@ -1514,55 +1514,99 @@ Private Sub AlpineHtmx As String
 	script1.AddLine("handleResponse(evt, apiId) {")
 	script1.IncreaseIndent
 	script1.DeclareVariable("xhr", "evt.detail.xhr", True)
-	script1.DeclareVariable("parsed", "''", False)
+	script1.DeclareVariable("contentType", $"xhr.getResponseHeader("Content-Type") || """$, True)
 	script1.DeclareVariable("contentToShow", "xhr.responseText", False)
+	script1.DeclareVariable("a", "", False)
+	script1.DeclareVariable("s", "", False)
+	script1.DeclareVariable("m", "", False)
+	script1.DeclareVariable("e", "", False)
+	script1.DeclareVariable("r", "", False)	
+	'If Verbose = False Then
 	script1.DeclareVariable("isSuccess", "xhr.status >= 200 && xhr.status < 300", False)
-	'script1.DeclareVariable("isSuccess", "false", False)
+	'End If
 	script1.AddLine("")
-	script1.AddComment("Try to pretty-print if it's JSON")
+	script1.StartIf($"contentType.includes("xml")"$)
+	script1.AddComment("1. Parse the string into an XML Document")
+	script1.DeclareVariable("parser", "new DOMParser()", True)
+	script1.DeclareVariable("xmlDoc", $"parser.parseFromString(xhr.responseText, "text/xml")"$, True)
+	script1.AddLine("")
+	script1.AddComment("2. Extract values using tags")
+	script1.AddLine($"a = xhr.status"$)
+	script1.AddLine($"s = xmlDoc.getElementsByTagName("s")[0]?.textContent"$)
+	script1.AddLine($"m = xmlDoc.getElementsByTagName("m")[0]?.textContent"$)
+	script1.AddLine($"e = xmlDoc.getElementsByTagName("e")[0]?.textContent"$)
+	script1.AddLine($"r = xmlDoc.getElementsByTagName("r")[0]"$)
+	script1.AppendComment("The data node")
+	
+	script1.AddLine("")
+	script1.AddComment("3. Logic check")
+	script1.AddConditionalCall("s && s !== 'ok' && s !== 'success'", "isSuccess = false;")
+	script1.AddLine("")
+	script1.AddComment("4. Extract token if present in r")
+	script1.DeclareVariable("token", $"xmlDoc.getElementsByTagName("access_token")[0]"$, True)
+	'script1.DeclareVariable("token", $"r.getElementsByTagName("access_token")[0]"$, True)
+	script1.AddConditionalCall("token", $"localStorage.setItem("access_token", token);"$)
+	
+	script1.AddElse
+	'script1.DeclareVariable("parsed", "''", False)
 	script1.StartTry
-	'script1.DeclareVariable("parsed", "JSON.parse(xhr.responseText)", True)
-	script1.AddLine("parsed = JSON.parse(xhr.responseText)")
+	script1.AddComment("1. Standard JSON Parsing")
+	script1.DeclareVariable("parsed", "JSON.parse(xhr.responseText)", True)
+	'script1.AddLine("parsed = JSON.parse(xhr.responseText);")
+	script1.AddComment("2. Extract values using keys")
+	script1.AddLine("a = parsed.a")
+	script1.AddLine("s = parsed.s")
+	script1.AddLine("m = parsed.m")
+	script1.AddLine("e = parsed.e")
+	script1.AddLine("r = parsed.r")
+	'script1.AddLine("")
+	'script1.AddComment("1. Try to pretty-print if it's JSON")
 	script1.AddLine("contentToShow = JSON.stringify(parsed, null, 2);")
-	' Verbose
-	'script1.AddConditionalCall("parsed.s && parsed.s !== 'ok' && parsed.s !== 'success'", "isSuccess = false;")
+	'If Verbose Then
+	'script1.AddLine("")
+	'script1.AddConditionalCall("s && s !== 'ok' && s !== 'success'", "isSuccess = false;")
+	
 	script1.AddLine("")
-	script1.AddComment("Token Storage Logic")
+	script1.AddComment("3. Logic check")
+	script1.AddConditionalCall("s && s !== 'ok' && s !== 'success'", "isSuccess = false;")
+	script1.AddLine("")
+	script1.AddComment("4. Extract token if present in r")
+	'End If
+	'script1.AddLine("")
+	'script1.AddComment("Token Storage Logic")
 	' Verbose
 	'script1.DeclareVariable("token", "parsed.r?.[0]?.access_token", True)
 	script1.DeclareVariable("token", "parsed.r?.access_token", True)
 	script1.AddConditionalCall("token", $"localStorage.setItem("access_token", token);"$)
-	script1.AddCatch("e")
+	script1.AddCatch("err")
 	'script1.IncreaseIndent
-	script1.AddComment("Not JSON, leave as raw (likely XML or text)")
+	script1.AddComment("Not JSON, leave as raw")
 	script1.EndTry
+	'script1.EndIf
 	script1.AddLine("")
 	'script1.AddTernary("this.alerts[id].message = isSuccess", "`Status ${xhr.status}: Success`", "`Error ${xhr.status} ${xhr.statusText} `;")
 	'script1.AddTernary("this.alerts[id].type = isSuccess", "'bg-emerald-400'", "'bg-rose-400';")
 	'script1.AddLine("this.alerts[id].show = true;")
 	script1.AddComment("Dynamic Alert Assignment")
-	If Verbose Then
-		'script1.DeclareVariable("isSuccess", "parsed.s && parsed.s !== 'ok' && parsed.s !== 'success'", False)
-		script1.AddLine("isSuccess = parsed.s && parsed.s !== 'ok' && parsed.s !== 'success'")
-	Else
-		'script1.DeclareVariable("isSuccess", "xhr.status >= 200 && xhr.status < 300", False)
-		script1.AddLine("isSuccess = xhr.status >= 200 && xhr.status < 300")
-	End If	
+	'If Verbose Then
+	'	script1.DeclareVariable("isSuccess", "parsed.s && (parsed.s == 'ok' || parsed.s == 'success')", True)
+	'Else
+	'	script1.DeclareVariable("isSuccess", "xhr.status >= 200 && xhr.status < 300", True)
+	'End If
 	script1.AddLine("this.alerts[apiId] = {")
 	script1.IncreaseIndent
 	script1.AddLine("show: true,")
 	If Verbose Then
-		script1.AddLine("message: parsed.a + ' ' + parsed.m,")
-		'script1.AddLine("error: parsed.e,")
-		script1.AddLine("status: parsed.a,")
-		script1.AddTernary("type: isSuccess", "'bg-success'", "'bg-danger'")
+		script1.AddLine("status: a,")
+		script1.AddLine("message: a + ' ' + (e ? e : m),")
 	Else
-		script1.AddTernary("message: isSuccess", "`Success (${xhr.status})`", "`Error (${xhr.status})`,")
-		script1.AddLine("status: xhr.status,")
-		script1.AddTernary("type: isSuccess", "'bg-success'", "'bg-danger'")
+		script1.AddLine("status: a,")
+		script1.AddTernary("message: isSuccess", "`${a} Success`", "`${a} Error`,")
 	End If
+	script1.AddTernary("type: isSuccess", "'bg-success'", "'bg-danger'")
 	script1.DecreaseIndent
 	script1.AddLine("};")
+	'script1.DecreaseIndent
 	script1.AddLine("")
 	'script1.AddLine("document.getElementById(`response-${apiId}`).textContent = contentToShow;") ' htmx
 	script1.AddComment("Use .value for Textareas (textContent is for <div> or <pre>)")
@@ -1572,6 +1616,9 @@ Private Sub AlpineHtmx As String
 	script1.EndIf
 	script1.DecreaseIndent
 	script1.AddLine("}")
+	script1.DecreaseIndent
+	script1.AddLine("}")
+	
 	script1.DecreaseIndent
 	script1.AddLine("}));")
 	script1.DecreaseIndent
@@ -1657,6 +1704,8 @@ Private Sub AlpineHtmx As String
 	'script1.EndIf
 	script1.DecreaseIndent
 	script1.AddLine("});")
+	script1.DecreaseIndent
+	script1.AddLine("});")
 	Return script1.Generate2
 End Sub
 
@@ -1718,15 +1767,28 @@ Private Sub SaveToken As String
 	Dim script1 As MiniJs
 	script1.Initialize
 	'script1.DecreaseIndent
+	script1.IncreaseIndent
+	script1.IncreaseIndent
+	script1.IncreaseIndent
 	script1.AddLine("{")
+	'script1.AddCode("{")
 	script1.IncreaseIndent
 	script1.AddLine("accessToken: localStorage.getItem('access_token'),")
 	script1.AddLine("saveToken(xhr) {")
 	script1.IncreaseIndent
 	script1.AddLine("try {")
 	script1.IncreaseIndent
+	
+'	script1.DeclareVariable("contentType", $"xhr.getResponseHeader("Content-Type") || """$, True)
+'	script1.StartIf($"contentType.includes("xml")"$)
+'	script1.DeclareVariable("parser", "new DOMParser()", True)
+'	script1.DeclareVariable("xmlDoc", $"parser.parseFromString(xhr.responseText, "text/xml")"$, True)
+'	'script1.DeclareVariable("resp", $"xmlDoc.getElementsByTagName("r")[0]"$, True)
+'	script1.DeclareVariable("token", $"xmlDoc.getElementsByTagName("access_token")[0]"$, True)
+'	script1.AddElse
 	script1.DeclareVariable("resp", "JSON.parse(xhr.responseText)", True)
 	script1.DeclareVariable("token", "resp.r?.[0]?.access_token", True)
+'	script1.EndIf
 	script1.StartIf("token")
 	script1.AddLine("localStorage.setItem('access_token', token);")
 	script1.AddLine("this.accessToken = token;")
@@ -1737,6 +1799,9 @@ Private Sub SaveToken As String
 	script1.DecreaseIndent
 	script1.AddLine("}")
 	script1.DecreaseIndent
+	script1.AddLine("}")
+	'script1.DecreaseIndent
+	script1.IncreaseIndent
 	script1.AddLine("}")
 	Return script1.Generate2
 End Sub
