@@ -16,8 +16,8 @@ Create Web API or Application Backend Server using B4J project template
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
 - [MiniCSS.b4xlib](https://github.com/pyhoon/MiniCSS-B4X)
-- [MiniJs.b4xlib](https://github.com/pyhoon/MiniJs-B4X)
 - [MiniHtml.b4xlib](https://github.com/pyhoon/MiniHtml2-B4X)
+- [MiniJS.b4xlib](https://github.com/pyhoon/MiniJS-B4X)
 - [MiniORMUtils.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
 - [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
 - sqlite-jdbc-3.7.2.jar (SQLite)
