@@ -14,7 +14,7 @@
             "Link": "https://github.com/pyhoon/MiniCSS-B4X/raw/refs/heads/main/prerelease/MiniCss.b4xlib"
         },
         {
-            "Name": "MiniHtml2.b4xlib",
+            "Name": "MiniHtml.b4xlib",
             "Platform": "B4X",
             "Version": 2.00,
             "Link": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v2.00/MiniHtml2.b4xlib"
@@ -23,7 +23,8 @@
             "Name": "MiniJS.b4xlib",
             "Platform": "B4X",
             "Version": 0.40,
-            "Link": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.40/MiniJs.b4xlib"
+            "Link": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.40/MiniJs.b4xlib",
+            "Update": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.40/update.json"
         },
         {
             "Name": "MiniORMUtils.b4xlib",

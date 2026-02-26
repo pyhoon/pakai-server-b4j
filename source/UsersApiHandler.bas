@@ -95,12 +95,16 @@ End Sub
 Private Sub GetSecureData
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
 	Dim token As String = WebApiUtils.RequestBearerToken(Request)
-	Log(token)
-	If token.EqualsIgnoreCase("null") Then
-		'HRM.ResponseCode = 409
-		'HRM.ResponseError = "Unauthorized Access"
-		Response.SendError(401, "Unauthorized Access")
-	Else		
+	Log($"token=[${token}]"$)
+	If token.EqualsIgnoreCase("null") Or token.Length = 0 Then
+		If HRM.VerboseMode Then
+			HRM.ResponseCode = 401
+			HRM.ResponseError = "Unauthorized Access"
+			ReturnApiResponse
+		Else
+			Response.SendError(401, "Unauthorized Access")
+		End If
+	Else
 		HRM.ResponseCode = 200
 		HRM.ResponseObject = CreateMap("data1": "secure data", "data2": Rnd(100000, 200000))
 		ReturnApiResponse
@@ -135,6 +139,6 @@ Private Sub PostLogin
 	'HRM.ResponseObject = CreateMap("access_token": "a5de6293fe36c1a9de23cb", "user_name": data.Get("username").As(String).Replace(CRLF, "").Trim)
 	HRM.ResponseObject = CreateMap("user_name": data.Get("username").As(String).Replace(CRLF, "").Trim, "access_token": "a5de6293fe36c1a9de23cb")
 	'HRM.ResponseData = result
-	HRM.ResponseMessage = "Login created successfully"
+	HRM.ResponseMessage = "Access Token Generated"
 	ReturnApiResponse
 End Sub

@@ -16,11 +16,13 @@ Sub Class_Globals
 	Private Api	As ApiSettings
 	Private ContentType As String 'ignore
 	Private Verbose As Boolean
-	Private Const RESPONSE_ELEMENT_MESSAGE 	As String = "m"
-	Private Const RESPONSE_ELEMENT_CODE 	As String = "a"
+	Private CustomTheme As Boolean
+	' Override default key names
+	Private Const RESPONSE_ELEMENT_MESSAGE 	As String = "m" 'ignore
+	Private Const RESPONSE_ELEMENT_CODE 	As String = "a" 'ignore
 	Private Const RESPONSE_ELEMENT_STATUS 	As String = "s" 'ignore
 	Private Const RESPONSE_ELEMENT_TYPE 	As String = "t" 'ignore
-	Private Const RESPONSE_ELEMENT_ERROR 	As String = "e"
+	Private Const RESPONSE_ELEMENT_ERROR 	As String = "e" 'ignore
 	Private Const RESPONSE_ELEMENT_RESULT 	As String = "r"	'ignore
 End Sub
 
@@ -32,6 +34,7 @@ Public Sub Initialize
 	'Handlers.Add("CategoriesApiHandler")
 	Handlers.Add("ProductsApiHandler")
 	'Handlers.Add("FindApiHandler")
+	Handlers.Add("UsersApiHandler")
 	Api = Main.Api
 	Verbose = Api.VerboseMode
 	ContentType = Api.ContentType	
@@ -131,7 +134,7 @@ Private Sub ShowHelpPage
 	BuildMethods ' Build page programatically
 	Dim strMain As String = GenerateHtml
 	strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
-	strMain = WebApiUtils.BuildHtml(strMain, Main.app.ctx)
+	strMain = WebApiUtils.BuildHtml(strMain, Main.App.ctx)
 	'WebApiUtils.WriteTextFile("help.html", strMain)
 	File.WriteString(File.DirApp, "help.html", strMain)
 	#Else
@@ -175,14 +178,19 @@ Private Sub GenerateHtml As String 'ignore
 	#End If
 	
 	Dim sty1 As MiniHtml = CreateTag("style").up(head1)
-	'sty1.text(css1.GenerateCSS)
-	sty1.text(GetStyles)
+	Dim cssFolder As String = File.Combine(File.Combine(Main.App.staticfiles.Folder, "assets"), "css")
+	If File.Exists(cssFolder, "help.css") Then
+		sty1.text(File.ReadString(cssFolder, "help.css"))
+		CustomTheme = True
+	Else
+		sty1.text(GetStyles)
+	End If
 	'sty1.multiline
 	'Log(sty1.build)
 	
 	Dim body1 As MiniHtml = CreateTag("body").up(html1)
 	body1.cls("bg-dark text-light")
-	body1.attr("hx-ext", "response-targets")
+	'body1.attr("hx-ext", "response-targets")
 	body1.attr("x-data", "apiApp")
 	body1.multiline
 	
@@ -272,6 +280,7 @@ Private Sub GenerateHtml As String 'ignore
 	img1.attr("src", "/assets/img/coffee.png")
 	'img1.cls("ms-2 mt-1")
 	img1.cls("my-1")
+	If CustomTheme Then img1.cls("dark-mode-ready")
 	img1.sty("height: 36px")
 	
 	Dim li2 As MiniHtml = CreateTag("li").up(ul1)
@@ -294,11 +303,17 @@ Private Sub GenerateHtml As String 'ignore
 	Dim img2 As MiniHtml = CreateTag("img").up(a4)
 	img2.attr("src", "/assets/img/sponsor.png")
 	img2.cls("mx-2")
+	If CustomTheme Then img2.cls("dark-mode-ready")
 	img2.sty("width: 174px")
 	
 	Dim div3 As MiniHtml = Div.up(body1)
 	div3.cls("content m-3")
 	div3.multiline
+	'Dim div6 As MiniHtml = Div.up(div5)
+	Dim script3 As String = SaveToken
+	div3.attr("x-data", script3.SubString2(0, script3.LastIndexOf(CRLF)))
+	div3.attr("@token-updated.window", "accessToken = localStorage.getItem('access_token')")
+	
 	Dim div4 As MiniHtml = Div.up(div3)
 	div4.cls("p-2")
 	div4.multiline
@@ -324,10 +339,10 @@ Private Sub GenerateHtml As String 'ignore
 	span2.text("Version: $VERSION$")
 	'div4.text("@DOCVIEW@")
 	
-	Dim div6 As MiniHtml = Div.up(div5)
-	Dim script3 As String = SaveToken
-	div6.attr("x-data", script3.SubString2(0, script3.LastIndexOf(CRLF)))
-	div6.attr("@token-updated.window", "accessToken = localStorage.getItem('access_token')")
+	'Dim div6 As MiniHtml = Div.up(div5)
+	'Dim script3 As String = SaveToken
+	'div6.attr("x-data", script3.SubString2(0, script3.LastIndexOf(CRLF)))
+	'div6.attr("@token-updated.window", "accessToken = localStorage.getItem('access_token')")
 	'div6.FormatAttributes = True
 	'div6.multiline
 	
@@ -359,7 +374,7 @@ Private Sub GenerateHtml As String 'ignore
 	footer1.cls("footer footer-dark bg-secondary pl-4 pt-2 pb-2")
 	footer1.multiline
 	Dim div9 As MiniHtml = Div.up(footer1)
-	div9.cls("footer small text-secondark text-center d-md-block")
+	div9.cls("footer small text-secondary text-center d-md-block")
 	div9.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;")
 	div9.multiline
 	Dim caption1 As MiniHtml = CreateTag("caption").up(div9)
@@ -370,7 +385,7 @@ Private Sub GenerateHtml As String 'ignore
 	Dim span3 As MiniHtml = Span.up(caption1)
 	span3.sty("color: red")
 	span3.text("❤")
-	caption1.text("in B4X")
+	caption1.text(" in B4X")
 	#If Bundle
 	body1.cdn("script", "/assets/js/bootstrap.min.js")
 	body1.cdn("script", "/assets/js/htmx.min.js")
@@ -526,6 +541,21 @@ Private Sub BuildMethods 'ignore
 	Method.Put("Elements", $"["{id}"]"$)
 	ReplaceMethod(Method)
 	
+	Dim Method As Map = RetrieveMethod("Client", "PostLogin")
+	Method.Put("Desc", "Get Access Token")
+	Method.Put("Name", "login") ' override group name
+	Dim Format As String = $"{"username": "admin"}"$
+	Dim Body As String = $"{"username": "admin"}"$
+	Method.Put("Format", Format)
+	Method.Put("Body", Body)	
+	ReplaceMethod(Method)
+	
+	Dim Method As Map = RetrieveMethod("Client", "GetSecureData")
+	Method.Put("Authenticate", "Token")
+	Method.Put("Desc", "Get Secure Data")
+	Method.Put("Name", "secure-data") ' override group name
+	ReplaceMethod(Method)
+	
 '	Dim Method As Map = RetrieveMethod("Find", "GetAllProducts")
 '	Method.Put("Desc", "Get all Products (with Category name)")
 '	ReplaceMethod(Method)
@@ -660,7 +690,7 @@ End Sub
 Private Sub CreateMethodProperties (groupName As String, methodLine As String) As Map
 	Dim methodProps As Map
 	methodProps.Initialize
-	methodProps.Put("Group", groupName)
+	methodProps.Put("Group", groupName) ' for heading text
 	methodProps.Put("Method", ExtractMethod(methodLine))
 	methodProps.Put("Desc", methodProps.Get("Method"))
 	methodProps.Put("Verb", ExtractVerb(methodLine))
@@ -668,6 +698,7 @@ Private Sub CreateMethodProperties (groupName As String, methodLine As String) A
 	methodProps.Put("Format", "&nbsp;")
 	methodProps.Put("Body", "")
 	methodProps.Put("Noapi", False)
+	methodProps.Put("Name", groupName) ' readded for overriding custom URL /api, default same as group
 	methodProps.Put("Format", "")
 	Return methodProps
 End Sub
@@ -810,10 +841,16 @@ Private Sub GenerateVerbSection (Props As Map) As VerbSection
 	If Props.ContainsKey("Elements") Then
 		Elements = Props.Get("Elements").As(JSON).ToList
 	End If
+	'If section.Noapi Then
+	'	section.Link = GenerateNoApiLink(Props.Get("Group"), Elements)
+	'Else
+	'	section.Link = GenerateLink(Props.Get("Version"), Props.Get("Group"), Elements)
+	'End If
+	' Override default name (came from Group or Handler name)
 	If section.Noapi Then
-		section.Link = GenerateNoApiLink(Props.Get("Group"), Elements)
+		section.Link = GenerateNoApiLink(Props.Get("Name"), Elements)
 	Else
-		section.Link = GenerateLink(Props.Get("Version"), Props.Get("Group"), Elements)
+		section.Link = GenerateLink(Props.Get("Version"), Props.Get("Name"), Elements)
 	End If
 	section.Authenticate = Props.Get("Authenticate")
 	section.Description = Props.Get("Desc")
@@ -872,6 +909,7 @@ Private Sub GenerateAccordionHead (section As VerbSection) As MiniHtml
 		span2.sty("width: 50px")
 		span2.cls("badge rounded-pill pill-yellow pill-yellow-text px-2 py-1 me-1")
 		span2.text(strAuthenticate)
+		'button1.cls(section.Authenticate.ToLowerCase) ' add class
 	End If
 	button1.text(section.Description)
 	Return h21
@@ -1066,6 +1104,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	Else
 		Dim button1 As MiniHtml = Button.up(div9)
 		'button1.attr("id", $"btn${section.ElementId}"$)
+		button1.cls(section.Authenticate.ToLowerCase) ' add class
 		button1.cls("btn submit-button-" & section.Color & " text-white col-md-6 col-lg-4 p-2 float-end")
 		button1.sty("cursor: pointer; padding-bottom: 60px")
 		button1.attr(":data-api-id", "apiId")
@@ -1159,7 +1198,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	textarea2.attr("rows", "10")
 	'textarea2.attr("id", $"response${section.ElementId}"$)
 	textarea2.attr(":id", "'response-' + apiId")
-	textarea2.cls("form-control")
+	textarea2.cls("form-control response-area")
 	textarea2.sty("background-color: #363636")
 	textarea2.sty("color: #68d391; font-size: small") ' text-green-400
 	textarea2.FormatAttributes = True
@@ -1457,11 +1496,11 @@ Private Sub GetStyles As String
 	cb1.Rule(".htmx-request.htmx-indicator")
 	cb1.Property("display", "inline-block")
 	
+	cb1.Rule("img.dark-mode-ready")
+	cb1.Property("filter", "invert(1)")
+	
 	Return css1.GenerateCSS
 End Sub
-
-' document.addEventListener('htmx:configRequest', (evt) => {...})
-'Private Sub HtmxConfigRequest As String
 
 Private Sub AlpineHtmx As String
 	Dim script1 As MiniJs
@@ -1515,10 +1554,13 @@ Private Sub AlpineHtmx As String
 	script1.IncreaseIndent
 	script1.DeclareVariable("xhr", "evt.detail.xhr", True)
 	script1.DeclareVariable("contentType", $"xhr.getResponseHeader("Content-Type") || """$, True)
+	'script1.ConsoleLog("contentType")
 	script1.DeclareVariable("contentToShow", "xhr.responseText", False)
+	'script1.ConsoleLog("contentToShow")
+	script1.DeclareVariable("m", "", False)
 	script1.DeclareVariable("a", "", False)
 	script1.DeclareVariable("s", "", False)
-	script1.DeclareVariable("m", "", False)
+	script1.DeclareVariable("t", "", False)
 	script1.DeclareVariable("e", "", False)
 	script1.DeclareVariable("r", "", False)	
 	'If Verbose = False Then
@@ -1531,22 +1573,31 @@ Private Sub AlpineHtmx As String
 	script1.DeclareVariable("xmlDoc", $"parser.parseFromString(xhr.responseText, "text/xml")"$, True)
 	script1.AddLine("")
 	script1.AddComment("2. Extract values using tags")
-	script1.AddLine($"a = xhr.status"$)
-	script1.AddLine($"s = xmlDoc.getElementsByTagName("s")[0]?.textContent"$)
-	script1.AddLine($"m = xmlDoc.getElementsByTagName("m")[0]?.textContent"$)
-	script1.AddLine($"e = xmlDoc.getElementsByTagName("e")[0]?.textContent"$)
-	script1.AddLine($"r = xmlDoc.getElementsByTagName("r")[0]"$)
+	'script1.AddLine($"a = xhr.status;"$)
+	'script1.AddLine($"t = xmlDoc.getElementsByTagName("${RESPONSE_ELEMENT_TYPE}")[0]?.textContent;"$)
+	script1.AddLine($"m = xmlDoc.getElementsByTagName("${RESPONSE_ELEMENT_MESSAGE}")[0]?.textContent;"$)
+	script1.AddLine($"a = xmlDoc.getElementsByTagName("${RESPONSE_ELEMENT_CODE}")[0]?.textContent;"$)
+	script1.AddLine($"s = xmlDoc.getElementsByTagName("${RESPONSE_ELEMENT_STATUS}")[0]?.textContent;"$)
+	script1.AddLine($"t = contentType;"$)
+	script1.AddLine($"e = xmlDoc.getElementsByTagName("${RESPONSE_ELEMENT_ERROR}")[0]?.textContent;"$)
+	script1.AddLine($"r = xmlDoc.getElementsByTagName("${RESPONSE_ELEMENT_RESULT}")[0];"$)
+	script1.AddCode(" ") ' leave a space
 	script1.AppendComment("The data node")
+	script1.ConsoleLog("m, a, s, t, e, r")
 	
 	script1.AddLine("")
 	script1.AddComment("3. Logic check")
 	script1.AddConditionalCall("s && s !== 'ok' && s !== 'success'", "isSuccess = false;")
 	script1.AddLine("")
 	script1.AddComment("4. Extract token if present in r")
-	script1.DeclareVariable("token", $"xmlDoc.getElementsByTagName("access_token")[0]"$, True)
 	'script1.DeclareVariable("token", $"r.getElementsByTagName("access_token")[0]"$, True)
+	script1.StartIf("r")
+	script1.AddComment("We use r.querySelector instead of xmlDoc to be specific")
+	script1.DeclareVariable("token", $"r.getElementsByTagName("access_token")[0]?.textContent;"$, True)
+	script1.StartIf("token")
 	script1.AddConditionalCall("token", $"localStorage.setItem("access_token", token);"$)
-	
+	script1.EndIf
+	script1.EndIf
 	script1.AddElse
 	'script1.DeclareVariable("parsed", "''", False)
 	script1.StartTry
@@ -1554,11 +1605,20 @@ Private Sub AlpineHtmx As String
 	script1.DeclareVariable("parsed", "JSON.parse(xhr.responseText)", True)
 	'script1.AddLine("parsed = JSON.parse(xhr.responseText);")
 	script1.AddComment("2. Extract values using keys")
-	script1.AddLine("a = parsed.a")
-	script1.AddLine("s = parsed.s")
-	script1.AddLine("m = parsed.m")
-	script1.AddLine("e = parsed.e")
-	script1.AddLine("r = parsed.r")
+	'script1.AddLine("m = parsed.m;")
+	'script1.AddLine("a = parsed.a;")
+	'script1.AddLine("s = parsed.s;")
+	'script1.AddLine("t = parsed.t;")
+	'script1.AddLine("e = parsed.e;")
+	'script1.AddLine("r = parsed.r;")
+	'script1.AddLine($"a = xhr.status;"$)
+	'script1.AddLine($"t = parsed.${RESPONSE_ELEMENT_TYPE};"$)
+	script1.AddLine($"m = parsed.${RESPONSE_ELEMENT_MESSAGE};"$)
+	script1.AddLine($"a = parsed.${RESPONSE_ELEMENT_CODE};"$)
+	script1.AddLine($"s = parsed.${RESPONSE_ELEMENT_STATUS};"$)
+	script1.AddLine($"t = contentType;"$)
+	script1.AddLine($"e = parsed.${RESPONSE_ELEMENT_ERROR};"$)
+	script1.AddLine($"r = parsed.${RESPONSE_ELEMENT_RESULT};"$)
 	'script1.AddLine("")
 	'script1.AddComment("1. Try to pretty-print if it's JSON")
 	script1.AddLine("contentToShow = JSON.stringify(parsed, null, 2);")
@@ -1582,7 +1642,7 @@ Private Sub AlpineHtmx As String
 	'script1.IncreaseIndent
 	script1.AddComment("Not JSON, leave as raw")
 	script1.EndTry
-	'script1.EndIf
+	script1.EndIf
 	script1.AddLine("")
 	'script1.AddTernary("this.alerts[id].message = isSuccess", "`Status ${xhr.status}: Success`", "`Error ${xhr.status} ${xhr.statusText} `;")
 	'script1.AddTernary("this.alerts[id].type = isSuccess", "'bg-emerald-400'", "'bg-rose-400';")
@@ -1598,7 +1658,7 @@ Private Sub AlpineHtmx As String
 	script1.AddLine("show: true,")
 	If Verbose Then
 		script1.AddLine("status: a,")
-		script1.AddLine("message: a + ' ' + (e ? e : m),")
+		script1.AddLine("message: a + ' ' + (e && e != 'null' ? e : m),")
 	Else
 		script1.AddLine("status: a,")
 		script1.AddTernary("message: isSuccess", "`${a} Success`", "`${a} Error`,")
@@ -1614,8 +1674,8 @@ Private Sub AlpineHtmx As String
 	script1.StartIf("responseEl")
 	script1.AddLine("responseEl.value = contentToShow;")
 	script1.EndIf
-	script1.DecreaseIndent
-	script1.AddLine("}")
+'	script1.DecreaseIndent
+'	script1.AddLine("}")
 	script1.DecreaseIndent
 	script1.AddLine("}")
 	
@@ -1651,6 +1711,7 @@ Private Sub AlpineHtmx As String
 	script1.DeclareVariable("creds", "btoa(`${localStorage.getItem('client_id')}:${localStorage.getItem('client_secret')}`)", True)
 	script1.AddLine("evt.detail.headers['Authorization'] = `Basic ${creds}`;")
 	script1.ElseIf("el.classList.contains('token')")
+	script1.ConsoleLog("'access_token', localStorage.getItem('access_token')")
 	script1.AddLine("evt.detail.headers['Authorization'] = `Bearer ${localStorage.getItem('access_token')}`;")
 	script1.EndIf
 	
@@ -1775,29 +1836,34 @@ Private Sub SaveToken As String
 	script1.IncreaseIndent
 	script1.AddLine("accessToken: localStorage.getItem('access_token'),")
 	script1.AddLine("saveToken(xhr) {")
+	'script1.IncreaseIndent
+	'script1.AddLine("try {")
 	script1.IncreaseIndent
-	script1.AddLine("try {")
-	script1.IncreaseIndent
-	
-'	script1.DeclareVariable("contentType", $"xhr.getResponseHeader("Content-Type") || """$, True)
-'	script1.StartIf($"contentType.includes("xml")"$)
-'	script1.DeclareVariable("parser", "new DOMParser()", True)
-'	script1.DeclareVariable("xmlDoc", $"parser.parseFromString(xhr.responseText, "text/xml")"$, True)
-'	'script1.DeclareVariable("resp", $"xmlDoc.getElementsByTagName("r")[0]"$, True)
-'	script1.DeclareVariable("token", $"xmlDoc.getElementsByTagName("access_token")[0]"$, True)
-'	script1.AddElse
+	script1.StartTry
+	script1.DeclareVariable("contentType", $"xhr.getResponseHeader('Content-Type') || ''"$, True)
+	script1.ConsoleLog("contentType")
+	script1.StartIf($"contentType.includes('xml')"$)
+	script1.DeclareVariable("parser", "new DOMParser()", True)
+	script1.DeclareVariable("xmlDoc", $"parser.parseFromString(xhr.responseText, 'text/xml')"$, True)
+	'script1.DeclareVariable("resp", $"xmlDoc.getElementsByTagName('r')[0]"$, True)
+	script1.DeclareVariable("token", $"xmlDoc.getElementsByTagName('r')[0].access_token"$, True)
+	script1.AddElse
 	script1.DeclareVariable("resp", "JSON.parse(xhr.responseText)", True)
 	script1.DeclareVariable("token", "resp.r?.[0]?.access_token", True)
-'	script1.EndIf
+	script1.EndIf
 	script1.StartIf("token")
 	script1.AddLine("localStorage.setItem('access_token', token);")
 	script1.AddLine("this.accessToken = token;")
 	script1.AddLine("console.log('Access token stored!');")
 	script1.EndIf
 	script1.DecreaseIndent
-	script1.AddLine("} catch(e) { console.log(e) }")
-	script1.DecreaseIndent
-	script1.AddLine("}")
+	script1.AddLine("} catch(err) { console.log(err) }")
+'	script1.AddCatch("err")
+'	script1.ConsoleLog("err")
+'	script1.EndTry
+	'script1.DecreaseIndent
+	'script1.AddLine("}")
+	script1.EndFunction
 	script1.DecreaseIndent
 	script1.AddLine("}")
 	'script1.DecreaseIndent
