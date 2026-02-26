@@ -1,8 +1,8 @@
 # Pakai Server - Web Application framework
 
-Version: 6.33
+Version: 6.36
 
-Create Web Application using B4J project template
+Create Web API or Application Backend Server using B4J project template
 
 ### Preview
 ![Index](pakai-index.png)
@@ -10,24 +10,24 @@ Create Web Application using B4J project template
 ---
 
 ## Templates
-- Pakai Server (6.33) **min**.b4xtemplate (assets excluded)
-- Pakai Server (6.33) **starter**.b4xtemplate **_recommended_**
-- Pakai Server (6.33) **bundle**.b4xtemplate (local css/js)
+- Pakai Server (6.36).b4xtemplate **_recommended_**
+- Pakai Server Bundle (6.36).b4xtemplate (local assets)
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
+- [MiniCSS.b4xlib](https://github.com/pyhoon/MiniCSS-B4X)
 - [MiniJs.b4xlib](https://github.com/pyhoon/MiniJs-B4X)
-- [MiniHtml2.b4xlib](https://github.com/pyhoon/MiniHtml2-B4X)
-- [MiniORMUtils.v4.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
+- [MiniHtml.b4xlib](https://github.com/pyhoon/MiniHtml2-B4X)
+- [MiniORMUtils.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
 - sqlite-jdbc-3.7.2.jar (SQLite)
 - mysql-connector-j-9.3.0.jar (MySQL)
 - mariadb-java-client-3.5.6.jar (MariaDB)
 
 ## Features
-- Frontend using HTMX v2.0.8, Bootstrap v5.3.8, Bootstrap Icons v1.13.1
+- Frontend using Bootstrap v5.3.8, Bootstrap Icons v1.13.1, HTMX v2.0.8, AlpineJS v3.15.8
 - Responsive design with modal dialog and toast
 - SQLite and MySQL/MariaDB backend
-- Built-in CRUD/REST examples
+- Built-in REST API or CRUD examples
 
 ## Improvement
 - Better UI/UX/DX compared to version 5.x
@@ -35,8 +35,8 @@ Create Web Application using B4J project template
 - HTML generated using B4X
 - No JavaScript module
 - No jQuery AJAX parsing
-- JSON/XML API is optional
-- WebApiUtils is optional
+- JSON/XML API supported
+- WebApiUtils supported with HelpHandler
 
 ### Code Example
 ```b4x
