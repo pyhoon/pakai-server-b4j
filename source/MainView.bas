@@ -33,6 +33,7 @@ Public Sub LoadToast (Tag1 As MiniHtml)
 	mToast = Tag1
 End Sub
 
+#Region MiniHTML Helpers
 Sub Anchor As MiniHtml
 	Return CreateTag("a")
 End Sub
@@ -82,6 +83,7 @@ Sub CreateTag (Name As String) As MiniHtml
 	tag1.Initialize(Name)
 	Return tag1
 End Sub
+#End Region
 
 Public Sub Render As MiniHtml
 	Dim page1 As MiniHtml = CreateTag("html").lang("en")
@@ -89,15 +91,16 @@ Public Sub Render As MiniHtml
 	PageBody.up(page1)
 	Dim body1 As MiniHtml = page1.ChildByName("body")
 	BodyFooter.up(body1)
-	#If Bundle
+	'Begin Bundle
 	body1.cdn("script", "$SERVER_URL$/assets/js/bootstrap.min.js")
 	body1.cdn("script", "$SERVER_URL$/assets/js/htmx.min.js")
-	#Else
+	'End Bundle
+	'Begin CDN
 	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
 	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y", "anonymous")
 	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
 	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz", "anonymous")
-	#End If
+	'End CDN
 	body1.cdn("script", "$SERVER_URL$/assets/js/app.js")
 	Return page1
 End Sub
@@ -113,15 +116,16 @@ Private Sub PageHeader As MiniHtml
 	Dim link1 As MiniHtml = CreateTag("link").up(head1)
 	link1.attr("rel", "icon")
 	link1.attr("type", "image/png")
-	link1.attr("href", "$SERVER_URL$/assets/img/favicon.png")	
-	#If Bundle
+	link1.attr("href", "$SERVER_URL$/assets/img/favicon.png")
+	'Begin Bundle
 	head1.cdn("style", "$SERVER_URL$/assets/css/bootstrap.min.css")
 	head1.cdn("style", "$SERVER_URL$/assets/css/bootstrap-icons.min.css")
-	#Else
+	'End Bundle
+	'Begin CDN
 	head1.cdn2("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
 	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB", "anonymous")
 	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")
-	#End If
+	'End CDN	
 	head1.cdn("style", "$SERVER_URL$/assets/css/main.css?v=$VERSION$")
 	Return head1
 End Sub
@@ -130,7 +134,6 @@ Private Sub PageBody As MiniHtml
 	Dim body1 As MiniHtml = CreateTag("body").cls("bg-white")
 	If mToast.IsInitialized Then mToast.up(body1)
 	Dim nav1 As MiniHtml = CreateTag("nav").up(body1)
-	'nav1.cls("navbar navbar-light navbar-expand-lg sticky-top bg-info")
 	nav1.cls("navbar navbar-light navbar-expand-lg sticky-top bg-info py-1")
 	Dim div1 As MiniHtml = Div.up(nav1)
 	div1.cls("container-fluid")
@@ -154,7 +157,6 @@ Private Sub PageBody As MiniHtml
 	Dim ulist1 As MiniHtml = Ul.up(collapse1)
 	ulist1.cls("navbar-nav navbar-brand ms-auto mb-md-0")
 	Dim list1 As MiniHtml = Li.up(ulist1)
-	'list1.cls("nav-item d-block d-lg-none text-center")
 	list1.cls("nav-item d-block d-lg-none")
 	Dim a1 As MiniHtml = Anchor.up(list1)
 	a1.cls("nav-link float-end")
@@ -162,8 +164,6 @@ Private Sub PageBody As MiniHtml
 	a1.attr("target", "_blank")
 	Dim img1 As MiniHtml = Img.up(a1)
 	img1.attr("src", "/assets/img/coffee.png")
-	'img1.cls("mt-1")
-	'img1.sty("height: 40px")
 	img1.cls("my-1")
 	img1.sty("height: 36px")
 	
@@ -203,10 +203,10 @@ Private Sub BodyFooter As MiniHtml
 	Dim caption1 As MiniHtml = CreateTag("caption").up(small1)
 	caption1.text("$APP_COPYRIGHT$")
 	Br.up(caption1)
-	caption1.text("Pakai ")
+	caption1.text("Made with ")
 	Dim span1 As MiniHtml = Span.up(caption1)
 	span1.sty("color: red")
 	Icon.up(span1).cls("bi bi-heart")
-	caption1.text(" B4X")
+	caption1.text(" powered by B4X")
 	Return footer1
 End Sub

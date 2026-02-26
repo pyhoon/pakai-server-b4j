@@ -1,8 +1,7 @@
 ﻿AppType=StandardJava
-Build1=Bundle,b4j.pakai,SQLite,hu2_acceptall,Bundle
-Build2=Default,b4j.pakai,SQLite,hu2_acceptall
-Build3=MariaDB,b4j.pakai,MariaDB,hu2_acceptall
-Build4=MySQL,b4j.pakai,MySQL,hu2_acceptall
+Build1=Default,b4j.pakai,hu2_acceptall
+Build2=MariaDB,b4j.pakai,MariaDB,hu2_acceptall
+Build3=MySQL,b4j.pakai,MySQL,hu2_acceptall
 File1=config.example
 File2=mariadb.example
 File3=mysql.example
@@ -16,9 +15,9 @@ Library1=endsmeet
 Library2=jcore
 Library3=minicss
 Library4=minihtml
-Library5=miniormutils
-Library6=webapiutils
-Library7=minijs
+Library5=minijs
+Library6=miniormutils
+Library7=webapiutils
 Module1=CategoriesApiHandler
 Module2=CategoriesHandler
 Module3=FindApiHandler
@@ -48,18 +47,27 @@ Version=10.45
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
 #Region Macros
-'For source
-#Macro: Title, Create Template (standard), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.36).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
-#Macro: Title, Create Template (bundle), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.36-bundle).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css&args=Objects\www\assets\js\*.js
-#Macro: Title, Create Template (min), ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.36-min).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE
-'#Macro: Title, Release folder, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
-#Macro: Title, Copy to AddLibs, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
+'Default - using jsdelivr CDNs
+'Bundle  - using local resources
+'1 - Create $APPNAME$.b4j
+'2 - Open $APPNAME$.b4j and remove all macros, except for release
+'    -> Default: Remove jsdelivr CDNs
+'3 - Create Pakai Server (6.36).b4xtemplate
+'    -> Bundle: Remove bundle CDNs
+'4 - Create Pakai Server Bundle (6.36).b4xtemplate
+'5 - Copy to B4J Additional Libraries folder
+'6 - Check Release folder
+#Macro: Title, Step 1, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\Pakai.b4j&args=%PROJECT%\$APPNAME$.b4j
+#Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
+#Macro: Title, Step 3, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.36).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=resources.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
+#Macro: Title, Step 4, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+Bundle+(6.36).b4xtemplate&args=Files&args=$APPNAME$.*&args=*.bas&args=libs.json&args=Objects\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css&args=Objects\www\assets\js\*.js
+#Macro: Title, Step 5, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\*.b4xtemplate&args=%ADDITIONAL%
+#Macro: Title, Step 6, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 'For release
-#Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&librariesrefresh=True
-#if Bundle
-#Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
-#End If
-'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2026-02-26_0049.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+'If Bundle, exclude GetResources
+'#Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&librariesrefresh=True
+'#Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
+'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
 '#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
 '#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
@@ -90,11 +98,6 @@ Sub AppStart (Args() As String)
 	App.Rest("/hx/categories/*", "CategoriesHandler")
 	#If Debug
 	Api = App.api
-	Api.EnableHelp = True
-	'Api.VerboseMode = False
-	'Api.PayloadType = WebApiUtils.MIME_TYPE_XML
-	Api.ContentType = WebApiUtils.MIME_TYPE_XML
-	
 	App.Get("/help", "HelpHandler")
 	App.Get("/api/find", "FindApiHandler")
 	App.Post("/api/find", "FindApiHandler")
@@ -105,10 +108,6 @@ Sub AppStart (Args() As String)
 	App.Post("/api/categories", "CategoriesApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
 	App.Rest("/api/categories/*", "CategoriesApiHandler")
-	
-	'App.Get("/client", "UsersApiHandler")
-	'App.Post("/api/login", "UsersApiHandler")
-	'App.Get("/api/secure-data", "UsersApiHandler")
 	#End If	
 	App.Start
 	App.LogStartupMessage
@@ -130,12 +129,12 @@ End Sub
 
 Public Sub ConfigureDatabase
 	Try
+		Dim dbvar As String = "sqlite"
 		#If MariaDB
 		Dim dbvar As String = "mariadb"
-		#Else If MySQL
+		#End If
+		#If MySQL
 		Dim dbvar As String = "mysql"
-		#Else
-		Dim dbvar As String = "sqlite"
 		#End If
 		If File.Exists(File.DirApp, $"${dbvar}.ini"$) = False Then
 			File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)

@@ -123,17 +123,16 @@ Private Sub GenerateHelpPage As String 'ignore
 	Dim link1 As MiniHtml = CreateTag("link").up(head1)
 	link1.attr("rel", "icon")
 	link1.attr("type", "image/png")
-	#If Bundle
 	link1.attr("href", "/assets/img/favicon.png")
+	'Begin Bundle
 	head1.cdn("style", "/assets/css/bootstrap.min.css")
 	head1.cdn("style", "/assets/css/bootstrap-icons.min.css")
-	#Else
-	link1.attr("href", "$SERVER_URL$/assets/img/favicon.png")
+	'End Bundle
+	'Begin CDN
 	head1.cdn2("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
 	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB", "anonymous")
 	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")
-	#End If
-	
+	'End CDN
 	Dim sty1 As MiniHtml = CreateTag("style").up(head1)
 	Dim cssFolder As String = File.Combine(File.Combine(Main.App.staticfiles.Folder, "assets"), "css")
 	If File.Exists(cssFolder, "help.css") Then
@@ -281,17 +280,18 @@ Private Sub GenerateHelpPage As String 'ignore
 	span3.sty("color: red")
 	span3.text("❤")
 	caption1.text(" using Pakai")
-	#If Bundle
+	'Begin Bundle
 	body1.cdn("script", "/assets/js/bootstrap.min.js")
 	body1.cdn("script", "/assets/js/htmx.min.js")
 	body1.cdn("script", "/assets/js/cdn.min.js")
-	#Else
+	'End Bundle
+	'Begin CDN
 	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
 	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y", "anonymous")
 	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
 	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz", "anonymous")
 	body1.cdn3("script", "https://cdn.jsdelivr.net/npm/alpinejs@3.15.8/dist/cdn.min.js", CreateMap("defer": ""))	
-	#End If
+	'End CDN
 
 	Dim script2 As String = AlpineHtmx
 	CreateTag("script").up(body1).text(script2.SubString2(0, script2.LastIndexOf(CRLF))).multiline
@@ -424,14 +424,6 @@ Private Sub BuildMethods 'ignore
 	'Method.Put("Expected", GetExpectedResponse(Method.Get("Verb"))) ' POST
 	Method.Put("Expected", GetExpectedResponse(""))
 	ReplaceMethod(Method)
-	
-	'Dim Method As Map = CreateMethodProperties("Find", "UploadImage ' #post")
-	'Method.Put("Desc", "Upload image")
-	'Method.Put("Name", "Upload")
-	'Method.Put("FileUpload", "Image")
-	'Method.Put("Format", "Image")
-	'Method.Put("Expected", GetExpectedResponse(""))
-	'AllMethods.Add(Method)
 End Sub
 
 Private Sub ReadHandlers 'ignore
