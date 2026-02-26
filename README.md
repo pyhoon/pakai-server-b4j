@@ -19,6 +19,7 @@ Create Web API or Application Backend Server using B4J project template
 - [MiniJs.b4xlib](https://github.com/pyhoon/MiniJs-B4X)
 - [MiniHtml.b4xlib](https://github.com/pyhoon/MiniHtml2-B4X)
 - [MiniORMUtils.b4xlib](https://github.com/pyhoon/MiniORMUtils-B4X)
+- [WebApiUtils.b4xlib](https://github.com/pyhoon/WebApiUtils-B4J)
 - sqlite-jdbc-3.7.2.jar (SQLite)
 - mysql-connector-j-9.3.0.jar (MySQL)
 - mariadb-java-client-3.5.6.jar (MariaDB)
