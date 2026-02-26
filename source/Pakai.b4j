@@ -48,12 +48,12 @@ Version=10.45
 #End If
 #Region Macros
 'Default - using jsdelivr CDNs
-'Bundle  - using local resources
 '1 - Create $APPNAME$.b4j
-'2 - Open $APPNAME$.b4j and remove all macros, except for release
-'    -> Default: Remove jsdelivr CDNs
+'2 - Open $APPNAME$.b4j
+'    -> Remove all macros for Step 1 to 6
 '3 - Create Pakai Server (6.36).b4xtemplate
-'    -> Bundle: Remove bundle CDNs
+'    -> Search for 'Bundle (MainView & HelpHandler)
+'    -> Uncomment Bundle resources, comment jsdelivr CDNs
 '4 - Create Pakai Server Bundle (6.36).b4xtemplate
 '5 - Copy to B4J Additional Libraries folder
 '6 - Check Release folder
@@ -65,7 +65,7 @@ Version=10.45
 #Macro: Title, Step 6, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 'For release
 'If Bundle, exclude GetResources
-'#Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&librariesrefresh=True
+#Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&librariesrefresh=True
 '#Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
 '#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
 '#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects

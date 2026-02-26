@@ -1,8 +1,7 @@
 ﻿AppType=StandardJava
-Build1=Bundle,b4j.pakai,SQLite,hu2_acceptall,Bundle
-Build2=Default,b4j.pakai,SQLite,hu2_acceptall
-Build3=MariaDB,b4j.pakai,MariaDB,hu2_acceptall
-Build4=MySQL,b4j.pakai,MySQL,hu2_acceptall
+Build1=Default,b4j.pakai,hu2_acceptall
+Build2=MariaDB,b4j.pakai,MariaDB,hu2_acceptall
+Build3=MySQL,b4j.pakai,MySQL,hu2_acceptall
 File1=config.example
 File2=mariadb.example
 File3=mysql.example
@@ -15,7 +14,7 @@ Group=App
 Library1=endsmeet
 Library2=jcore
 Library3=minicss
-Library4=minihtml2
+Library4=minihtml
 Library5=minijs
 Library6=miniormutils
 Library7=webapiutils
@@ -30,7 +29,7 @@ Module8=ProductsHandler
 NumberOfFiles=4
 NumberOfLibraries=7
 NumberOfModules=8
-Version=10.3
+Version=10.45
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
@@ -48,13 +47,11 @@ Version=10.3
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
 #Region Macros
-#Macro: Title, GetLibraries, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&args=false
-#if Bundle
-#Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
-#End If
-#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%_2026-02-20_0020.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
-#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
-#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
+#Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&librariesrefresh=True
+'#Macro: Title, GetResources, ide://run?file=%JAVABIN%\java.exe&args=-jar&args=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
+'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+'#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
+'#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
 	Public DB 					As MiniORM
@@ -83,9 +80,6 @@ Sub AppStart (Args() As String)
 	App.Rest("/hx/categories/*", "CategoriesHandler")
 	#If Debug
 	Api = App.api
-	Api.EnableHelp = True
-	'Api.VerboseMode = False
-	
 	App.Get("/help", "HelpHandler")
 	App.Get("/api/find", "FindApiHandler")
 	App.Post("/api/find", "FindApiHandler")
@@ -117,12 +111,12 @@ End Sub
 
 Public Sub ConfigureDatabase
 	Try
+		Dim dbvar As String = "sqlite"
 		#If MariaDB
 		Dim dbvar As String = "mariadb"
-		#Else If MySQL
+		#End If
+		#If MySQL
 		Dim dbvar As String = "mysql"
-		#Else
-		Dim dbvar As String = "sqlite"
 		#End If
 		If File.Exists(File.DirApp, $"${dbvar}.ini"$) = False Then
 			File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)
