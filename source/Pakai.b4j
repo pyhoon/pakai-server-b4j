@@ -27,10 +27,9 @@ Module5=HttpsFilter
 Module6=MainView
 Module7=ProductsApiHandler
 Module8=ProductsHandler
-Module9=UsersApiHandler
 NumberOfFiles=4
 NumberOfLibraries=7
-NumberOfModules=9
+NumberOfModules=8
 Version=10.45
 @EndOfDesignText@
 #Region Project Attributes
@@ -107,9 +106,9 @@ Sub AppStart (Args() As String)
 	App.Rest("/api/products/*", "ProductsApiHandler")
 	App.Rest("/api/categories/*", "CategoriesApiHandler")
 	
-	App.Get("/client", "UsersApiHandler")
-	App.Post("/api/login", "UsersApiHandler")
-	App.Get("/api/secure-data", "UsersApiHandler")
+	'App.Get("/client", "UsersApiHandler")
+	'App.Post("/api/login", "UsersApiHandler")
+	'App.Get("/api/secure-data", "UsersApiHandler")
 	#End If	
 	App.Start
 	App.LogStartupMessage
