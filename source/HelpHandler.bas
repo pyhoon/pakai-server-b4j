@@ -280,7 +280,7 @@ Private Sub GenerateHelpPage As String 'ignore
 	'Bundle
 	'body1.cdn("script", "/assets/js/bootstrap.min.js")
 	'body1.cdn("script", "/assets/js/htmx.min.js")
-	'body1.cdn("script", "/assets/js/cdn.min.js")
+	'body1.cdn3("script", "/assets/js/cdn.min.js", CreateMap("defer": ""))
 	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
 	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y", "anonymous")
 	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
