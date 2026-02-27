@@ -1,6 +1,6 @@
 # Pakai Server - Web Application framework
 
-Version: 6.36
+Version: 6.39
 
 Create Web API or Application Backend Server using B4J project template
 
@@ -10,8 +10,8 @@ Create Web API or Application Backend Server using B4J project template
 ---
 
 ## Templates
-- Pakai Server (6.36).b4xtemplate **_recommended_**
-- Pakai Server Bundle (6.36).b4xtemplate (local assets)
+- Pakai Server (6.39).b4xtemplate **_recommended_**
+- Pakai Server Bundle (6.39).b4xtemplate (local assets)
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
