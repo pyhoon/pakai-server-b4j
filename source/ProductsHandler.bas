@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.36
+' Version 6.39
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
