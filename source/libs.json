@@ -23,8 +23,7 @@
             "Name": "MiniJS.b4xlib",
             "Platform": "B4X",
             "Version": 0.50,
-            "Link": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.50/MiniJs.b4xlib",
-            "Update": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.50/update.json"
+            "Link": "https://github.com/pyhoon/MiniJs-B4X/releases/download/v0.50/MiniJs.b4xlib"
         },
         {
             "Name": "MiniORMUtils.b4xlib",

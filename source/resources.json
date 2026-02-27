@@ -54,14 +54,6 @@
             "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/htmx.min.js"
         },
         {
-            "File": "www\\assets\\js\\json-enc.min.js",
-            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/json-enc.min.js"
-        },
-        {
-            "File": "www\\assets\\js\\response-targets.min.js",
-            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/response-targets.min.js"
-        },
-        {
             "File": "www\\assets\\js\\app.js",
             "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/app.js"
         }
