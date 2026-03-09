@@ -55,7 +55,7 @@ Private Sub CreateProductsTable As MiniHtml
 		App.ctx.Put("/products/table", table1)
 	End If
 
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
 	DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
