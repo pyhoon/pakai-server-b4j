@@ -61,11 +61,13 @@ Private Sub CreateProductsTable As MiniHtml
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
-	
+	Dim rows As List = DB.Results
+	DB.Close
+
 	Dim table1 As MiniHtml = App.ctx.Get("/products/table")
 	Dim tbody1 As MiniHtml = table1.Child(1)
 	tbody1.Children.Clear ' remove all children
-	For Each row As Map In DB.Results
+	For Each row As Map In rows
 		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, True))
 		Dim tr1 As MiniHtml = CreateProductsRow
 		tr1.Child(0).text2(row.Get("id"))
@@ -77,7 +79,6 @@ Private Sub CreateProductsTable As MiniHtml
 		tr1.Child(5).Child(1).attr("hx-get", "/hx/products/delete/" & row.Get("id"))
 		tr1.up(tbody1)
 	Next
-	DB.Close
 	Return table1
 End Sub
 ```
