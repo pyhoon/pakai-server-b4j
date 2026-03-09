@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Api Handler class
-' Version 6.39
+' Version 6.40
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -94,7 +94,7 @@ End Sub
 
 Private Sub GetCategories
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Query
 	If DB.Error.IsInitialized Then
@@ -110,7 +110,7 @@ End Sub
 
 Private Sub GetCategoryById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Find(id)
 	If DB.Error.IsInitialized Then
@@ -154,7 +154,7 @@ Private Sub CreateNewCategory
 		End If
 	Next
 	' Check conflict category name
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Conditions = Array("category_name = ?")
 	DB.Parameters = Array(data.Get("category_name"))
@@ -215,7 +215,7 @@ Private Sub UpdateCategoryById (id As Int)
 		Return
 	End If
 	' Check conflict category name
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Conditions = Array("category_name = ?", "id <> ?")
 	DB.Parameters = Array(data.Get("category_name"), id)
@@ -273,7 +273,7 @@ End Sub
 
 Private Sub DeleteCategoryById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_categories"
 	' Find row by id
 	DB.Find(id)

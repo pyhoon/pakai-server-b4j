@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Api Handler class
-' Version 6.39
+' Version 6.40
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -94,7 +94,7 @@ End Sub
 
 Private Sub GetProducts
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Query
 	If DB.Error.IsInitialized Then
@@ -110,7 +110,7 @@ End Sub
 
 Private Sub GetProductById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Find(id)
 	If DB.Error.IsInitialized Then
@@ -154,7 +154,7 @@ Private Sub PostProduct
 		End If
 	Next
 	' Check conflict product code
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Conditions = Array("product_code = ?")
 	DB.Parameters = Array(data.Get("product_code"))
@@ -224,7 +224,7 @@ Private Sub PutProductById (id As Int)
 		End If
 	Next
 	' Check conflict product code
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Conditions = Array("product_code = ?", "id <> ?")
 	DB.Parameters = Array(data.Get("product_code"), id)
@@ -288,7 +288,7 @@ End Sub
 
 Private Sub DeleteProductById (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products"
 	' Find row by id
 	DB.Find(id)

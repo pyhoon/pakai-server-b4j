@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.39
+' Version 6.40
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -307,7 +307,7 @@ Private Sub HandleSearch
 		App.ctx.Put("/hx/products/search", table1)
 	End If
 
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
 	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
@@ -319,11 +319,12 @@ Private Sub HandleSearch
 	End If
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
+	Dim rows As List = DB.Results
 
 	Dim table1 As MiniHtml = App.ctx.Get("/hx/products/search")
 	Dim tbody1 As MiniHtml = table1.Child(1)
 	tbody1.Children.Clear ' remove all children
-	For Each row As Map In DB.Results
+	For Each row As Map In rows
 		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, True))
 		Dim tr1 As MiniHtml = CreateProductsRow
 		tr1.Child(0).text2(row.Get("id"))
@@ -347,7 +348,7 @@ End Sub
 ' Edit modal
 Private Sub HandleEditModal
 	Dim id As String = Request.RequestURI.SubString("/hx/products/edit/".Length)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("category_id category", "product_code code", "product_name name", "product_price price")
 	DB.WhereParam("id = ?", id)
@@ -367,7 +368,7 @@ End Sub
 ' Delete modal
 Private Sub HandleDeleteModal
 	Dim id As String = Request.RequestURI.SubString("/hx/products/delete/".Length)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("id", "product_code AS code", "product_name AS name")
 	DB.WhereParam("id = ?", id)
@@ -399,7 +400,7 @@ Private Sub HandleProducts
 			
 			' Check conflict
 			Try
-				DB.SQL = DB.Open
+				DB.Open
 				DB.Table = "tbl_products"
 				DB.Conditions = Array("product_code = ?")
 				DB.Parameters = Array(code)
@@ -441,7 +442,7 @@ Private Sub HandleProducts
 				Return
 			End If
 			
-			DB.SQL = DB.Open
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Find(id)
 			If DB.Found = False Then
@@ -475,7 +476,7 @@ Private Sub HandleProducts
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
-			DB.SQL = DB.Open
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Find(id)
 			If DB.Found = False Then
@@ -511,18 +512,19 @@ Private Sub CreateProductsTable As MiniHtml
 		App.ctx.Put("/products/table", table1)
 	End If
 
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
 	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
+	Dim rows As List = DB.Results
 	
 	Dim table1 As MiniHtml = App.ctx.Get("/products/table")
 	Dim tbody1 As MiniHtml = table1.Child(1)
 	tbody1.Children.Clear ' remove all children
-	For Each row As Map In DB.Results
+	For Each row As Map In rows
 		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, True))
 		Dim tr1 As MiniHtml = CreateProductsRow
 		tr1.Child(0).text2(row.Get("id"))
@@ -661,11 +663,12 @@ Private Sub CreateAddModal As String
 	select1.Children.Clear ' remove all children
 	Option.up(select1).attr("value", "").text("Select Category").selected.disabled
 	
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
 	DB.Query
-	For Each row As Map In DB.Results
+	Dim rows As List = DB.Results
+	For Each row As Map In rows
 		Dim catid As Int = row.Get("id")
 		Dim catname As String = row.Get("name")
 		Option.up(select1).attr("value", catid).text(catname)
@@ -769,11 +772,12 @@ Private Sub CreateEditModal (CategoryId As String) As String
 	select1.Children.Clear ' remove all children
 	Option.up(select1).attr("value", "").text("Select Category").disabled
 	
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
 	DB.Query
-	For Each row As Map In DB.Results
+	Dim rows As List = DB.Results
+	For Each row As Map In rows
 		Dim catid As Int = row.Get("id")
 		Dim catname As String = row.Get("name")
 		Dim option1 As MiniHtml = Option.up(select1).attr("value", catid).text(catname)

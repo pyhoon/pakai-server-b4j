@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Main View
-' Version 6.39
+' Version 6.40
 Sub Class_Globals
 	Private mModal As MiniHtml
 	Private mToast As MiniHtml

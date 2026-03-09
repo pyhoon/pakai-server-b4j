@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Find Api Handler class
-' Version 6.39
+' Version 6.40
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -96,7 +96,7 @@ End Sub
 
 Private Sub GetAllProducts
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
@@ -115,7 +115,7 @@ End Sub
 
 Public Sub GetProductsByCategoryId (id As Int)
 	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
@@ -155,7 +155,7 @@ Public Sub SearchByKeywords
 		Return
 	End If
 	Dim SearchForText As String = data.Get("keyword")
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")

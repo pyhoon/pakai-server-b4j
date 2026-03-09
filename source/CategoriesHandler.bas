@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.39
+' Version 6.40
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -290,7 +290,7 @@ End Sub
 Private Sub HandleEditModal
 	Try
 		Dim id As String = Request.RequestURI.SubString("/hx/categories/edit/".Length)
-		DB.SQL = DB.Open
+		DB.Open
 		DB.Table = "tbl_categories"
 		DB.Columns = Array("id", "category_name")
 		DB.WhereParam("id = ?", id)
@@ -358,7 +358,7 @@ End Sub
 Private Sub HandleDeleteModal
 	Try
 		Dim id As String = Request.RequestURI.SubString("/hx/categories/delete/".Length)
-		DB.SQL = DB.Open
+		DB.Open
 		DB.Table = "tbl_categories"
 		DB.Columns = Array("id", "category_name")
 		DB.WhereParam("id = ?", id)
@@ -418,7 +418,7 @@ Private Sub HandleCategories
 				Return
 			End If
 			Try
-				DB.SQL = DB.Open
+				DB.Open
 				DB.Table = "tbl_categories"
 				DB.Conditions = Array("category_name = ?")
 				DB.Parameters = Array(name)
@@ -448,7 +448,7 @@ Private Sub HandleCategories
 			' Update
 			Dim id As Int = Request.GetParameter("id")
 			Dim name As String = Request.GetParameter("name")
-			DB.SQL = DB.Open
+			DB.Open
 			DB.Table = "tbl_categories"
 			
 			DB.Find(id)
@@ -483,7 +483,7 @@ Private Sub HandleCategories
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
-			DB.SQL = DB.Open
+			DB.Open
 			DB.Table = "tbl_categories"
 			
 			DB.Find(id)
@@ -526,16 +526,18 @@ Private Sub CreateCategoriesTable As MiniHtml
 		App.ctx.Put("/hx/categories/table", table1)
 	End If
 	
-	DB.SQL = DB.Open
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name")
 	DB.OrderBy = CreateMap("id": "")
 	DB.Query
-
+	Dim rows As List = DB.Results
+	DB.Close
+	
 	Dim table1 As MiniHtml = App.ctx.Get("/hx/categories/table")
 	Dim tbody1 As MiniHtml = table1.Child(1)
 	tbody1.Children.Clear ' remove all children
-	For Each row As Map In DB.Results
+	For Each row As Map In rows
 		Dim tr1 As MiniHtml = CreateCategoriesRow		
 		tr1.Child(0).text2(row.Get("id"))
 		tr1.Child(1).text2(row.Get("category_name"))
@@ -543,7 +545,6 @@ Private Sub CreateCategoriesTable As MiniHtml
 		tr1.Child(2).Child(1).attr("hx-get", "/hx/categories/delete/" & row.Get("id"))
 		tr1.up(tbody1)
 	Next
-	DB.Close
 	Return table1
 End Sub
 
