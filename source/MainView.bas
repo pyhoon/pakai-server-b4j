@@ -92,12 +92,12 @@ Public Sub Render As MiniHtml
 	Dim body1 As MiniHtml = page1.ChildByName("body")
 	BodyFooter.up(body1)
 	'Bundle
-	body1.cdn("script", "$SERVER_URL$/assets/js/bootstrap.min.js")
-	body1.cdn("script", "$SERVER_URL$/assets/js/htmx.min.js")
-	'body1.cdn2("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
-	'"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y", "anonymous")
-	'body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
-	'"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz", "anonymous")
+	'body1.cdn("script", "$SERVER_URL$/assets/js/bootstrap.min.js")
+	'body1.cdn("script", "$SERVER_URL$/assets/js/htmx.min.js")
+	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js", _
+	"sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y", "anonymous")
+	body1.cdn2("script", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js", _
+	"sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz", "anonymous")
 	body1.cdn("script", "$SERVER_URL$/assets/js/app.js")
 	Return page1
 End Sub
@@ -115,11 +115,11 @@ Private Sub PageHeader As MiniHtml
 	link1.attr("type", "image/png")
 	link1.attr("href", "$SERVER_URL$/assets/img/favicon.png")
 	'Bundle
-	head1.cdn("style", "$SERVER_URL$/assets/css/bootstrap.min.css")
-	head1.cdn("style", "$SERVER_URL$/assets/css/bootstrap-icons.min.css")
-	'head1.cdn2("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
-	'"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB", "anonymous")
-	'head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")	
+	'head1.cdn("style", "$SERVER_URL$/assets/css/bootstrap.min.css")
+	'head1.cdn("style", "$SERVER_URL$/assets/css/bootstrap-icons.min.css")
+	head1.cdn2("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
+	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB", "anonymous")
+	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")	
 	head1.cdn("style", "$SERVER_URL$/assets/css/main.css?v=$VERSION$")
 	Return head1
 End Sub

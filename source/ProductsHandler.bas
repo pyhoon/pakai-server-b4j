@@ -320,6 +320,7 @@ Private Sub HandleSearch
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	Dim rows As List = DB.Results
+	DB.Close
 
 	Dim table1 As MiniHtml = App.ctx.Get("/hx/products/search")
 	Dim tbody1 As MiniHtml = table1.Child(1)
@@ -335,8 +336,7 @@ Private Sub HandleSearch
 		tr1.Child(5).Child(0).attr("hx-get", "/hx/products/edit/" & row.Get("id"))
 		tr1.Child(5).Child(1).attr("hx-get", "/hx/products/delete/" & row.Get("id"))
 		tr1.up(tbody1)
-	Next	
-	DB.Close
+	Next
 	App.WriteHtml(Response, table1.build)
 End Sub
 
@@ -520,6 +520,7 @@ Private Sub CreateProductsTable As MiniHtml
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	Dim rows As List = DB.Results
+	DB.Close
 	
 	Dim table1 As MiniHtml = App.ctx.Get("/products/table")
 	Dim tbody1 As MiniHtml = table1.Child(1)
@@ -536,7 +537,6 @@ Private Sub CreateProductsTable As MiniHtml
 		tr1.Child(5).Child(1).attr("hx-get", "/hx/products/delete/" & row.Get("id"))
 		tr1.up(tbody1)
 	Next
-	DB.Close
 	Return table1
 End Sub
 
@@ -668,12 +668,12 @@ Private Sub CreateAddModal As String
 	DB.Columns = Array("id", "category_name AS name")
 	DB.Query
 	Dim rows As List = DB.Results
+	DB.Close
 	For Each row As Map In rows
 		Dim catid As Int = row.Get("id")
 		Dim catname As String = row.Get("name")
 		Option.up(select1).attr("value", catid).text(catname)
 	Next
-	DB.Close
 	Return form1.build
 End Sub
 
@@ -777,13 +777,13 @@ Private Sub CreateEditModal (CategoryId As String) As String
 	DB.Columns = Array("id", "category_name AS name")
 	DB.Query
 	Dim rows As List = DB.Results
+	DB.Close
 	For Each row As Map In rows
 		Dim catid As Int = row.Get("id")
 		Dim catname As String = row.Get("name")
 		Dim option1 As MiniHtml = Option.up(select1).attr("value", catid).text(catname)
 		If catid = CategoryId Then option1.selected
 	Next
-	DB.Close
 	Return form1.build
 End Sub
 

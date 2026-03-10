@@ -104,8 +104,8 @@ Private Sub GetCategories
 		HRM.ResponseCode = 200
 		HRM.ResponseData = DB.Results2
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
 
 Private Sub GetCategoryById (id As Int)
@@ -125,8 +125,8 @@ Private Sub GetCategoryById (id As Int)
 			HRM.ResponseError = "Category not found"
 		End If
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
 
 Private Sub CreateNewCategory
@@ -162,15 +162,15 @@ Private Sub CreateNewCategory
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Category already exist"
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	' Insert new row
@@ -189,8 +189,8 @@ Private Sub CreateNewCategory
 		HRM.ResponseObject = DB.First2
 		HRM.ResponseMessage = "Category created successfully"
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
 
 Private Sub UpdateCategoryById (id As Int)
@@ -223,15 +223,15 @@ Private Sub UpdateCategoryById (id As Int)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Category already exist"
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	' Find row by id
@@ -239,15 +239,15 @@ Private Sub UpdateCategoryById (id As Int)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Category not found"
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	' Update row by id
@@ -267,8 +267,8 @@ Private Sub UpdateCategoryById (id As Int)
 		HRM.ResponseMessage = "Category updated successfully"
 		HRM.ResponseObject = DB.First2
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
 
 Private Sub DeleteCategoryById (id As Int)
@@ -280,15 +280,15 @@ Private Sub DeleteCategoryById (id As Int)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Category not found"
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	' Delete row
@@ -302,6 +302,6 @@ Private Sub DeleteCategoryById (id As Int)
 		HRM.ResponseCode = 200
 		HRM.ResponseMessage = "Category deleted successfully"
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub

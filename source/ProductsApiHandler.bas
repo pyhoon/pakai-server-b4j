@@ -104,8 +104,8 @@ Private Sub GetProducts
 		HRM.ResponseCode = 200
 		HRM.ResponseData = DB.Results2
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
 
 Private Sub GetProductById (id As Int)
@@ -125,8 +125,8 @@ Private Sub GetProductById (id As Int)
 			HRM.ResponseError = "Product not found"
 		End If
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
 
 Private Sub PostProduct
@@ -162,15 +162,15 @@ Private Sub PostProduct
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Product already exist"
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	' Insert new row
@@ -195,8 +195,8 @@ Private Sub PostProduct
 		HRM.ResponseObject = DB.First2
 		HRM.ResponseMessage = "Product created successfully"
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
 
 Private Sub PutProductById (id As Int)
@@ -232,15 +232,15 @@ Private Sub PutProductById (id As Int)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Product Code already exist"
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	' Find row by id
@@ -248,15 +248,15 @@ Private Sub PutProductById (id As Int)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	' Update row by id
@@ -282,8 +282,8 @@ Private Sub PutProductById (id As Int)
 		HRM.ResponseMessage = "Product updated successfully"
 		HRM.ResponseObject = DB.First2
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
 
 Private Sub DeleteProductById (id As Int)
@@ -295,15 +295,15 @@ Private Sub DeleteProductById (id As Int)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
-		ReturnApiResponse
 		DB.Close
+		ReturnApiResponse
 		Return
 	End If
 	' Delete row
@@ -317,6 +317,6 @@ Private Sub DeleteProductById (id As Int)
 		HRM.ResponseCode = 200
 		HRM.ResponseMessage = "Product deleted successfully"
 	End If
-	ReturnApiResponse
 	DB.Close
+	ReturnApiResponse
 End Sub
