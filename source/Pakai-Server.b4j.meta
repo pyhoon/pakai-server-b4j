@@ -25,6 +25,6 @@ ModuleClosedNodes5=
 ModuleClosedNodes6=
 ModuleClosedNodes7=
 ModuleClosedNodes8=
-NavigationStack=Main,AppStart,52,0,MainView,Render,87,0,MainView,PageHeader,110,0,HelpHandler,GenerateHelpPage,273,0
+NavigationStack=HelpHandler,Class_Globals,2,0,CategoriesHandler,RenderPage,139,3,ProductsHandler,RenderPage,145,0,HelpHandler,ShowHelpPage,92,5,CategoriesHandler,CreateCategoriesTable,527,1,Main,AppStart,67,6,ProductsHandler,CreateProductsTable,495,0,ProductsHandler,HandleSearch,314,1,FindApiHandler,GetAllProducts,96,0,FindApiHandler,GetProductsByCategoryId,116,0,FindApiHandler,SearchByKeywords,159,0
 SelectedBuild=0
 VisibleModules=4,6,1,2,3,5,7,8

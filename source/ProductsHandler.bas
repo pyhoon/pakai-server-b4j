@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.40
+' Version 6.41
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -139,16 +139,17 @@ Private Sub RenderPage
 		i1.attr("title", "Categories")
 		'a1.text("Categories")
 
-		Dim list2 As MiniHtml = Li.up(ulist1)
-		list2.cls("nav-item d-block d-lg-block")
-		Dim a2 As MiniHtml = Anchor.up(list2)
-		a2.attr("href", "/help")
-		a2.cls("nav-link float-end")
-		a2.text("API")
-		Dim i2 As MiniHtml = Icon.up(a2)
-		i2.cls("bi bi-gear me-2")
-		i2.attr("title", "API")
-		'a2.text("API")
+		If App.api.EnableHelp Then
+			Dim list2 As MiniHtml = Li.up(ulist1)
+			list2.cls("nav-item d-block d-lg-block")
+			Dim a2 As MiniHtml = Anchor.up(list2)
+			a2.attr("href", "/help")
+			a2.cls("nav-link float-end")
+			a2.text("API")
+			Dim i2 As MiniHtml = Icon.up(a2)
+			i2.cls("bi bi-gear me-2")
+			i2.attr("title", "API")
+		End If
 
 		' Sample for adding additional menu link
 		'Dim list2 As MiniHtml = Li.cls("nav-item d-block d-lg-block").up(ulist1)
@@ -317,7 +318,7 @@ Private Sub HandleSearch
 		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
 		DB.Parameters = Array("%" & keyword & "%", "%" & keyword.ToUpperCase & "%", "%" & keyword.ToUpperCase & "%")
 	End If
-	DB.OrderBy = CreateMap("p.id": "")
+	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
 	Dim rows As List = DB.Results
 	DB.Close
@@ -517,7 +518,7 @@ Private Sub CreateProductsTable As MiniHtml
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
 	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
-	DB.OrderBy = CreateMap("p.id": "")
+	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
 	Dim rows As List = DB.Results
 	DB.Close

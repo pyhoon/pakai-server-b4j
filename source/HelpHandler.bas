@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Help Handler class
-' Version 6.40
+' Version 6.41
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
@@ -95,7 +95,15 @@ Private Sub ShowHelpPage
 	strMain = WebApiUtils.BuildHtml(strMain, Main.App.ctx)
 	File.WriteString(File.DirApp, "help.html", strMain)
 	#Else
-	Dim strMain As String = File.ReadString(File.DirApp, "help.html")
+	If File.Exists(File.DirApp, "help.html") Then
+		Dim strMain As String = File.ReadString(File.DirApp, "help.html")
+	Else
+		BuildMethods ' Build page programatically
+		Dim strMain As String = GenerateHelpPage
+		strMain = WebApiUtils.BuildTag(strMain, "HELP", "") ' Hide API icon
+		strMain = WebApiUtils.BuildHtml(strMain, Main.App.ctx)
+		File.WriteString(File.DirApp, "help.html", strMain)
+	End If
 	#End If
 	WebApiUtils.ReturnHtml(strMain, Response)
 End Sub

@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.40
+' Version 6.41
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -134,14 +134,16 @@ Private Sub RenderPage
 		i1.cls("bi bi-house me-2")
 		i1.attr("title", "Home")
 
-		Dim list2 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
-		Dim a2 As MiniHtml = Anchor.up(list2)
-		a2.attr("href", "/help")
-		a2.cls("nav-link float-end")
-		a2.text("API")
-		Dim i2 As MiniHtml = Icon.up(a2)
-		i2.cls("bi bi-gear me-2")
-		i2.attr("title", "API")
+		If App.api.EnableHelp Then
+			Dim list2 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
+			Dim a2 As MiniHtml = Anchor.up(list2)
+			a2.attr("href", "/help")
+			a2.cls("nav-link float-end")
+			a2.text("API")
+			Dim i2 As MiniHtml = Icon.up(a2)
+			i2.cls("bi bi-gear me-2")
+			i2.attr("title", "API")
+		End If
 
 		' Sample for adding additional menu link
 		'Dim list2 As MiniHtml = Li.up(ulist1).cls("nav-item d-block d-lg-block")
@@ -529,7 +531,7 @@ Private Sub CreateCategoriesTable As MiniHtml
 	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name")
-	DB.OrderBy = CreateMap("id": "")
+	DB.OrderBy = CreateMap("id": "DESC")
 	DB.Query
 	Dim rows As List = DB.Results
 	DB.Close
