@@ -1,18 +1,6 @@
 {
-    "Version": "6.36",
+    "Version": "6.40",
     "Resources": [
-        {
-            "File": "www\\assets\\img\\coffee.png",
-            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/coffee.png"
-        },
-        {
-            "File": "www\\assets\\img\\favicon.png",
-            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/favicon.png"
-        },
-        {
-            "File": "www\\assets\\img\\sponsor.png",
-            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/img/sponsor.png"
-        },
         {
             "File": "www\\assets\\css\\bootstrap.min.css",
             "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/bootstrap.min.css"
@@ -20,10 +8,6 @@
         {
             "File": "www\\assets\\css\\bootstrap-icons.min.css",
             "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/bootstrap-icons.min.css"
-        },
-        {
-            "File": "www\\assets\\css\\main.css",
-            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/css/main.css"
         },
         {
             "File": "www\\assets\\css\\fonts\\bootstrap-icons.woff",
@@ -52,10 +36,6 @@
         {
             "File": "www\\assets\\js\\htmx.min.js",
             "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/htmx.min.js"
-        },
-        {
-            "File": "www\\assets\\js\\app.js",
-            "Link": "https://raw.githubusercontent.com/pyhoon/pakai-server-b4j/refs/heads/main/source/Objects/www/assets/js/app.js"
         }
     ]
 }
