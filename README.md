@@ -58,7 +58,7 @@ Private Sub CreateProductsTable As MiniHtml
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
 	DB.Join("tbl_categories c", "p.category_id = c.id", "")
-	DB.OrderBy = CreateMap("p.id": "")
+	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
 	Dim rows As List = DB.Results
 	DB.Close
