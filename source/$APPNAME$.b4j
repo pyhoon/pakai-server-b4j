@@ -29,11 +29,11 @@ Module8=ProductsHandler
 NumberOfFiles=4
 NumberOfLibraries=7
 NumberOfModules=8
-Version=10.45
+Version=10.5
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 6.40
+' Version: 6.42
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -58,9 +58,9 @@ Sub Process_Globals
 	Public MS 					As ORMSettings
 	Public App 					As EndsMeet
 	Public Api 					As ApiSettings
-	Public Const COLOR_RED 		As Int = -65536
-	Public Const COLOR_BLUE 	As Int = -16776961
-	Public Const VERSION 		As String = "6.40"
+	Public Const COLOR_RED 		As Int = 0xFFFF0000 '-65536
+	Public Const COLOR_BLUE 	As Int = 0xFF0000FF '-16776961
+	Public Const VERSION 		As String = "6.42"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -71,16 +71,16 @@ Sub AppStart (Args() As String)
 	App.LoadConfig
 	App.LogEnabled = True
 	#If Release
-	App.ssl.Enabled = True
-	App.RedirectToHttps = True
+	'App.ssl.Enabled = True
+	'App.RedirectToHttps = True
 	#End If
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
 	App.Rest("/hx/categories/*", "CategoriesHandler")
-	#If Debug
+	
+	' Use API
 	Api = App.api
-	App.Get("/help", "HelpHandler")
 	App.Get("/api/find", "FindApiHandler")
 	App.Post("/api/find", "FindApiHandler")
 	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
@@ -89,8 +89,10 @@ Sub AppStart (Args() As String)
 	App.Get("/api/categories", "CategoriesApiHandler")
 	App.Post("/api/categories", "CategoriesApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
-	App.Rest("/api/categories/*", "CategoriesApiHandler")
-	#End If	
+	App.Rest("/api/categories/*", "CategoriesApiHandler")	
+	App.Get("/help", "HelpHandler")	
+	Api.EnableHelp = True
+	
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", VERSION)
