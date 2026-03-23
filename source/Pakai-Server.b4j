@@ -167,7 +167,7 @@ Public Sub ConfigureDatabase
 			Case DB.SQLITE
 				Dim DBExist As Boolean = DB.Exist
 			Case DB.MARIADB, DB.MYSQL
-				Wait For (DB.InitSchema) Complete (Success As Boolean)
+				Wait For (DB.InitSchemaAsync) Complete (Success As Boolean)
 				If Success = False Then
 					LogColor("Database initilialization failed!", COLOR_RED)
 					Log("Application is terminated.")
