@@ -25,6 +25,6 @@ ModuleClosedNodes5=
 ModuleClosedNodes6=
 ModuleClosedNodes7=
 ModuleClosedNodes8=
-NavigationStack=FindApiHandler,GetProductsByCategoryId,115,3,FindApiHandler,SearchByKeywords,155,0,CategoriesHandler,HandleEditModal,290,3,CategoriesHandler,HandleDeleteModal,362,0,ProductsHandler,HandleEditModal,347,0,ProductsHandler,HandleDeleteModal,368,0,CategoriesHandler,HandleCategories,492,0,Main,AddUsersTable,238,0,Main,CreateDatabase,176,1,Main,AppStart,52,0,Main,Process_Globals,42,0
+NavigationStack=ProductsHandler,HandleEditModal,347,0,ProductsHandler,HandleDeleteModal,368,0,CategoriesHandler,HandleCategories,492,0,Main,AddUsersTable,238,0,Main,CreateDatabase,176,1,Main,AppStart,52,0,FindApiHandler,SearchByKeywords,150,0,FindApiHandler,Class_Globals,4,0,Main,Process_Globals,42,0,FindApiHandler,GetAllProducts,95,0,FindApiHandler,ReturnMethodNotAllow,89,0
 SelectedBuild=0
 VisibleModules=4,6,1,2,3,5,7,8

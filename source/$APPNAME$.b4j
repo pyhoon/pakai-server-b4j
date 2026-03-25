@@ -33,7 +33,7 @@ Version=10.5
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 6.50
+' Version: 6.51
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -60,7 +60,7 @@ Sub Process_Globals
 	Public Api 					As ApiSettings
 	Public Const COLOR_RED 		As Int = 0xFFFF0000 '-65536
 	Public Const COLOR_BLUE 	As Int = 0xFF0000FF '-16776961
-	Public Const VERSION 		As String = "6.50"
+	Public Const VERSION 		As String = "6.51"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>

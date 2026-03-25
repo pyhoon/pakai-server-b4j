@@ -25,6 +25,6 @@ ModuleClosedNodes5=
 ModuleClosedNodes6=
 ModuleClosedNodes7=
 ModuleClosedNodes8=
-NavigationStack=Main,AppStart,33,3
+NavigationStack=Main,AppStart,33,3,Main,Process_Globals,23,0
 SelectedBuild=0
 VisibleModules=
