@@ -1,6 +1,6 @@
 # Pakai Server - Web Application framework
 
-Version: 6.42
+Version: 6.50
 
 Create Web API or Application Backend Server using B4J project template
 
@@ -10,7 +10,7 @@ Create Web API or Application Backend Server using B4J project template
 ---
 
 ## Templates
-- Pakai Server (6.42).b4xtemplate
+- Pakai Server (6.50).b4xtemplate
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
@@ -57,7 +57,7 @@ Private Sub CreateProductsTable As MiniHtml
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join("tbl_categories c", "p.category_id = c.id", "")
+	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
 	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
 	Dim rows As List = DB.Results
