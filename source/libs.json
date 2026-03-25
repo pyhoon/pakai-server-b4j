@@ -1,5 +1,5 @@
 {
-    "Version": "6.40",
+    "Version": "6.50",
     "Libraries": [
         {
             "Name": "EndsMeet.b4xlib",
@@ -32,9 +32,9 @@
         {
             "Name": "MiniORMUtils.b4xlib",
             "Platform": "B4X",
-            "Version": 4.30,
-            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v4.30/MiniORMUtils.b4xlib",
-            "Update": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v4.30/update.json"
+            "Version": 5.00,
+            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v5.00/MiniORMUtils.b4xlib",
+            "Update": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v5.00/update.json"
         },
         {
             "Name": "WebApiUtils.b4xlib",
