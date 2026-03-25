@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.42
+' Version 6.50
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -295,7 +295,8 @@ Private Sub HandleEditModal
 		DB.Open
 		DB.Table = "tbl_categories"
 		DB.Columns = Array("id", "category_name")
-		DB.WhereParam("id = ?", id)
+		DB.Condition = "id = ?"
+		DB.Parameter = id
 		DB.Query
 		If DB.Found Then
 			Dim name As String = DB.First.Get("category_name")
@@ -363,7 +364,8 @@ Private Sub HandleDeleteModal
 		DB.Open
 		DB.Table = "tbl_categories"
 		DB.Columns = Array("id", "category_name")
-		DB.WhereParam("id = ?", id)
+		DB.Condition = "id = ?"
+		DB.Parameter = id
 		DB.Query
 		If DB.Found Then
 			Dim name As String = DB.First.Get("category_name")
@@ -496,7 +498,8 @@ Private Sub HandleCategories
 			End If
 			
 			DB.Table = "tbl_products"
-			DB.WhereParam("category_id = ?", id)
+			DB.Condition = "category_id = ?"
+			DB.Parameter = id
 			DB.Query
 			If DB.Found Then
 				ShowAlert("Cannot delete category with associated products!", "warning")

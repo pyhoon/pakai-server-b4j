@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.42
+' Version 6.50
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -311,8 +311,7 @@ Private Sub HandleSearch
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
-	DB.Join("tbl_categories c", "p.category_id = c.id", "")
+	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
 	Dim keyword As String = Request.GetParameter("keyword")
 	If keyword <> "" Then
 		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
@@ -352,7 +351,8 @@ Private Sub HandleEditModal
 	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("category_id category", "product_code code", "product_name name", "product_price price")
-	DB.WhereParam("id = ?", id)
+	DB.Condition = "id = ?"
+	DB.Parameter = id
 	DB.Query
 	Dim row As Map
 	Dim category_id As Int
@@ -372,7 +372,8 @@ Private Sub HandleDeleteModal
 	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("id", "product_code AS code", "product_name AS name")
-	DB.WhereParam("id = ?", id)
+	DB.Condition = "id = ?"
+	DB.Parameter = id
 	DB.Query
 	Dim row As Map
 	If DB.Found Then
@@ -516,8 +517,7 @@ Private Sub CreateProductsTable As MiniHtml
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	'DB.Join = DB.CreateJoin("tbl_categories c", "p.category_id = c.id", "")
-	DB.Join("tbl_categories c", "p.category_id = c.id", "")
+	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
 	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
 	Dim rows As List = DB.Results

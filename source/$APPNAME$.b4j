@@ -33,7 +33,7 @@ Version=10.5
 @EndOfDesignText@
 #Region Project Attributes
 ' Product: Pakai Server
-' Version: 6.42
+' Version: 6.50
 ' License: MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -60,7 +60,7 @@ Sub Process_Globals
 	Public Api 					As ApiSettings
 	Public Const COLOR_RED 		As Int = 0xFFFF0000 '-65536
 	Public Const COLOR_BLUE 	As Int = 0xFF0000FF '-16776961
-	Public Const VERSION 		As String = "6.42"
+	Public Const VERSION 		As String = "6.50"
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -154,7 +154,7 @@ Public Sub ConfigureDatabase
 			Case DB.SQLITE
 				Dim DBExist As Boolean = DB.Exist
 			Case DB.MARIADB, DB.MYSQL
-				Wait For (DB.InitSchema) Complete (Success As Boolean)
+				Wait For (DB.InitSchemaAsync) Complete (Success As Boolean)
 				If Success = False Then
 					LogColor("Database initilialization failed!", COLOR_RED)
 					Log("Application is terminated.")
@@ -199,7 +199,7 @@ Private Sub CreateDatabase
 	If UsePool(DB.DbType) Then
 		Wait For (DB.CreateDatabaseAsync) Complete (Success As Boolean)
 	Else
-		Dim Success As Boolean = DB.InitializeSQLite
+		Dim Success As Boolean = DB.CreateSQLite
 	End If
 	If Not(Success) Then
 		LogColor("Database creation failed!", COLOR_RED)
@@ -216,27 +216,27 @@ Private Sub CreateDatabase
 	DB.QueryAddToBatch = True
 	
 	DB.Table = "tbl_categories"
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_name", "Null": False)))
+	DB.Columns.Add(CreateMap("Name": "category_name", "Null": False))
 	DB.Create
 
 	DB.Columns = Array("category_name")
-	DB.Insert2(Array("Hardwares"))
-	DB.Insert2(Array("Toys"))
+	DB.Inserts = Array("Hardwares")
+	DB.Inserts = Array("Toys")
 
 	DB.Table = "tbl_products"
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "category_id", "Type": DB.INTEGER, "Null": False)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_code", "Length": "12", "Null": False)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_name", "Null": False)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Null": False, "Default": "0.00")))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "product_image", "Type": DB.BLOB)))
+	DB.Columns.Add(CreateMap("Name": "category_id", "Type": DB.INTEGER, "Null": False))
+	DB.Columns.Add(CreateMap("Name": "product_code", "Length": "12", "Null": False))
+	DB.Columns.Add(CreateMap("Name": "product_name", "Null": False))
+	DB.Columns.Add(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Null": False, "Default": "0.00"))
+	DB.Columns.Add(CreateMap("Name": "product_image", "Type": DB.BLOB))
 	DB.Foreign = "category_id"
 	DB.References("tbl_categories", "id")
 	DB.Create
 	
 	DB.Columns = Array("category_id", "product_code", "product_name", "product_price")
-	DB.Insert2(Array(2, "T001", "Teddy Bear", 99.9))
-	DB.Insert2(Array(1, "H001", "Hammer", 15.75))
-	DB.Insert2(Array(2, "T002", "Optimus Prime", 1000))
+	DB.Inserts = Array(2, "T001", "Teddy Bear", 99.9)
+	DB.Inserts = Array(1, "H001", "Hammer", 15.75)
+	DB.Inserts = Array(2, "T002", "Optimus Prime", 1000)
 	
 	Wait For (DB.ExecuteBatchAsync) Complete (Success As Boolean)
 	If Success Then
@@ -259,13 +259,13 @@ Public Sub AddUsersTable
 	DB.QueryAddToBatch = True
 
 	DB.Table = "tbl_users"
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "first_name", "Null": False)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "last_name", "Null": False)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "email", "Null": False)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "hash", "Null": False)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "salt", "Null": False)))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "admin", "Null": False, "Type": DB.INTEGER, "Default": "0")))
-	DB.Columns.Add(DB.CreateColumn2(CreateMap("Name": "active", "Null": False, "Type": DB.INTEGER, "Default": "0")))
+	DB.Columns.Add(CreateMap("Name": "first_name", "Null": False))
+	DB.Columns.Add(CreateMap("Name": "last_name", "Null": False))
+	DB.Columns.Add(CreateMap("Name": "email", "Null": False))
+	DB.Columns.Add(CreateMap("Name": "hash", "Null": False))
+	DB.Columns.Add(CreateMap("Name": "salt", "Null": False))
+	DB.Columns.Add(CreateMap("Name": "admin", "Null": False, "Type": DB.INTEGER, "Default": "0"))
+	DB.Columns.Add(CreateMap("Name": "active", "Null": False, "Type": DB.INTEGER, "Default": "0"))
 	DB.Create
 	
 	Wait For (DB.ExecuteBatchAsync) Complete (Success As Boolean)
