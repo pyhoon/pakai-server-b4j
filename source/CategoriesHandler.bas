@@ -5,10 +5,11 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.51
+' Version 6.60
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
+	Private Path As String
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -22,18 +23,18 @@ End Sub
 Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
-	Method = req.Method
-	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	Dim path As String = req.RequestURI
-	If path = "/categories" Then
+	Path = Request.RequestURI
+	Method = Request.Method.ToUpperCase
+	Log($"${Method}: ${Path}"$)
+	If Path = "/categories" Then
 		RenderPage
-	Else If path = "/hx/categories/table" Then
+	Else If Path = "/hx/categories/table" Then
 		HandleTable
-	Else If path = "/hx/categories/add" Then
+	Else If Path = "/hx/categories/add" Then
 		HandleAddModal
-	Else If path.StartsWith("/hx/categories/edit/") Then
+	Else If Path.StartsWith("/hx/categories/edit/") Then
 		HandleEditModal
-	Else If path.StartsWith("/hx/categories/delete/") Then
+	Else If Path.StartsWith("/hx/categories/delete/") Then
 		HandleDeleteModal
 	Else
 		HandleCategories
@@ -291,19 +292,27 @@ End Sub
 ' Edit modal
 Private Sub HandleEditModal
 	Try
-		Dim id As String = Request.RequestURI.SubString("/hx/categories/edit/".Length)
-		DB.Open
-		DB.Table = "tbl_categories"
-		DB.Columns = Array("id", "category_name")
-		DB.Condition = "id = ?"
-		DB.Parameter = id
-		DB.Query
-		If DB.Found Then
-			Dim name As String = DB.First.Get("category_name")
-		End If
+		Dim id As Int = Path.SubString("/hx/categories/edit/".Length)
 	Catch
 		Log(LastException)
+		ShowAlert($"Error: ${LastException.Message}"$, "danger")
+		Return
 	End Try
+
+	DB.Open
+	DB.Table = "tbl_categories"
+	DB.Columns = Array("id", "category_name")
+	DB.Condition = "id = ?"
+	DB.Parameter = id
+	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+		DB.Close
+		Return
+	End If
+	If DB.Found Then
+		Dim name As String = DB.First.Get("category_name")
+	End If
 	DB.Close
 	
 	Dim form1 As MiniHtml = Form
@@ -328,6 +337,7 @@ Private Sub HandleEditModal
 	id1.attr("type", "hidden")
 	id1.attr("name", "id")
 	id1.attr("value", id)
+	
 	Dim group1 As MiniHtml = Div.up(modalBody)
 	group1.cls("form-group")
 	Dim label1 As MiniHtml = Label.up(group1)
@@ -360,19 +370,26 @@ End Sub
 ' Delete modal
 Private Sub HandleDeleteModal
 	Try
-		Dim id As String = Request.RequestURI.SubString("/hx/categories/delete/".Length)
-		DB.Open
-		DB.Table = "tbl_categories"
-		DB.Columns = Array("id", "category_name")
-		DB.Condition = "id = ?"
-		DB.Parameter = id
-		DB.Query
-		If DB.Found Then
-			Dim name As String = DB.First.Get("category_name")
-		End If
+		Dim id As Int = Path.SubString("/hx/categories/delete/".Length)
 	Catch
 		Log(LastException)
+		ShowAlert($"Error: ${LastException.Message}"$, "danger")
+		Return
 	End Try
+	DB.Open
+	DB.Table = "tbl_categories"
+	DB.Columns = Array("id", "category_name")
+	DB.Condition = "id = ?"
+	DB.Parameter = id
+	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+		DB.Close
+		Return
+	End If
+	If DB.Found Then
+		Dim name As String = DB.First.Get("category_name")
+	End If
 	DB.Close
 	
 	Dim form1 As MiniHtml = Form
@@ -421,32 +438,32 @@ Private Sub HandleCategories
 				ShowAlert("Category name must be at least 2 characters long.", "warning")
 				Return
 			End If
-			Try
-				DB.Open
-				DB.Table = "tbl_categories"
-				DB.Conditions = Array("category_name = ?")
-				DB.Parameters = Array(name)
-				DB.Query
-				If DB.Found Then
-					ShowAlert("Category already exists!", "warning")
-					DB.Close
-					Return
-				End If
-			Catch
-				Log(LastException)
-				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
-			End Try
-
+			DB.Open
+			DB.Table = "tbl_categories"
+			DB.Conditions = Array("category_name = ?")
+			DB.Parameters = Array(name)
+			DB.Query
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
+			If DB.Found Then
+				ShowAlert("Category already exists!", "warning")
+				DB.Close
+				Return
+			End If
 			' Insert new row
-			Try
-				DB.Reset
-				DB.Columns = Array("category_name", "created_date")
-				DB.Parameters = Array(name, Main.CurrentDateTime)
-				DB.Save
-				ShowToast("Category", "created", "Category created successfully!", "success")
-			Catch
-				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
-			End Try
+			DB.Table = "tbl_categories"
+			DB.Columns = Array("category_name", "created_date")
+			DB.Parameters = Array(name, Main.CurrentDateTime)
+			DB.Save
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
+			ShowToast("Category", "created", "Category created successfully!", "success")
 			DB.Close
 		Case "PUT"
 			' Update
@@ -454,68 +471,84 @@ Private Sub HandleCategories
 			Dim name As String = Request.GetParameter("name")
 			DB.Open
 			DB.Table = "tbl_categories"
-			
 			DB.Find(id)
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
 			If DB.Found = False Then
 				ShowAlert("Category not found!", "warning")
 				DB.Close
 				Return
 			End If
-
-			DB.Reset
+			DB.Table = "tbl_categories"
 			DB.Conditions = Array("category_name = ?", "id <> ?")
 			DB.Parameters = Array(name, id)
 			DB.Query
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
 			If DB.Found Then
 				ShowAlert("Category already exists!", "warning")
 				DB.Close
 				Return
 			End If
-			
 			' Update row
-			Try
-				DB.Reset
-				DB.Columns = Array("category_name", "modified_date")
-				DB.Parameters = Array(name, Main.CurrentDateTime)
-				DB.Id = id
-				DB.Save
-				ShowToast("Category", "updated", "Category updated successfully!", "info")
-			Catch
-				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
-			End Try
+			DB.Table = "tbl_categories"
+			DB.Columns = Array("category_name", "modified_date")
+			DB.Parameters = Array(name, Main.CurrentDateTime)
+			DB.Id = id
+			DB.Save
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
+			ShowToast("Category", "updated", "Category updated successfully!", "info")
 			DB.Close
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
 			DB.Open
 			DB.Table = "tbl_categories"
-			
 			DB.Find(id)
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
 			If DB.Found = False Then
 				ShowAlert("Category not found!", "warning")
 				DB.Close
 				Return
 			End If
-			
 			DB.Table = "tbl_products"
 			DB.Condition = "category_id = ?"
 			DB.Parameter = id
 			DB.Query
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
 			If DB.Found Then
 				ShowAlert("Cannot delete category with associated products!", "warning")
 				DB.Close
 				Return
 			End If
-
 			' Delete row
-			Try
-				DB.Table = "tbl_categories"
-				DB.Id = id
-				DB.Delete
-				ShowToast("Category", "deleted", "Category deleted successfully!", "danger")
-			Catch
-				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
-			End Try
+			DB.Table = "tbl_categories"
+			DB.Id = id
+			DB.Delete
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
+			ShowToast("Category", "deleted", "Category deleted successfully!", "danger")
 			DB.Close
 	End Select
 End Sub
@@ -536,6 +569,9 @@ Private Sub CreateCategoriesTable As MiniHtml
 	DB.Columns = Array("id", "category_name")
 	DB.OrderBy = CreateMap("id": "DESC")
 	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+	End If
 	Dim rows As List = DB.Results
 	DB.Close
 	

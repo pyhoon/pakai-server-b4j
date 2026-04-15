@@ -5,10 +5,11 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.51
+' Version 6.60
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
+	Private Path As String
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -22,20 +23,20 @@ End Sub
 Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
-	Method = req.Method
-	Log($"${Request.Method}: ${Request.RequestURI}"$)
-	Dim path As String = req.RequestURI
-	If path = "/" Then
+	Path = Request.RequestURI
+	Method = Request.Method.ToUpperCase
+	Log($"${Method}: ${Path}"$)
+	If Path = "/" Then
 		RenderPage
-	Else If path = "/hx/products/table" Then
+	Else If Path = "/hx/products/table" Then
 		HandleTable
-	Else If path = "/hx/products/search" Then
+	Else If Path = "/hx/products/search" Then
 		HandleSearch
-	Else If path = "/hx/products/add" Then
+	Else If Path = "/hx/products/add" Then
 		HandleAddModal
-	Else If path.StartsWith("/hx/products/edit/") Then
+	Else If Path.StartsWith("/hx/products/edit/") Then
 		HandleEditModal
-	Else If path.StartsWith("/hx/products/delete/") Then
+	Else If Path.StartsWith("/hx/products/delete/") Then
 		HandleDeleteModal
 	Else
 		HandleProducts
@@ -311,7 +312,7 @@ Private Sub HandleSearch
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
+	DB.Join = DB.CreateJoin("", "tbl_categories AS c", Array("p.category_id = c.id"))
 	Dim keyword As String = Request.GetParameter("keyword")
 	If keyword <> "" Then
 		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
@@ -319,6 +320,11 @@ Private Sub HandleSearch
 	End If
 	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+		DB.Close
+		Return
+	End If
 	Dim rows As List = DB.Results
 	DB.Close
 
@@ -347,13 +353,24 @@ End Sub
 
 ' Edit modal
 Private Sub HandleEditModal
-	Dim id As String = Request.RequestURI.SubString("/hx/products/edit/".Length)
+	Try
+		Dim id As Int = Path.SubString("/hx/products/edit/".Length)
+	Catch
+		Log(LastException)
+		ShowAlert($"Error: ${LastException.Message}"$, "danger")
+		Return
+	End Try	
 	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("category_id category", "product_code code", "product_name name", "product_price price")
 	DB.Condition = "id = ?"
 	DB.Parameter = id
 	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+		DB.Close
+		Return
+	End If
 	Dim row As Map
 	Dim category_id As Int
 	If DB.Found Then
@@ -368,13 +385,24 @@ End Sub
 
 ' Delete modal
 Private Sub HandleDeleteModal
-	Dim id As String = Request.RequestURI.SubString("/hx/products/delete/".Length)
+	Try
+		Dim id As Int = Path.SubString("/hx/products/delete/".Length)
+	Catch
+		Log(LastException)
+		ShowAlert($"Error: ${LastException.Message}"$, "danger")
+		Return
+	End Try
 	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("id", "product_code AS code", "product_name AS name")
 	DB.Condition = "id = ?"
 	DB.Parameter = id
 	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+		DB.Close
+		Return
+	End If
 	Dim row As Map
 	If DB.Found Then
 		row = DB.First
@@ -401,31 +429,33 @@ Private Sub HandleProducts
 			End If
 			
 			' Check conflict
-			Try
-				DB.Open
-				DB.Table = "tbl_products"
-				DB.Conditions = Array("product_code = ?")
-				DB.Parameters = Array(code)
-				DB.Query
-				If DB.Found Then
-					ShowAlert("Product Code already exists!", "warning")
-					DB.Close
-					Return
-				End If
-			Catch
-				Log(LastException)
-				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
-			End Try
+			DB.Open
+			DB.Table = "tbl_products"
+			DB.Conditions = Array("product_code = ?")
+			DB.Parameters = Array(code)
+			DB.Query
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
+			If DB.Found Then
+				ShowAlert("Product Code already exists!", "warning")
+				DB.Close
+				Return
+			End If
+
 			' Insert new row
-			Try
-				DB.Reset
-				DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "created_date")
-				DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
-				DB.Save
-				ShowToast("Product", "created", "Product created successfully!", "success")
-			Catch
-				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
-			End Try
+			DB.Table = "tbl_products"
+			DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "created_date")
+			DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
+			DB.Save
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
+			ShowToast("Product", "created", "Product created successfully!", "success")
 			DB.Close
 		Case "PUT"
 			' Update
@@ -453,10 +483,15 @@ Private Sub HandleProducts
 				Return
 			End If
 
-			DB.Reset
+			DB.Table = "tbl_products"
 			DB.Conditions = Array("product_code = ?", "id <> ?")
 			DB.Parameters = Array(code, id)
 			DB.Query
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
 			If DB.Found Then
 				ShowAlert("Product Code already exists!", "warning")
 				DB.Close
@@ -464,16 +499,17 @@ Private Sub HandleProducts
 			End If
 			
 			' Update row
-			Try
-				DB.Reset
-				DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "modified_date")
-				DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
-				DB.Id = id
-				DB.Save
-				ShowToast("Product", "updated", "Product updated successfully!", "info")
-			Catch
-				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
-			End Try
+			DB.Table = "tbl_products"
+			DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "modified_date")
+			DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
+			DB.Id = id
+			DB.Save
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
+			ShowToast("Product", "updated", "Product updated successfully!", "info")
 			DB.Close
 		Case "DELETE"
 			' Delete
@@ -488,14 +524,15 @@ Private Sub HandleProducts
 			End If
 
 			' Delete row
-			Try
-				DB.Table = "tbl_products"
-				DB.Id = id
-				DB.Delete
-				ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
-			Catch
-				ShowAlert($"Database error: ${LastException.Message}"$, "danger")
-			End Try
+			DB.Table = "tbl_products"
+			DB.Id = id
+			DB.Delete
+			If DB.Error.IsInitialized Then
+				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+				DB.Close
+				Return
+			End If
+			ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
 			DB.Close
 	End Select
 End Sub
@@ -517,9 +554,12 @@ Private Sub CreateProductsTable As MiniHtml
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
+	DB.Join = DB.CreateJoin("", "tbl_categories AS c", Array("p.category_id = c.id"))
 	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+	End If	
 	Dim rows As List = DB.Results
 	DB.Close
 	
@@ -668,6 +708,9 @@ Private Sub CreateAddModal As String
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
 	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+	End If
 	Dim rows As List = DB.Results
 	DB.Close
 	For Each row As Map In rows
@@ -777,6 +820,9 @@ Private Sub CreateEditModal (CategoryId As String) As String
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name AS name")
 	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+	End If
 	Dim rows As List = DB.Results
 	DB.Close
 	For Each row As Map In rows

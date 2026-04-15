@@ -31,10 +31,10 @@ NumberOfLibraries=7
 NumberOfModules=8
 Version=10.5
 @EndOfDesignText@
-#Region Project Attributes
-' Product: Pakai Server
-' Version: 6.51
-' License: MIT License
+#Region  Project Attributes
+' Product:   Pakai Server
+' Version:   6.60
+' License:   MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
 #MergeLibraries: True
@@ -46,7 +46,7 @@ Version=10.5
 #Else
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
-#Region Macros
+#Region  Macros
 #Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&librariesrefresh=True
 #Macro: Title, GetResources, ide://run?file=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
 '#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
@@ -54,13 +54,13 @@ Version=10.5
 '#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
-	Public DB 					As MiniORM
-	Public MS 					As ORMSettings
-	Public App 					As EndsMeet
-	Public Api 					As ApiSettings
-	Public Const COLOR_RED 		As Int = 0xFFFF0000 '-65536
-	Public Const COLOR_BLUE 	As Int = 0xFF0000FF '-16776961
-	Public Const VERSION 		As String = "6.51"
+	Public App 				As EndsMeet
+	Public DB 				As MiniORM
+	Public Api 				As ApiSettings
+	Public MS 				As MiniORMSettings
+	Public Const VERSION 	As String = "6.60"
+	Public Const COLOR_RED 	As Int = 0xFFFF0000 '-65536
+	Public Const COLOR_BLUE As Int = 0xFF0000FF '-16776961
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -86,10 +86,10 @@ Sub AppStart (Args() As String)
 	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
 	App.Get("/api/products", "ProductsApiHandler")
 	App.Post("/api/products", "ProductsApiHandler")
-	App.Get("/api/categories", "CategoriesApiHandler")
-	App.Post("/api/categories", "CategoriesApiHandler")
+	'App.Get("/api/categories", "CategoriesApiHandler")
+	'App.Post("/api/categories", "CategoriesApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
-	App.Rest("/api/categories/*", "CategoriesApiHandler")	
+	App.Rest("/api/categories/*", "CategoriesApiHandler")
 	App.Get("/help", "HelpHandler")	
 	Api.EnableHelp = True
 	
@@ -99,19 +99,22 @@ Sub AppStart (Args() As String)
 	Log($"App version: ${VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
-	ConfigureDatabase
+	InitDatabase
 	StartMessageLoop
 End Sub
 
-' Set global ApiSettings from Main to HttpResponseMessage
-Public Sub SetApiMessage (Message As HttpResponseMessage)
-	Message.VerboseMode = Api.VerboseMode
-	Message.OrderedKeys = Api.OrderedKeys
-	Message.ContentType = Api.ContentType
-	Message.PayloadType = Api.PayloadType
+' Initialize global HttpResponseMessage instance
+Public Sub HRM As HttpResponseMessage
+	Dim HRM1 As HttpResponseMessage
+	HRM1.Initialize
+	HRM1.VerboseMode = Api.VerboseMode
+	HRM1.OrderedKeys = Api.OrderedKeys
+	HRM1.ContentType = Api.ContentType
+	HRM1.PayloadType = Api.PayloadType
+	Return HRM1
 End Sub
 
-Public Sub ConfigureDatabase
+Private Sub InitDatabase
 	Try
 		Dim dbvar As String = "sqlite"
 		#If MariaDB
@@ -176,7 +179,7 @@ Public Sub ConfigureDatabase
 			Return
 		End If
 		LogColor($"${DB.DbType} database existed!"$, COLOR_BLUE)
-		'AddUsersTable
+		AddUsersTable
 		If UsePool(DB.DbType) Then
 			DB.InitPool
 		End If
@@ -257,7 +260,9 @@ Public Sub AddUsersTable
 	DB.ShowExtraLogs = True
 	DB.UseTimestamps = True
 	DB.QueryAddToBatch = True
-
+	DB.IfNotExist = True
+	
+	DB.Open
 	DB.Table = "tbl_users"
 	DB.Columns.Add(CreateMap("Name": "first_name", "Null": False))
 	DB.Columns.Add(CreateMap("Name": "last_name", "Null": False))

@@ -5,101 +5,43 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Find Api Handler class
-' Version 6.51
+' Version 6.60
 Sub Class_Globals
 	Private DB As MiniORM
-	Private App As EndsMeet
+	Private HRM As HttpResponseMessage
 	Private Request As ServletRequest
 	Private Response As ServletResponse
-	Private HRM As HttpResponseMessage
+	Private Path As String
 	Private Method As String
-	Private Elements() As String
-	Private ElementId As Int
-	Private ElementKey As String
 End Sub
 
 Public Sub Initialize
 	DB = Main.DB
-	App = Main.App
-	HRM.Initialize
-	Main.SetApiMessage(HRM)
+	HRM = Main.HRM
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
+	Path = Request.RequestURI
 	Method = Request.Method.ToUpperCase
-	Dim FullElements() As String = WebApiUtils.GetUriElements(Request.RequestURI)
-	Elements = WebApiUtils.CropElements(FullElements, 3)
-	If ElementMatch("") Then
-		If App.MethodAvailable2(Method, "/api/find", Me) Then
-			Select Method
-				Case "GET"
-					GetAllProducts
-					Return
-				Case "POST"
-					SearchByKeywords
-					Return
-			End Select
-		End If
-		ReturnMethodNotAllow
-		Return
-	Else If ElementMatch("key/id") Then
-		If App.MethodAvailable2(Method, "/api/find/products-by-category_id/*", Me) Then
-			If ElementKey = "products-by-category_id" Then
-				GetProductsByCategoryId(ElementId)
-				Return
-			End If
-		End If
-		ReturnMethodNotAllow
-		Return
+	If Path = "/api/find" And Method = "GET" Then
+		GetAllProducts
+	Else If Path = "/api/find" And Method = "POST" Then
+		SearchByKeywords
+	Else If Path.StartsWith("/api/find/products-by-category_id/") And Method = "GET" Then
+		GetProductsByCategoryId
+	Else
+		WebApiUtils.ReturnBadRequest(HRM, Response)
 	End If
-	ReturnBadRequest
-End Sub
-
-Private Sub ElementMatch (Pattern As String) As Boolean
-	Select Pattern
-		Case ""
-			If Elements.Length = 0 Then
-				Return True
-			End If
-		Case "id"
-			If Elements.Length = 1 Then
-				If IsNumber(Elements(0)) Then
-					ElementId = Elements(0)
-					Return True
-				End If
-			End If
-		Case "key/id"
-			If Elements.Length = 2 Then
-				ElementKey = Elements(0)
-				If IsNumber(Elements(1)) Then
-					ElementId = Elements(1)
-					Return True
-				End If
-			End If
-	End Select
-	Return False
-End Sub
-
-Private Sub ReturnApiResponse
-	WebApiUtils.ReturnHttpResponse(HRM, Response)
-End Sub
-
-Private Sub ReturnBadRequest
-	WebApiUtils.ReturnBadRequest(HRM, Response)
-End Sub
-
-Private Sub ReturnMethodNotAllow
-	WebApiUtils.ReturnMethodNotAllow(HRM, Response)
 End Sub
 
 Private Sub GetAllProducts
-	Log($"${Request.Method}: ${Request.RequestURI}"$)
+	Log($"${Method}: ${Path}"$)
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
+	DB.Join = DB.CreateJoin("", "tbl_categories AS c", Array("p.category_id = c.id"))
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	If DB.Error.IsInitialized Then
@@ -107,18 +49,26 @@ Private Sub GetAllProducts
 		HRM.ResponseError = DB.Error.Message
 	Else
 		HRM.ResponseCode = 200
-		HRM.ResponseData = DB.Results2
+		HRM.ResponseData = DB.Results
 	End If
 	DB.Close
-	ReturnApiResponse
+	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
-Public Sub GetProductsByCategoryId (id As Int)
-	Log($"${Request.Method}: ${Request.RequestURI}"$)
+Public Sub GetProductsByCategoryId
+	Log($"${Method}: ${Path}"$)
+	Try
+		Dim id As Int = Path.SubString("/api/find/products-by-category_id/".Length)
+	Catch
+		HRM.ResponseCode = 400
+		HRM.ResponseError = "Invalid id value"
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End Try
 	DB.Open
-	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
+	DB.Table = "tbl_products AS p"
+	DB.Columns = Array("p.id AS id", "p.category_id AS catid", "c.category_name AS category", "p.product_code AS code", "p.product_name AS name", "p.product_price AS price")
+	DB.Join = DB.CreateJoin("", "tbl_categories AS c", Array("p.category_id = c.id"))
 	DB.Condition = "c.id = ?"
 	DB.Parameter = id
 	DB.OrderBy = CreateMap("p.id": "")
@@ -128,19 +78,19 @@ Public Sub GetProductsByCategoryId (id As Int)
 		HRM.ResponseError = DB.Error.Message
 	Else
 		HRM.ResponseCode = 200
-		HRM.ResponseData = DB.Results2
+		HRM.ResponseData = DB.Results
 	End If
 	DB.Close
-	ReturnApiResponse
+	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
 Public Sub SearchByKeywords
-	Log($"${Request.Method}: ${Request.RequestURI}"$)
+	Log($"${Method}: ${Path}"$)
 	Dim str As String = WebApiUtils.RequestDataText(Request)
 	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
-		ReturnApiResponse
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
@@ -152,14 +102,14 @@ Public Sub SearchByKeywords
 	If data.ContainsKey("keyword") = False Then
 		HRM.ResponseCode = 400
 		HRM.ResponseError = "Key 'keyword' not found"
-		ReturnApiResponse
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	Dim SearchForText As String = data.Get("keyword")
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
+	DB.Join = DB.CreateJoin("", "tbl_categories AS c", Array("p.category_id = c.id"))
 	If SearchForText <> "" Then
 		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
 		DB.Parameters = Array("%" & SearchForText & "%", "%" & SearchForText.ToUpperCase & "%", "%" & SearchForText.ToUpperCase & "%")
@@ -171,8 +121,8 @@ Public Sub SearchByKeywords
 		HRM.ResponseError = DB.Error.Message
 	Else
 		HRM.ResponseCode = 200
-		HRM.ResponseData = DB.Results2
+		HRM.ResponseData = DB.Results
 	End If
 	DB.Close
-	ReturnApiResponse
+	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
