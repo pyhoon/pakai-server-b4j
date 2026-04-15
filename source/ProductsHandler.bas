@@ -129,6 +129,17 @@ Private Sub RenderPage
 		Dim page1 As MiniHtml = main1.Render
 		Dim ulist1 As MiniHtml = FindUListTag(page1)
 		
+		' Sample for adding additional menu link
+		Dim list3 As MiniHtml = Li.up(ulist1)
+		list3.cls("nav-item d-block d-lg-block")
+		Dim a3 As MiniHtml = Anchor.up(list3)
+		a3.attr("href", "/users")
+		a3.cls("nav-link")
+		a3.text("Users")
+		Dim i3 As MiniHtml = Icon.up(a3)
+		i3.cls("bi bi-tag me-2")
+		i3.attr("title", "Users")
+		
 		Dim list1 As MiniHtml = Li.up(ulist1)
 		list1.cls("nav-item d-block d-lg-block")
 		Dim a1 As MiniHtml = Anchor.up(list1)
@@ -152,11 +163,13 @@ Private Sub RenderPage
 			i2.attr("title", "API")
 		End If
 
-		' Sample for adding additional menu link
-		'Dim list2 As MiniHtml = Li.cls("nav-item d-block d-lg-block").up(ulist1)
-		'Dim a2 As MiniHtml = Anchor.href("/users").up(list1)
-		'a2.cls("nav-link")
-		'a2.text("Users")
+'		' Sample for adding additional menu link
+'		Dim list3 As MiniHtml = Li.up(ulist1)
+'		list3.cls("nav-item d-block d-lg-block")
+'		Dim a3 As MiniHtml = Anchor.up(list3)
+'		a3.attr("href", "/users")
+'		a3.cls("nav-link")
+'		a3.text("Users")
 
 		Dim doc As MiniHtml
 		doc.Initialize("")

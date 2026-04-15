@@ -19,6 +19,7 @@ Library5=minijs
 Library6=miniormutils
 Library7=webapiutils
 Module1=CategoriesApiHandler
+Module10=UsersHandler
 Module2=CategoriesHandler
 Module3=FindApiHandler
 Module4=HelpHandler
@@ -26,9 +27,10 @@ Module5=HttpsFilter
 Module6=MainView
 Module7=ProductsApiHandler
 Module8=ProductsHandler
+Module9=UsersApiHandler
 NumberOfFiles=4
 NumberOfLibraries=7
-NumberOfModules=8
+NumberOfModules=10
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
@@ -89,8 +91,10 @@ Sub AppStart (Args() As String)
 	#End If
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
+	App.Get("/users", "UsersHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
 	App.Rest("/hx/categories/*", "CategoriesHandler")
+	App.Rest("/hx/users/*", "UsersHandler")
 	
 	' Use API
 	Api = App.api
@@ -104,6 +108,7 @@ Sub AppStart (Args() As String)
 	'App.Post("/api/categories", "CategoriesApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
 	App.Rest("/api/categories/*", "CategoriesApiHandler")
+	App.Rest("/api/users/*", "UsersApiHandler")
 	App.Get("/help", "HelpHandler")	
 	Api.EnableHelp = True
 	
@@ -193,7 +198,7 @@ Private Sub InitDatabase
 			Return
 		End If
 		LogColor($"${DB.DbType} database existed!"$, COLOR_BLUE)
-		AddUsersTable
+		'AddUsersTable
 		If UsePool(DB.DbType) Then
 			DB.InitPool
 		End If

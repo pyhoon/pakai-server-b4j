@@ -426,6 +426,38 @@ Private Sub BuildMethods 'ignore
 	'Method.Put("Expected", GetExpectedResponse(Method.Get("Verb"))) ' POST
 	Method.Put("Expected", GetExpectedResponse(""))
 	ReplaceMethod(Method)
+	
+	
+	Dim Method As Map = RetrieveMethod("Users", "GetUsers")
+	Method.Put("Desc", "Read all Users")
+	ReplaceMethod(Method)
+	
+	Dim Method As Map = RetrieveMethod("Users", "GetUserById (id As Int)")
+	Method.Put("Desc", "Read one User by id")
+	Method.Put("Elements", $"["{id}"]"$)
+	ReplaceMethod(Method)
+	
+	Dim Method As Map = CreateMethodProperties("Users", "PostUser")
+	Method.Put("Desc", "Add new User")
+	Dim FormatMap As Map = CreateMap("category_id": 1, "User_code": "CODE", "User_name": "UserName", "User_price": 0)
+	Dim BodyMap As Map = CreateMap("category_id": 1, "User_code": "", "User_name": "", "User_price": 0)
+	Method.Put("Format", FormatMap.As(JSON).ToString)
+	Method.Put("Body", BodyMap.As(JSON).ToString)
+	ReplaceMethod(Method)
+	
+	Dim Method As Map = RetrieveMethod("Users", "PutUserById (id As Int)")
+	Method.Put("Desc", "Update User by id")
+	Dim FormatMap As Map = CreateMap("category_id": 1, "User_code": "CODE", "User_name": "UserName", "User_price": 10)
+	Dim BodyMap As Map = CreateMap("category_id": 1, "User_code": "", "User_name": "", "User_price": 0)
+	Method.Put("Format", FormatMap.As(JSON).ToString)
+	Method.Put("Body", BodyMap.As(JSON).ToString)
+	Method.Put("Elements", $"["{id}"]"$)
+	ReplaceMethod(Method)
+	
+	Dim Method As Map = RetrieveMethod("Users", "DeleteUserById (id As Int)")
+	Method.Put("Desc", "Delete User by id")
+	Method.Put("Elements", $"["{id}"]"$)
+	ReplaceMethod(Method)
 End Sub
 
 Private Sub ReadHandlers 'ignore
