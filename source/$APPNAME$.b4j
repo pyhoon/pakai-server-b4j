@@ -19,9 +19,6 @@ Library5=minijs
 Library6=miniormutils
 Library7=webapiutils
 Module1=CategoriesApiHandler
-Module10=UsersApiHandler
-Module11=UsersHandler
-Module12=UsersModel
 Module2=CategoriesHandler
 Module3=FindApiHandler
 Module4=HelpHandler
@@ -32,7 +29,7 @@ Module8=ProductsApiHandler
 Module9=ProductsHandler
 NumberOfFiles=4
 NumberOfLibraries=7
-NumberOfModules=12
+NumberOfModules=9
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
@@ -81,10 +78,8 @@ Sub AppStart (Args() As String)
 	' Frontend using HTMX and AlpineJS
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
-	App.Get("/users", "UsersHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
 	App.Rest("/hx/categories/*", "CategoriesHandler")
-	App.Rest("/hx/users/*", "UsersHandler")
 	
 	' For REST API
 	Api = App.api
@@ -92,7 +87,6 @@ Sub AppStart (Args() As String)
 	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
 	App.Rest("/api/categories/*", "CategoriesApiHandler")
-	App.Rest("/api/users/*", "UsersApiHandler")
 	App.Get("/help", "HelpHandler")	
 	Api.EnableHelp = True
 	
