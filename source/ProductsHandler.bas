@@ -637,7 +637,7 @@ Private Sub CreateAddModal As String
 	
 	DB.Open
 	DB.Table = "tbl_categories"
-	DB.Columns = Array("id", "category_name AS name")
+	DB.Columns = Array("id", "category_name name")
 	DB.Query
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
@@ -754,7 +754,7 @@ Private Sub CreateEditModal (CategoryId As String) As String
 	
 	DB.Open
 	DB.Table = "tbl_categories"
-	DB.Columns = Array("id", "category_name AS name")
+	DB.Columns = Array("id", "category_name name")
 	DB.Query
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
