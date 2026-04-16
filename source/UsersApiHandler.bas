@@ -68,7 +68,7 @@ Private Sub GetUserById
 	End Try
 	DB.Open
 	DB.Table = "tbl_users"
-	DB.Find(Id)
+	DB.Find(id)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
@@ -196,7 +196,7 @@ Private Sub PutUserById
 	DB.Open
 	DB.Table = "tbl_users"
 	DB.Conditions = Array("user_name = ?", "id <> ?") ' duplicate keys not alowed
-	DB.Parameters = Array(user_name, Id)
+	DB.Parameters = Array(user_name, id)
 	DB.Query
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
@@ -215,7 +215,7 @@ Private Sub PutUserById
 
 	' Find row by id
 	DB.Table = "tbl_users"
-	DB.Find(Id)
+	DB.Find(id)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
@@ -235,7 +235,7 @@ Private Sub PutUserById
 	DB.Table = "tbl_users"
 	DB.Columns = Array("user_name", "key2", "key3", "modified_date")
 	DB.Parameters = Array(user_name, key2, key3, modified_date)
-	DB.Id = Id
+	DB.Id = id
 	DB.Save
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
@@ -263,7 +263,7 @@ Private Sub DeleteUserById
 	' Find row by id
 	DB.Open
 	DB.Table = "tbl_users"
-	DB.Find(Id)
+	DB.Find(id)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
@@ -281,7 +281,7 @@ Private Sub DeleteUserById
 
 	' Delete row
 	DB.Table = "tbl_users"
-	DB.Id = Id
+	DB.Id = id
 	DB.Delete
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422

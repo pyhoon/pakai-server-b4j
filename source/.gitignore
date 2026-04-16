@@ -2,6 +2,7 @@
 Objects/*.ini
 Objects/*.log
 Objects/*.jar
+Objects/*.json
 Objects/*.db*
 Objects/keystore*
 Objects/help.html

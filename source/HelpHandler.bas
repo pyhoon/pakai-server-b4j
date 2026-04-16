@@ -44,48 +44,6 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	ShowHelpPage
 End Sub
 
-Sub Div As MiniHtml
-	Return CreateTag("div")
-End Sub
-
-Sub Button As MiniHtml
-	Return CreateTag("button")
-End Sub
-
-Sub Anchor As MiniHtml
-	Return CreateTag("a")
-End Sub
-
-Sub Icon As MiniHtml
-	Return CreateTag("i")
-End Sub
-
-Sub Input As MiniHtml
-	Return CreateTag("input")
-End Sub
-
-Sub Meta As MiniHtml
-	Return CreateTag("meta")
-End Sub
-
-Sub Span As MiniHtml
-	Return CreateTag("span")
-End Sub
-
-Sub Strong As MiniHtml
-	Return CreateTag("strong")
-End Sub
-
-Sub Textarea As MiniHtml
-	Return CreateTag("textarea")
-End Sub
-
-Sub CreateTag (Name As String) As MiniHtml
-	Dim tag1 As MiniHtml
-	tag1.Initialize(Name)
-	Return tag1
-End Sub
-
 Private Sub ShowHelpPage
 	#If Debug
 	'ReadHandlers ' Read from source (optional) - comment hashtags are required
@@ -109,26 +67,24 @@ Private Sub ShowHelpPage
 End Sub
 
 Private Sub GenerateHelpPage As String 'ignore
-	Dim html1 As MiniHtml = CreateTag("html")
-	html1.lang("en")
-	html1.multiline
-	Dim head1 As MiniHtml = CreateTag("head").up(html1)
+	Dim html1 As MiniHtml = MH.Html
+	Dim head1 As MiniHtml = MH.Head.up(html1)
 	head1.multiline
-	Dim meta1 As MiniHtml = Meta.up(head1)
+	Dim meta1 As MiniHtml = MH.Meta.up(head1)
 	meta1.attr("http-equiv", "content-type")
 	meta1.attr("content", "text/html; charset=utf-8")
-	Dim meta2 As MiniHtml = Meta.up(head1)
+	Dim meta2 As MiniHtml = MH.Meta.up(head1)
 	meta2.attr("name", "viewport")
 	meta2.attr("content", "width=device-width, initial-scale=1")
-	Dim meta3 As MiniHtml = Meta.up(head1)
+	Dim meta3 As MiniHtml = MH.Meta.up(head1)
 	meta3.attr("name", "csrf-token")
-	Dim meta4 As MiniHtml = Meta.up(head1)
+	Dim meta4 As MiniHtml = MH.Meta.up(head1)
 	meta4.attr("name", "description")
-	Dim meta5 As MiniHtml = Meta.up(head1)
+	Dim meta5 As MiniHtml = MH.Meta.up(head1)
 	meta5.attr("name", "author")
-	Dim title1 As MiniHtml = CreateTag("title").up(head1)
+	Dim title1 As MiniHtml = MH.Title.up(head1)
 	title1.text("API Documentation")
-	Dim link1 As MiniHtml = CreateTag("link").up(head1)
+	Dim link1 As MiniHtml = MH.Link.up(head1)
 	link1.attr("rel", "icon")
 	link1.attr("type", "image/png")
 	link1.attr("href", "/assets/img/favicon.png")
@@ -138,7 +94,7 @@ Private Sub GenerateHelpPage As String 'ignore
 	head1.cdn2("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
 	"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB", "anonymous")
 	head1.cdn("style", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")
-	Dim sty1 As MiniHtml = CreateTag("style").up(head1)
+	Dim sty1 As MiniHtml = MH.Style.up(head1)
 	Dim cssFolder As String = File.Combine(File.Combine(Main.App.staticfiles.Folder, "assets"), "css")
 	If File.Exists(cssFolder, "help.css") Then
 		sty1.text(File.ReadString(cssFolder, "help.css"))
@@ -148,102 +104,102 @@ Private Sub GenerateHelpPage As String 'ignore
 	End If
 	'Log(sty1.build)
 	
-	Dim body1 As MiniHtml = CreateTag("body").up(html1)
+	Dim body1 As MiniHtml = MH.Body.up(html1)
 	'body1.cls("bg-dark text-light")
 	body1.sty("background: #393939")
 	body1.attr("x-data", "apiApp")
 	body1.multiline
 	
-	Dim nav1 As MiniHtml = CreateTag("nav").up(body1)
+	Dim nav1 As MiniHtml = MH.Nav.up(body1)
 	nav1.cls("navbar navbar-light navbar-expand-lg sticky-top py-1")
 	nav1.sty("background-color: yellow")
 	nav1.multiline
 	
-	Dim div1 As MiniHtml = Div.up(nav1)
+	Dim div1 As MiniHtml = MH.Div.up(nav1)
 	div1.cls("container-fluid")
 	
-	Dim a1 As MiniHtml = Anchor.up(div1)
+	Dim a1 As MiniHtml = MH.Anchor.up(div1)
 	a1.cls("navbar-brand me-0 me-lg-2")
 	a1.attr("href", "#")
-	Dim i1 As MiniHtml = Icon.up(a1)
+	Dim i1 As MiniHtml = MH.Icon.up(a1)
 	i1.cls("bi bi-gear h3")
-	Dim a2 As MiniHtml = Anchor.up(div1)
+	Dim a2 As MiniHtml = MH.Anchor.up(div1)
 	a2.cls("navbar-brand font-weight-bold")
 	a2.attr("href", "#")
 	a2.text("API Documentation")
 	
-	Dim toggler1 As MiniHtml = Button.up(div1)
+	Dim toggler1 As MiniHtml = MH.Button.up(div1)
 	toggler1.cls("navbar-toggler d-md-block d-lg-none collapsed")
 	toggler1.attr("type", "button")
 	toggler1.attr("data-bs-toggle", "collapse")
 	toggler1.attr("data-bs-target", "#navbarCollapse")
 	toggler1.sty("border: none")
-	Dim span1 As MiniHtml = Span.up(toggler1)
+	Dim span1 As MiniHtml = MH.Span.up(toggler1)
 	span1.cls("navbar-toggler-icon")
 	
-	Dim div2 As MiniHtml = Div.up(div1)
+	Dim div2 As MiniHtml = MH.Div.up(div1)
 	div2.cls("collapse navbar-collapse")
 	div2.attr("id", "navbarCollapse")
 	div2.multiline
-	Dim ul1 As MiniHtml = CreateTag("ul").up(div2)
+	Dim ul1 As MiniHtml = MH.Ul.up(div2)
 	ul1.cls("navbar-nav navbar-brand ms-auto mb-md-0")
 	ul1.multiline
 	
-	Dim li1 As MiniHtml = CreateTag("li").up(ul1)
+	Dim li1 As MiniHtml = MH.Li.up(ul1)
 	li1.cls("nav-item d-none d-sm-none d-md-block")
 	li1.multiline
-	Dim a3 As MiniHtml = Anchor.up(li1)
+	Dim a3 As MiniHtml = MH.Anchor.up(li1)
 	a3.attr("href", "https://paypal.me/aeric80/")
 	a3.attr("target", "_blank")
-	Dim img1 As MiniHtml = CreateTag("img").up(a3)
+	Dim img1 As MiniHtml = MH.Img.up(a3)
 	img1.attr("src", "/assets/img/coffee.png")
 	'img1.cls("ms-2 mt-1")
 	img1.cls("my-1")
 	If CustomTheme Then img1.cls("dark-mode-ready")
 	img1.sty("height: 36px")
 	
-	Dim li2 As MiniHtml = CreateTag("li").up(ul1)
+	Dim li2 As MiniHtml = MH.Li.up(ul1)
 	li2.cls("nav-item d-block d-lg-block")
-	Dim a5 As MiniHtml = Anchor.up(li2)
+	Dim a5 As MiniHtml = MH.Anchor.up(li2)
 	a5.text("Home")
 	a5.attr("href", "/")
 	a5.cls("nav-link text-dark float-end")
-	Dim i2 As MiniHtml = Icon.up(a5)
+	Dim i2 As MiniHtml = MH.Icon.up(a5)
 	i2.cls("bi bi-house me-2")
 	i2.attr("title", "Home")
 	
-	Dim div2 As MiniHtml = Div.up(body1)
+	Dim div2 As MiniHtml = MH.Div.up(body1)
 	div2.cls("text-center font-weight-bold d-block d-sm-block d-md-none")
 	div2.sty("background-color: whitesmoke")
 	div2.multiline
-	Dim a4 As MiniHtml = Anchor.up(div2)
+	Dim a4 As MiniHtml = MH.Anchor.up(div2)
 	a4.attr("href", "https://paypal.me/aeric80/")
 	a4.attr("target", "_blank")
-	Dim img2 As MiniHtml = CreateTag("img").up(a4)
+	Dim img2 As MiniHtml = MH.Img.up(a4)
 	img2.attr("src", "/assets/img/sponsor.png")
 	img2.cls("mx-2")
 	If CustomTheme Then img2.cls("dark-mode-ready")
 	img2.sty("width: 174px")
 	
-	Dim div3 As MiniHtml = Div.up(body1)
+	Dim div3 As MiniHtml = MH.Div.up(body1)
 	div3.cls("content m-3")
 	div3.multiline
 	Dim script3 As String = SaveToken
 	div3.attr("x-data", script3.SubString2(0, script3.LastIndexOf(CRLF)))
 	div3.attr("@token-updated.window", "accessToken = localStorage.getItem('access_token')")
 	
-	Dim div4 As MiniHtml = Div.up(div3)
+	Dim div4 As MiniHtml = MH.Div.up(div3)
 	div4.cls("p-2")
 	div4.multiline
 	
-	Dim div5 As MiniHtml = Div.up(div4)
+	Dim div5 As MiniHtml = MH.Div.up(div4)
 	div5.cls("row text-center text-light align-items-center justify-content-center")
 	
-	Dim h31 As MiniHtml = CreateTag("h3").up(div5)
+	Dim h31 As MiniHtml = MH.H3.up(div5)
 	h31.cls("mb-0")
 	h31.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;")
 	h31.text("$HOME_TITLE$")
-	Dim span2 As MiniHtml = Span.up(div5)
+	Dim span2 As MiniHtml = MH.Span.up(div5)
 	span2.cls("small")
 	span2.text("Version: $VERSION$")
 	
@@ -254,7 +210,7 @@ Private Sub GenerateHelpPage As String 'ignore
 	For Each GroupName As String In AllGroups.Keys
 		Dim AcordionGroup As MiniHtml = GenerateHeaderByGroup(GroupName)
 		AcordionGroup.up(div4)
-		Dim div1 As MiniHtml = Div.up(AcordionGroup)
+		Dim div1 As MiniHtml = MH.Div.up(AcordionGroup)
 		div1.cls("accordion")
 		div1.multiline
 		For Each method As Map In AllMethods
@@ -267,21 +223,21 @@ Private Sub GenerateHelpPage As String 'ignore
 		Next
 	Next
 	
-	Dim div6 As MiniHtml = Div.up(body1)
+	Dim div6 As MiniHtml = MH.Div.up(body1)
 	div6.cls("bottom")
-	Dim footer1 As MiniHtml = CreateTag("footer").up(body1)
+	Dim footer1 As MiniHtml = MH.Footer.up(body1)
 	footer1.cls("footer pl-4 pt-2 pb-2")
 	footer1.multiline
-	Dim div7 As MiniHtml = Div.up(footer1)
+	Dim div7 As MiniHtml = MH.Div.up(footer1)
 	div7.cls("footer small text-light text-center d-md-block")
 	div7.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;")
 	div7.multiline
-	Dim caption1 As MiniHtml = CreateTag("caption").up(div7)
+	Dim caption1 As MiniHtml = MH.Caption.up(div7)
 	caption1.multiline
 	caption1.text("$APP_COPYRIGHT$")
-	CreateTag("br").up(caption1)
+	MH.Br.up(caption1)
 	caption1.text("Made with")
-	Dim span3 As MiniHtml = Span.up(caption1)
+	Dim span3 As MiniHtml = MH.Span.up(caption1)
 	span3.sty("color: red")
 	span3.text("❤")
 	caption1.text(" using Pakai")
@@ -296,7 +252,7 @@ Private Sub GenerateHelpPage As String 'ignore
 	body1.cdn3("script", "https://cdn.jsdelivr.net/npm/alpinejs@3.15.8/dist/cdn.min.js", CreateMap("defer": ""))	
 
 	Dim script2 As String = AlpineHtmx
-	CreateTag("script").up(body1).text(script2.SubString2(0, script2.LastIndexOf(CRLF))).multiline
+	MH.Script.up(body1).text(script2.SubString2(0, script2.LastIndexOf(CRLF))).multiline
 	
 	Dim doc As MiniHtml
 	doc.Initialize("")
@@ -707,7 +663,7 @@ Private Sub UseAuthenticate (Name As String) As Boolean
 End Sub
 
 Private Sub GenerateAccordion (section As VerbSection) As MiniHtml
-	Dim div1 As MiniHtml = Div
+	Dim div1 As MiniHtml = MH.Div
 	div1.cls("accordion-item")
 	div1.multiline
 	GenerateAccordionHead(section).up(div1)
@@ -716,11 +672,11 @@ Private Sub GenerateAccordion (section As VerbSection) As MiniHtml
 End Sub
 
 Private Sub GenerateAccordionHead (section As VerbSection) As MiniHtml
-	Dim h21 As MiniHtml = CreateTag("h2")
+	Dim h21 As MiniHtml = MH.H2
 	h21.cls("accordion-header")
 	h21.attr("id", $"${section.ElementId}-heading"$)
 	h21.multiline
-	Dim button1 As MiniHtml = Button.up(h21)
+	Dim button1 As MiniHtml = MH.Button.up(h21)
 	button1.cls("accordion-button accordion-button-" & section.Color & " bg-opacity-75 py-2 collapsed")
 	button1.attr("type", "button")
 	button1.attr("data-bs-toggle", "collapse")
@@ -728,13 +684,13 @@ Private Sub GenerateAccordionHead (section As VerbSection) As MiniHtml
 	button1.attr("aria-controls", $"${section.ElementId}-collapse"$)
 	button1.FormatAttributes = True
 	button1.multiline
-	Dim span1 As MiniHtml = Span.up(button1)
+	Dim span1 As MiniHtml = MH.Span.up(button1)
 	span1.sty("width: 60px")
 	span1.cls($"badge badge-${section.Color} text-secondary py-1 me-2"$)
 	span1.text(section.Verb)
 	Dim strAuthenticate As String = WebApiUtils.ProperCase(section.Authenticate)
 	If UseAuthenticate(strAuthenticate) Then
-		Dim span2 As MiniHtml = Span.up(button1)
+		Dim span2 As MiniHtml = MH.Span.up(button1)
 		span2.sty("width: 50px")
 		span2.cls("badge rounded-pill pill-yellow pill-yellow-text px-2 py-1 me-1")
 		span2.text(strAuthenticate)
@@ -744,60 +700,60 @@ Private Sub GenerateAccordionHead (section As VerbSection) As MiniHtml
 End Sub
 
 Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
-	Dim div1 As MiniHtml = Div
+	Dim div1 As MiniHtml = MH.Div
 	div1.attr("id", $"${section.ElementId}-collapse"$)
 	div1.cls("accordion-collapse collapse")
 	div1.attr("aria-labelledby", $"${section.ElementId}-heading"$)
 	div1.multiline
-	Dim div2 As MiniHtml = Div.up(div1)
+	Dim div2 As MiniHtml = MH.Div.up(div1)
 	div2.cls("accordion-body")
 	div2.attr("x-data", $"{ apiId: '${section.ElementId}' }"$)
 	div2.multiline
-	Dim div3 As MiniHtml = Div.up(div2)
+	Dim div3 As MiniHtml = MH.Div.up(div2)
 	div3.cls("row")
 	div3.multiline
-	Dim div4 As MiniHtml = Div.up(div3)
+	Dim div4 As MiniHtml = MH.Div.up(div3)
 	div4.cls("col-md-3 p-2")
 	div4.multiline
-	Dim p1 As MiniHtml = CreateTag("p").up(div4)
+	Dim p1 As MiniHtml = MH.P.up(div4)
 	p1.multiline
-	Dim strong1 As MiniHtml = Strong.up(p1)
+	Dim strong1 As MiniHtml = MH.Strong.up(p1)
 	strong1.text("Parameters")
-	CreateTag("br").up(p1)
-	Dim span1 As MiniHtml = Span.up(p1)
+	MH.Br.up(p1)
+	Dim span1 As MiniHtml = MH.Span.up(p1)
 	span1.cls("form-control")
 	span1.sty("background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small")
 	span1.text(section.Params)
 
 	If section.Verb = "POST" Or section.Verb = "PUT" Then
-		Dim p2 As MiniHtml = CreateTag("p").up(div4)
+		Dim p2 As MiniHtml = MH.P.up(div4)
 		p2.multiline
-		Dim strong2 As MiniHtml = Strong.up(p2)
+		Dim strong2 As MiniHtml = MH.Strong.up(p2)
 		strong2.text("Format")
-		Dim span2 As MiniHtml = Span.up(p2)
+		Dim span2 As MiniHtml = MH.Span.up(p2)
 		span2.cls("form-control")
 		span2.sty("background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small")
 		span2.multiline
 		span2.text(section.Format)
 	End If
 
-	Dim div5 As MiniHtml = Div.up(div4)
+	Dim div5 As MiniHtml = MH.Div.up(div4)
 	div5.cls("mt-3")
 	div5.multiline
-	Dim strong3 As MiniHtml = Strong.up(div5)
+	Dim strong3 As MiniHtml = MH.Strong.up(div5)
 	strong3.text("Status Code")
 	div5.text(section.Expected)
 	
-	Dim div6 As MiniHtml = Div.up(div3)
+	Dim div6 As MiniHtml = MH.Div.up(div3)
 	div6.cls("col-md-3 p-2")
 	div6.multiline
 	
-	Dim p3 As MiniHtml = CreateTag("p").up(div6)
+	Dim p3 As MiniHtml = MH.P.up(div6)
 	p3.multiline
-	Dim strong4 As MiniHtml = Strong.up(p3)
+	Dim strong4 As MiniHtml = MH.Strong.up(p3)
 	strong4.text("Path")
-	CreateTag("br").up(p3)
-	Dim input1 As MiniHtml = Input.up(p3)
+	MH.Br.up(p3)
+	Dim input1 As MiniHtml = MH.Input.up(p3)
 	input1.attr(":id", "'path-' + apiId")
 	input1.attr("type", "text")
 	input1.cls("form-control data-path text-light")
@@ -809,17 +765,17 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	input1.multiline
 	
 	If section.Verb = "POST" Or section.Verb = "PUT" Then
-		Dim p4 As MiniHtml = CreateTag("p").up(div6)
+		Dim p4 As MiniHtml = MH.P.up(div6)
 		p4.multiline
-		Dim strong5 As MiniHtml = Strong.up(p4)
+		Dim strong5 As MiniHtml = MH.Strong.up(p4)
 		Select section.FileUpload.ToLowerCase
 			Case "image", "pdf"
 				strong5.text("Choose a File")
-				CreateTag("br").up(p4)
-				'Dim label1 As MiniHtml = CreateTag("label").up(p4)
+				MH.Br.up(p4)
+				'Dim label1 As MiniHtml = MH.Label.up(p4)
 				'label1.attr("for", "file-" & section.ElementId)
 				'label1.text("Choose a file:")
-				Dim input2 As MiniHtml = Input.up(p4)
+				Dim input2 As MiniHtml = MH.Input.up(p4)
 				input2.attr("type", "file")
 				input2.attr(":id", "'file-' + apiId")
 				input2.attr("id", "file-" & section.ElementId)
@@ -827,7 +783,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 				input2.cls("pb-3")
 			Case Else
 				strong5.text("Body")
-				Dim textarea1 As MiniHtml = Textarea.up(p4)
+				Dim textarea1 As MiniHtml = MH.Textarea.up(p4)
 				textarea1.attr(":id", "'body-' + apiId")
 				textarea1.attr("rows", "6")
 				textarea1.cls("form-control data-body")
@@ -838,7 +794,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 		End Select
 	End If
 	
-	Dim button1 As MiniHtml = Button.up(div6)
+	Dim button1 As MiniHtml = MH.Button.up(div6)
 	button1.cls("btn submit-button-" & section.Color & " text-white col-md-6 col-lg-4 p-2 float-end")
 	If section.Authenticate <> "" Then button1.cls(section.Authenticate.ToLowerCase) ' add class
 	button1.sty("cursor: pointer; padding-bottom: 60px")
@@ -851,20 +807,20 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	button1.attr("@htmx:after-request", $"handleResponse($event, apiId)"$)
 	button1.FormatAttributes = True
 	button1.multiline
-	Dim span3 As MiniHtml = Span.up(button1)
+	Dim span3 As MiniHtml = MH.Span.up(button1)
 	span3.cls("htmx-indicator spinner-border spinner-border-sm me-2")
-	Dim strong6 As MiniHtml = Strong.up(button1)
+	Dim strong6 As MiniHtml = MH.Strong.up(button1)
 	strong6.text("Submit")
 	
-	Dim div7 As MiniHtml = Div.up(div3)
+	Dim div7 As MiniHtml = MH.Div.up(div3)
 	div7.cls("col-md-6 p-2")
 	div7.multiline
-	Dim p5 As MiniHtml = CreateTag("p").up(div7)
+	Dim p5 As MiniHtml = MH.P.up(div7)
 	p5.multiline
-	Dim strong7 As MiniHtml = Strong.up(p5)
+	Dim strong7 As MiniHtml = MH.Strong.up(p5)
 	strong7.text("Response")
-	CreateTag("br").up(p5)
-	Dim textarea2 As MiniHtml = Textarea.up(p5)
+	MH.Br.up(p5)
+	Dim textarea2 As MiniHtml = MH.Textarea.up(p5)
 	textarea2.attr("rows", "10")
 	textarea2.attr(":id", "'response-' + apiId")
 	textarea2.cls("form-control response-area")
@@ -872,7 +828,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	textarea2.sty("color: #68d391; font-size: small") ' text-green-400
 	textarea2.FormatAttributes = True
 
-	Dim div8 As MiniHtml = Div.up(div7)
+	Dim div8 As MiniHtml = MH.Div.up(div7)
 	div8.attr("x-show", "alerts[apiId]?.show")
 	div8.attr(":class", "alerts[apiId]?.type")
 	div8.cls("alert")
@@ -885,15 +841,15 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 End Sub
 
 Private Sub GenerateHeaderByGroup (Group As String) As MiniHtml
-	Dim div1 As MiniHtml = Div
+	Dim div1 As MiniHtml = MH.Div
 	div1.cls("row mt-3")
 	div1.multiline
-	Dim div2 As MiniHtml = Div.up(div1)
+	Dim div2 As MiniHtml = MH.Div.up(div1)
 	div2.cls("col-md-12")
 	div2.multiline
-	Dim h61 As MiniHtml = CreateTag("h6").up(div2)
+	Dim h61 As MiniHtml = MH.H6.up(div2)
 	h61.cls("text-uppercase text-primary")
-	Dim strong1 As MiniHtml = Strong.up(h61)
+	Dim strong1 As MiniHtml = MH.Strong.up(h61)
 	strong1.text(Group)
 	Return div1
 End Sub
