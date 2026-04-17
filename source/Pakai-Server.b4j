@@ -146,7 +146,7 @@ Private Sub InitDatabase
 				DBS.DBHost = ctx.GetDefault("DbHost", "")
 				DBS.DBPort = ctx.GetDefault("DbPort", "")
 				DBS.DBName = ctx.GetDefault("DbName", "")
-				DBS.DriverClass = ctx.GetDefault("DriverClass", "")
+				DBS.Driver = ctx.GetDefault("DriverClass", "")
 				DBS.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
 				DBS.User = ctx.GetDefault("User", "")
 				DBS.Password = ctx.GetDefault("Password", "")
