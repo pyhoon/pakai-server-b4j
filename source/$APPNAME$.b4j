@@ -56,10 +56,10 @@ Version=10.5
 '#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 #End Region
 Sub Process_Globals
-	Public App 				As EndsMeet
 	Public DB 				As MiniORM
+	Public App 				As EndsMeet
 	Public Api 				As ApiSettings
-	Public MS 				As MiniORMSettings
+	Public DBS 				As MiniORMSettings
 	Public Const VERSION 	As String = "6.60"
 	Public Const COLOR_RED 	As Int = 0xFFFF0000
 	Public Const COLOR_BLUE As Int = 0xFF0000FF
@@ -87,7 +87,7 @@ Sub AppStart (Args() As String)
 	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
 	App.Rest("/api/categories/*", "CategoriesApiHandler")
-	App.Get("/help", "HelpHandler")	
+	App.Get("/help", "HelpHandler")
 	Api.EnableHelp = True
 	
 	App.Start
@@ -126,28 +126,28 @@ Private Sub InitDatabase
 		Dim ctx As Map = File.ReadMap(File.DirApp, $"${dbvar}.ini"$)
 		DB.Initialize
 		'DB.ShowExtraLogs = True
-		MS.Initialize
-		MS.DBType = ctx.GetDefault("DbType", "")
-		Select MS.DBType
+		DBS.Initialize
+		DBS.DBType = ctx.GetDefault("DbType", "")
+		Select DBS.DBType
 			Case DB.MARIADB, DB.MYSQL
-				MS.DBHost = ctx.GetDefault("DbHost", "")
-				MS.DBPort = ctx.GetDefault("DbPort", "")
-				MS.DBName = ctx.GetDefault("DbName", "")
-				MS.DriverClass = ctx.GetDefault("DriverClass", "")
-				MS.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
-				MS.User = ctx.GetDefault("User", "")
-				MS.Password = ctx.GetDefault("Password", "")
-				MS.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
+				DBS.DBHost = ctx.GetDefault("DbHost", "")
+				DBS.DBPort = ctx.GetDefault("DbPort", "")
+				DBS.DBName = ctx.GetDefault("DbName", "")
+				DBS.Driver = ctx.GetDefault("DriverClass", "")
+				DBS.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
+				DBS.User = ctx.GetDefault("User", "")
+				DBS.Password = ctx.GetDefault("Password", "")
+				DBS.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
 			Case DB.SQLITE
-				MS.DBDir = ctx.GetDefault("DbDir", File.DirApp)
-				MS.DBFile = ctx.GetDefault("DbFile", "Pakai.db")
-				MS.JournalMode = "WAL"
+				DBS.DBDir = ctx.GetDefault("DbDir", File.DirApp)
+				DBS.DBFile = ctx.GetDefault("DbFile", "Pakai.db")
+				DBS.JournalMode = "WAL"
 			Case Else
-				LogColor($"${MS.DBType} not supported!"$, COLOR_RED)
+				LogColor($"${DBS.DBType} not supported!"$, COLOR_RED)
 				Log("Application is terminated.")
 				ExitApplication
 		End Select
-		DB.Settings = MS
+		DB.Settings = DBS
 
 		LogColor("Checking database...", COLOR_BLUE)
 		Select DB.DbType
