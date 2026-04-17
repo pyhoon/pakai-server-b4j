@@ -75,17 +75,6 @@ Private Sub RenderPage
 		'Dim i2 As MiniHtml = MH.Icon.up(a2)
 		'i2.cls("bi bi-tag me-2")
 		'i2.attr("title", "Users")
-		
-		' Sample for adding additional menu link
-		Dim list2 As MiniHtml = MH.Li.up(ulist1)
-		list2.cls("nav-item d-block d-lg-block")
-		Dim a2 As MiniHtml = MH.Anchor.up(list2)
-		a2.attr("href", "/tests")
-		a2.cls("nav-link float-end")
-		a2.text("Test")
-		Dim i2 As MiniHtml = MH.Icon.up(a2)
-		i2.cls("bi bi-tag me-2")
-		i2.attr("title", "Tests")
 
 		If App.api.EnableHelp Then
 			Dim list3 As MiniHtml = MH.Li.up(ulist1)
