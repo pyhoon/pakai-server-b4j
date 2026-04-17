@@ -12,7 +12,7 @@ Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private Path As String
-	Private Method As String
+	Private Method As String	
 End Sub
 
 Public Sub Initialize
