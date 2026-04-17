@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Help Handler class
-' Version 6.30
+' Version 6.60
 Sub Class_Globals
 	Private AllGroups 	As Map
 	Private AllMethods 	As List
