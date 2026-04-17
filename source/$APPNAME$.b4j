@@ -214,6 +214,7 @@ Private Sub CreateDatabase
 
 	DB.ShowExtraLogs = True
 	DB.UseTimestamps = True
+	DB.QueryExecute = False
 	DB.QueryAddToBatch = True
 	
 	DB.Table = "tbl_categories"
@@ -246,6 +247,7 @@ Private Sub CreateDatabase
 		LogColor("Database creation failed!", COLOR_RED)
 	End If
 	DB.Close
+	DB.QueryExecute = True
 End Sub
 
 Public Sub CurrentDateTime As String
