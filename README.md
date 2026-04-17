@@ -1,6 +1,6 @@
 # Pakai Server - Web Application framework
 
-Version: 6.51
+Version: 6.60
 
 Create Web API or Application Backend Server using B4J project template
 
@@ -10,7 +10,7 @@ Create Web API or Application Backend Server using B4J project template
 ---
 
 ## Templates
-- Pakai Server (6.51).b4xtemplate
+- Pakai Server (6.60).b4xtemplate
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
@@ -42,27 +42,31 @@ Create Web API or Application Backend Server using B4J project template
 ```b4x
 Private Sub CreateProductsTable As MiniHtml
 	If App.ctx.ContainsKey("/products/table") = False Then
-		Dim table1 As MiniHtml = Table.cls("table table-bordered table-hover rounded small")
-		Dim thead1 As MiniHtml = Thead.cls("table-light").up(table1)
-		Th.up(thead1).sty("text-align: right; width: 50px").text("#")
-		Th.up(thead1).text("Code")
-		Th.up(thead1).text("Name")
-		Th.up(thead1).text("Category")
-		Th.up(thead1).sty("text-align: right").text("Price")
-		Th.up(thead1).sty("text-align: center; width: 120px").text("Actions")
-		Tbody.up(table1)
+		Dim table1 As MiniHtml = MH.Table
+		table1.cls("table table-bordered table-hover rounded small")
+		Dim thead1 As MiniHtml = MH.Thead.cls("table-light").up(table1)
+		MH.Th.up(thead1).sty("text-align: right; width: 50px").text("#")
+		MH.Th.up(thead1).text("Code")
+		MH.Th.up(thead1).text("Name")
+		MH.Th.up(thead1).text("Category")
+		MH.Th.up(thead1).sty("text-align: right").text("Price")
+		MH.Th.up(thead1).sty("text-align: center; width: 120px").text("Actions")
+		MH.Tbody.up(table1)
 		App.ctx.Put("/products/table", table1)
 	End If
 
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = Array("tbl_categories c", "p.category_id = c.id")
+	DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
 	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
+	If DB.Error.IsInitialized Then
+		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+	End If	
 	Dim rows As List = DB.Results
 	DB.Close
-
+	
 	Dim table1 As MiniHtml = App.ctx.Get("/products/table")
 	Dim tbody1 As MiniHtml = table1.Child(1)
 	tbody1.Children.Clear ' remove all children
