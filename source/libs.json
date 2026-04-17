@@ -4,9 +4,9 @@
         {
             "Name": "EndsMeet.b4xlib",
             "Platform": "B4J",
-            "Version": 1.90,
-            "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v1.90/EndsMeet.b4xlib",
-            "Update": "https://github.com/pyhoon/EndsMeet/releases/download/v1.90/update.json"
+            "Version": 2.00,
+            "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v2.00/EndsMeet.b4xlib",
+            "Update": "https://github.com/pyhoon/EndsMeet/releases/download/v2.00/update.json"
         },
         {
             "Name": "MiniCSS.b4xlib",
