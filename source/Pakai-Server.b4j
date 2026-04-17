@@ -65,8 +65,8 @@ Version=10.5
 #Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&librariesrefresh=True
 #Macro: Title, GetResources, ide://run?file=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
 '#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
-'#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
 '#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
+'#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
 #End Region
 Sub Process_Globals
 	Public DB 				As MiniORM
