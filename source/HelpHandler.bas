@@ -7,16 +7,14 @@ Version=10.3
 ' Help Handler class
 ' Version 6.60
 Sub Class_Globals
-	Private Request As ServletRequest 'ignore
-	Private Response As ServletResponse
-	Private Handlers As List
-	Private AllMethods As List
-	Private AllGroups As Map
-	Type VerbSection (Verb As String, Color As String, ElementId As String, Link As String, FileUpload As String, Authenticate As String, Description As String, Params As String, Format As String, Body As String, Expected As String, InputDisabled As Boolean, DisabledBackground As String, Raw As Boolean, Noapi As Boolean)
-	Private Api	As ApiSettings
-	Private ContentType As String 'ignore
-	Private Verbose As Boolean
+	Private AllGroups 	As Map
+	Private AllMethods 	As List
+	Private Handlers 	As List
 	Private CustomTheme As Boolean
+	Private Verbose 	As Boolean
+	Private ContentType As String 'ignore
+	Private Request 	As ServletRequest 'ignore
+	Private Response 	As ServletResponse
 	' Override default key names
 	Private Const RESPONSE_ELEMENT_MESSAGE 	As String = "m" 'ignore
 	Private Const RESPONSE_ELEMENT_CODE 	As String = "a" 'ignore
@@ -24,18 +22,18 @@ Sub Class_Globals
 	Private Const RESPONSE_ELEMENT_TYPE 	As String = "t" 'ignore
 	Private Const RESPONSE_ELEMENT_ERROR 	As String = "e" 'ignore
 	Private Const RESPONSE_ELEMENT_RESULT 	As String = "r"	'ignore
+	Type VerbSection (Verb As String, Color As String, ElementId As String, Link As String, FileUpload As String, Authenticate As String, Description As String, Params As String, Format As String, Body As String, Expected As String, InputDisabled As Boolean, DisabledBackground As String, Raw As Boolean, Noapi As Boolean)
 End Sub
 
 Public Sub Initialize
-	AllMethods.Initialize
-	AllGroups.Initialize
 	Handlers.Initialize
-	Handlers.Add("CategoriesApiHandler")
-	Handlers.Add("ProductsApiHandler")
+	AllGroups.Initialize
+	AllMethods.Initialize
 	Handlers.Add("FindApiHandler")
-	Api = Main.Api
-	Verbose = Api.VerboseMode
-	ContentType = Api.ContentType	
+	Handlers.Add("ProductsApiHandler")
+	Handlers.Add("CategoriesApiHandler")
+	Verbose = Main.Api.VerboseMode
+	ContentType = Main.Api.ContentType	
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -88,7 +86,7 @@ Private Sub GenerateHelpPage As String 'ignore
 	link1.attr("rel", "icon")
 	link1.attr("type", "image/png")
 	link1.attr("href", "/assets/img/favicon.png")
-	'Bundle
+	'Local assets
 	'head1.cdn("style", "/assets/css/bootstrap.min.css")
 	'head1.cdn("style", "/assets/css/bootstrap-icons.min.css")
 	head1.cdn2("style", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css", _
@@ -102,10 +100,8 @@ Private Sub GenerateHelpPage As String 'ignore
 	Else
 		sty1.text(GetStyles)
 	End If
-	'Log(sty1.build)
 	
 	Dim body1 As MiniHtml = MH.Body.up(html1)
-	'body1.cls("bg-dark text-light")
 	body1.sty("background: #393939")
 	body1.attr("x-data", "apiApp")
 	body1.multiline
@@ -153,7 +149,6 @@ Private Sub GenerateHelpPage As String 'ignore
 	a3.attr("target", "_blank")
 	Dim img1 As MiniHtml = MH.Img.up(a3)
 	img1.attr("src", "/assets/img/coffee.png")
-	'img1.cls("ms-2 mt-1")
 	img1.cls("my-1")
 	If CustomTheme Then img1.cls("dark-mode-ready")
 	img1.sty("height: 36px")
@@ -241,7 +236,7 @@ Private Sub GenerateHelpPage As String 'ignore
 	span3.sty("color: red")
 	span3.text("❤")
 	caption1.text(" using Pakai")
-	'Bundle
+	'Local assets
 	'body1.cdn("script", "/assets/js/bootstrap.min.js")
 	'body1.cdn("script", "/assets/js/htmx.min.js")
 	'body1.cdn3("script", "/assets/js/cdn.min.js", CreateMap("defer": ""))
@@ -302,36 +297,26 @@ Private Sub RemoveMethodAndReAdd (Method As Map)
 End Sub
 
 Private Sub BuildMethods 'ignore
-	Dim Method As Map = RetrieveMethod("Categories", "GetCategories")
-	Method.Put("Desc", "List All Categories")
+	Dim Method As Map = RetrieveMethod("Find", "GetAllProducts")
+	Method.Put("Desc", "Get all Products (with Category name)")
 	ReplaceMethod(Method)
 	
-	Dim Method As Map = RetrieveMethod("Categories", "GetCategoryById (id As Int)")
-	Method.Put("Desc", "Read one Category by id")
-	Method.Put("Elements", $"["{id}"]"$)
+	Dim Method As Map = RetrieveMethod("Find", "GetProductsByCategoryId")
+	Method.Put("Desc", "Filter Products (with Category Id)")
+	Method.Put("Params", "id [Int]")
+	Method.Put("Elements", $"["products-by-category_id", "{id}"]"$)
 	ReplaceMethod(Method)
 	
-	Dim Method As Map = RetrieveMethod("Categories", "CreateNewCategory '#POST")
-	Method.Put("Desc", "Add new Category")
-	Dim FormatMap As Map = CreateMap("category_name": "category_name")
+	Dim Method As Map = RetrieveMethod("Find", "SearchByKeywords ' #post")
+	Dim FormatMap As Map = CreateMap("keyword": "text")
+	Dim BodytMap As Map = CreateMap("keyword": "")
 	Method.Put("Format", FormatMap.As(JSON).ToString)
-	FormatMap.Put("category_name", "Testing")
-	Method.Put("Body", FormatMap.As(JSON).ToString)
+	Method.Put("Body", BodytMap.As(JSON).ToString)
+	Method.Put("Desc", "Filter Products (with Category name)")
+	'Method.Put("Expected", GetExpectedResponse(Method.Get("Verb"))) ' POST
+	Method.Put("Expected", GetExpectedResponse(""))
 	ReplaceMethod(Method)
-
-	Dim Method As Map = RetrieveMethod("Categories", "UpdateCategoryById (id As Int) '#PUT")
-	Method.Put("Desc", "Update Category by id")
-	Method.Put("Elements", $"["{id}"]"$)	
-	Dim FormatMap As Map = CreateMap("category_name": "category_name")
-	Method.Put("Format", FormatMap.As(JSON).ToString)
-	Method.Put("Body", FormatMap.As(JSON).ToString)
-	ReplaceMethod(Method)
-	
-	Dim Method As Map = RetrieveMethod("Categories", "DeleteCategoryById (id As Int)")
-	Method.Put("Desc", "Delete Category by id")
-	Method.Put("Elements", $"["{id}"]"$)
-	RemoveMethodAndReAdd(Method)
-	
+		
 	Dim Method As Map = RetrieveMethod("Products", "GetProducts")
 	Method.Put("Desc", "Read all Products")
 	ReplaceMethod(Method)
@@ -363,40 +348,50 @@ Private Sub BuildMethods 'ignore
 	Method.Put("Elements", $"["{id}"]"$)
 	ReplaceMethod(Method)
 	
-	Dim Method As Map = RetrieveMethod("Find", "GetAllProducts")
-	Method.Put("Desc", "Get all Products (with Category name)")
+	Dim Method As Map = RetrieveMethod("Categories", "GetCategories")
+	Method.Put("Desc", "List All Categories")
 	ReplaceMethod(Method)
 	
-	Dim Method As Map = RetrieveMethod("Find", "GetProductsByCategoryId")
-	Method.Put("Desc", "Filter Products (with Category Id)")
-	Method.Put("Params", "id [Int]")
-	Method.Put("Elements", $"["products-by-category_id", "{id}"]"$)
+	Dim Method As Map = RetrieveMethod("Categories", "GetCategoryById (id As Int)")
+	Method.Put("Desc", "Read one Category by id")
+	Method.Put("Elements", $"["{id}"]"$)
 	ReplaceMethod(Method)
 	
-	Dim Method As Map = RetrieveMethod("Find", "SearchByKeywords ' #post")
-	Dim FormatMap As Map = CreateMap("keyword": "text")
-	Dim BodytMap As Map = CreateMap("keyword": "")
+	Dim Method As Map = RetrieveMethod("Categories", "CreateNewCategory '#POST")
+	Method.Put("Desc", "Add new Category")
+	Dim FormatMap As Map = CreateMap("category_name": "category_name")
 	Method.Put("Format", FormatMap.As(JSON).ToString)
-	Method.Put("Body", BodytMap.As(JSON).ToString)
-	Method.Put("Desc", "Filter Products (with Category name)")
-	'Method.Put("Expected", GetExpectedResponse(Method.Get("Verb"))) ' POST
-	Method.Put("Expected", GetExpectedResponse(""))
+	FormatMap.Put("category_name", "Testing")
+	Method.Put("Body", FormatMap.As(JSON).ToString)
 	ReplaceMethod(Method)
+
+	Dim Method As Map = RetrieveMethod("Categories", "UpdateCategoryById (id As Int) '#PUT")
+	Method.Put("Desc", "Update Category by id")
+	Method.Put("Elements", $"["{id}"]"$)	
+	Dim FormatMap As Map = CreateMap("category_name": "category_name")
+	Method.Put("Format", FormatMap.As(JSON).ToString)
+	Method.Put("Body", FormatMap.As(JSON).ToString)
+	ReplaceMethod(Method)
+	
+	Dim Method As Map = RetrieveMethod("Categories", "DeleteCategoryById (id As Int)")
+	Method.Put("Desc", "Delete Category by id")
+	Method.Put("Elements", $"["{id}"]"$)
+	RemoveMethodAndReAdd(Method)
 End Sub
 
 Private Sub ReadHandlers 'ignore
-	Dim verbs() As String = Array As String("GET", "POST", "PUT", "DELETE")
+	Dim Verbs() As String = Array As String("GET", "POST", "PUT", "DELETE")
 	For Each Handler As String In Handlers
 		Dim Methods As List
 		Methods.Initialize
 		Dim Group As String = Handler.Replace("Handler", "").Replace("Api", "").Replace("Web", "").Replace("Auth", "")
-		Dim lines As List = File.ReadList(File.DirApp.Replace("\Objects", ""), Handler & ".bas")
-		For Each line As String In lines
-			If line.StartsWith("'") Or line.StartsWith("#") Then Continue
-			Dim index As Int = line.toLowerCase.IndexOf("sub ")
+		Dim Lines As List = File.ReadList(File.DirApp.Replace("\Objects", ""), Handler & ".bas")
+		For Each Line As String In Lines
+			If Line.StartsWith("'") Or Line.StartsWith("#") Then Continue
+			Dim index As Int = Line.toLowerCase.IndexOf("sub ")
 			If index > -1 Then
-				Dim MethodLine As String = line.SubString(index).Replace("Sub ", "").Trim
-				For Each verb As String In verbs
+				Dim MethodLine As String = Line.SubString(index).Replace("Sub ", "").Trim
+				For Each verb As String In Verbs
 					If MethodLine.ToUpperCase.StartsWith(verb) Or MethodLine.ToUpperCase.Contains("#" & verb) Then
 						'RemoveComment(MethodLine)
 						Dim Method As Map = CreateMethodProperties(Group, MethodLine)
@@ -405,9 +400,9 @@ Private Sub ReadHandlers 'ignore
 					End If
 				Next
 			Else
-				If line.Contains("'") And line.Contains("#") Then
+				If Line.Contains("'") And Line.Contains("#") Then
 					' Detect commented hashtags inside Handler
-					ParseHashtags(line, Methods)
+					ParseHashtags(Line, Methods)
 				End If
 			End If
 		Next
@@ -863,9 +858,9 @@ Private Sub GetStyles As String
 	cb1.Initialize(css1)
 	' Using builder pattern (fluent syntax)
 	
-'	cb1.Rule(".body")
-'	cb1.Property("font-family", "Arial, Helvetica, Tahoma, Times New Roman")
-'	cb1.Property("font-size", "0.8em")
+	'cb1.Rule(".body")
+	'cb1.Property("font-family", "Arial, Helvetica, Tahoma, Times New Roman")
+	'cb1.Property("font-size", "0.8em")
 	
 	cb1.Rule(".btn")
 	cb1.Property("border-radius", "3px")
@@ -880,7 +875,6 @@ Private Sub GetStyles As String
 	
 	cb1.Rule(".accordion-body")
 	cb1.Property("color", "white")
-	'cb1.Property("background", "#393939")
 	cb1.Property("background", "#636363")
 	cb1.Property("font-family", "Arial, Helvetica, Tahoma, Times New Roman")
 	cb1.Property("font-size", "0.8em")
@@ -1137,10 +1131,6 @@ Private Sub AlpineHtmx As String
 	'script1.ConsoleLog("'pathVal='+pathVal")
 	script1.AddConditionalCall("pathVal", "evt.detail.path = pathVal;")
 	script1.AddLine("")
-	'script1.AddComment("Set Content-Type and Accept based on dropdown")
-	'script1.AddComment("Grab values from inputs INSIDE this container only")
-	'script1.DeclareVariable("type", "document.getElementById(`type-${apiId}`)?.value || 'json';", True)
-	'script1.AddTernary("evt.detail.headers['Content-Type'] = type === 'json'", "'application/json'", "'application/xml';")
 	script1.AddLine("evt.detail.headers['Accept'] = 'application/json, application/xml';")
 	script1.AddLine("")
 	script1.AddComment("Auth Logic")
