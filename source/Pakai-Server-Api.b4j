@@ -53,7 +53,7 @@ Version=10.5
 '5 - Check Release folder
 #Macro: Title, Step 1, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\Pakai-Server-Api.b4j&args=%PROJECT%\$APPNAME$.b4j
 #Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
-#Macro: Title, Step 3, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+Api+(6.60).b4xtemplate&args=Files&args=$APPNAME$.*&args=*ApiHandler.bas&args=HttpsFilter.bas&args=MH.bas&args=libs.json&args=res.json&args=..\LICENSE&args=Objects\www\assets\img
+#Macro: Title, Step 3, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+Api+(6.60).b4xtemplate&args=Files&args=$APPNAME$.*&args=*ApiHandler.bas&args=HelpHandler.bas&args=HttpsFilter.bas&args=MH.bas&args=libs.json&args=res.json&args=..\LICENSE&args=Objects\www\assets\img
 #Macro: Title, Step 4, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\Pakai+Server+Api+(6.60).b4xtemplate&args=%ADDITIONAL%
 #Macro: Title, Step 5, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 'For release
