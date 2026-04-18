@@ -60,7 +60,7 @@ Version=10.5
 #Macro: Title, Step 4, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\Pakai+Server+(6.60).b4xtemplate&args=%ADDITIONAL%
 #Macro: Title, Step 5, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 'For release
-#Macro: Title, ModelGenerator, ide://run?file=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
+#Macro: Title, ModelGenerator, ide://run?file=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
 #Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\libget.jar&args=%PROJECT%&librariesrefresh=True
 #Macro: Title, GetResources, ide://run?file=%ADDITIONAL%\resget.jar&args=%PROJECT%&args=true
 '#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.ini&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
