@@ -89,7 +89,7 @@ Private Sub RenderPage
 		doc.Write("<!DOCTYPE html>")
 		doc.Write(page1.build)
 		App.ctx.Put("/categories", doc.ToString)
-		File.WriteString(File.DirApp, "categories.html", doc.ToString)
+		'File.WriteString(File.DirApp, "categories.html", doc.ToString)
 	End If
 	App.WriteHtml2(Response, App.ctx.Get("/categories"), App.ctx)
 End Sub
@@ -179,7 +179,7 @@ End Sub
 
 ' Return table HTML
 Private Sub HandleTable
-	App.WriteHtml(Response, CreateCategoriesTable.build)
+	App.WriteHtml(Response, CategoriesTable.build)
 End Sub
 
 ' Add modal
@@ -205,14 +205,12 @@ Private Sub HandleModalEdit
 	DB.Query
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-		DB.Close
 		Return
 	End If
 	Dim row As Map
 	If DB.Found Then
 		row = DB.First
 	End If
-	DB.Close
 	
 	App.WriteHtml2(Response, ModalEdit, row)
 End Sub
@@ -235,14 +233,12 @@ Private Sub HandleModalDelete
 	DB.Query
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-		DB.Close
 		Return
 	End If
 	Dim row As Map
 	If DB.Found Then
 		row = DB.First
 	End If
-	DB.Close
 	
 	App.WriteHtml2(Response, ModalDelete, row)
 End Sub
@@ -257,6 +253,7 @@ Private Sub HandleCategories
 				ShowAlert("Category name must be at least 2 characters long.", "warning")
 				Return
 			End If
+			
 			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Conditions = Array("category_name = ?")
@@ -264,115 +261,112 @@ Private Sub HandleCategories
 			DB.Query
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found Then
 				ShowAlert("Category already exists!", "warning")
-				DB.Close
 				Return
 			End If
+			
 			' Insert new row
+			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Columns = Array("category_name", "created_date")
 			DB.Parameters = Array(name, Main.CurrentDateTime)
 			DB.Save
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Category", "created", "Category created successfully!", "success")
-			DB.Close
 		Case "PUT"
 			' Update
 			Dim id As Int = Request.GetParameter("id")
 			Dim name As String = Request.GetParameter("name")
+			
 			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Find(id)
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found = False Then
 				ShowAlert("Category not found!", "warning")
-				DB.Close
 				Return
 			End If
+			
+			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Conditions = Array("category_name = ?", "id <> ?")
 			DB.Parameters = Array(name, id)
 			DB.Query
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found Then
 				ShowAlert("Category already exists!", "warning")
-				DB.Close
 				Return
 			End If
+			
 			' Update row
+			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Columns = Array("category_name", "modified_date")
 			DB.Parameters = Array(name, Main.CurrentDateTime)
-			DB.Id = id
+			DB.Condition = "id = ?"
+			DB.Parameter = id
 			DB.Save
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Category", "updated", "Category updated successfully!", "info")
-			DB.Close
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
+			
 			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Find(id)
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found = False Then
 				ShowAlert("Category not found!", "warning")
-				DB.Close
 				Return
 			End If
+			
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Condition = "category_id = ?"
 			DB.Parameter = id
 			DB.Query
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found Then
 				ShowAlert("Cannot delete category with associated products!", "warning")
-				DB.Close
 				Return
 			End If
+			
 			' Delete row
+			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Id = id
 			DB.Delete
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Category", "deleted", "Category deleted successfully!", "danger")
-			DB.Close
 	End Select
 End Sub
 
-Private Sub CreateCategoriesTable As MiniHtml
+Private Sub CategoriesTable As MiniHtml
 	If App.ctx.ContainsKey("/hx/categories/table") = False Then
 		Dim table1 As MiniHtml = MH.Table
 		table1.cls("table table-bordered table-hover rounded small")
@@ -382,7 +376,7 @@ Private Sub CreateCategoriesTable As MiniHtml
 		MH.Th.up(thead1).text("Actions").sty("text-align: center; width: 120px")
 		MH.Tbody.up(table1)
 		App.ctx.Put("/hx/categories/table", table1)
-		File.WriteString(File.DirApp, "categories-table.html", table1.build)
+		'File.WriteString(File.DirApp, "categories-table.html", table1.build.Trim)
 	End If
 	
 	DB.Open
@@ -393,14 +387,12 @@ Private Sub CreateCategoriesTable As MiniHtml
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 	End If
-	Dim rows As List = DB.Results
-	DB.Close
 	
 	Dim table1 As MiniHtml = App.ctx.Get("/hx/categories/table")
 	Dim tbody1 As MiniHtml = table1.Child(1)
 	tbody1.Children.Clear ' remove all children
-	For Each row As Map In rows
-		Dim tr1 As MiniHtml = CreateCategoriesRow		
+	For Each row As Map In DB.Results
+		Dim tr1 As MiniHtml = CategoriesTableRow
 		tr1.Child(0).text2(row.Get("id"))
 		tr1.Child(1).text2(row.Get("category_name"))
 		tr1.Child(2).Child(0).attr("hx-get", "/hx/categories/edit/" & row.Get("id"))
@@ -410,7 +402,7 @@ Private Sub CreateCategoriesTable As MiniHtml
 	Return table1
 End Sub
 
-Private Sub CreateCategoriesRow As MiniHtml
+Private Sub CategoriesTableRow As MiniHtml
 	If App.ctx.ContainsKey("/categories/table/row") = False Then
 		Dim tr1 As MiniHtml = MH.Tr
 		Dim td1 As MiniHtml = MH.Td.up(tr1)
@@ -441,7 +433,7 @@ Private Sub CreateCategoriesRow As MiniHtml
 		a2.attr("title", "Delete")
 
 		App.ctx.Put("/categories/table/row", tr1.ConvertToBytes)
-		File.WriteString(File.DirApp, "categories-table-row.html", tr1.build)
+		'File.WriteString(File.DirApp, "categories-table-row.html", tr1.build.Trim)
 	End If
 	Return MH.ConvertFromBytes(App.ctx.Get("/categories/table/row"))
 End Sub
@@ -484,7 +476,7 @@ Private Sub ModalAdd As String
 		button2.text("Cancel")
 		
 		App.ctx.Put("/hx/categories/add", form1)
-		File.WriteString(File.DirApp, "categories-add.html", form1.build)		
+		'File.WriteString(File.DirApp, "categories-add.html", form1.build.Trim)
 	End If
 	
 	Dim form1 As MiniHtml = App.ctx.Get("/hx/categories/add")
@@ -542,9 +534,11 @@ Private Sub ModalEdit As String
 		button2.attr("data-bs-dismiss", "modal")
 		button2.text("Cancel")
 		
-		App.ctx.Put("/hx/categories/edit", form1.build)
-		File.WriteString(File.DirApp, "categories-edit.html", form1.build)
+		App.ctx.Put("/hx/categories/edit", form1)
+		'File.WriteString(File.DirApp, "categories-edit.html", form1.build.Trim)
 	End If
+	
+	Dim form1 As MiniHtml = App.ctx.Get("/hx/categories/edit")
 	Return form1.build
 End Sub
 
@@ -583,10 +577,12 @@ Private Sub ModalDelete As String
 		button2.attr("data-bs-dismiss", "modal")
 		button2.text("Cancel")
 		
-		App.ctx.Put("/hx/categories/delete", form1.build)
-		File.WriteString(File.DirApp, "categories-delete.html", form1.build)
+		App.ctx.Put("/hx/categories/delete", form1)
+		'File.WriteString(File.DirApp, "categories-delete.html", form1.build.Trim)
 	End If
-	Return App.ctx.Get("/hx/categories/delete")
+	
+	Dim form1 As MiniHtml = App.ctx.Get("/hx/categories/delete")
+	Return form1.build
 End Sub
 
 Private Sub ShowAlert (message As String, status As String)
@@ -600,7 +596,7 @@ Private Sub ShowToast (entity As String, action As String, message As String, st
 	Dim div1 As MiniHtml = MH.Div
 	div1.attr("id", "categories-container")
 	div1.attr("hx-swap-oob", "true")
-	CreateCategoriesTable.up(div1)
+	CategoriesTable.up(div1)
 
 	Dim script1 As MiniJs
 	script1.Initialize
