@@ -52,7 +52,6 @@ Private Sub GetCategories
 		HRM.ResponseCode = 200
 		HRM.ResponseData = DB.Results
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -66,6 +65,7 @@ Private Sub GetCategoryById
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End Try
+	
 	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Find(id)
@@ -81,7 +81,6 @@ Private Sub GetCategoryById
 			HRM.ResponseError = "Category not found"
 		End If
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -99,6 +98,7 @@ Private Sub PostCategory
 	Else
 		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
 	End If
+	
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_name") 
 	For Each requiredkey As String In RequiredKeys
@@ -109,6 +109,7 @@ Private Sub PostCategory
 			Return
 		End If
 	Next
+	
 	' Check conflict category name
 	DB.Open
 	DB.Table = "tbl_categories"
@@ -118,18 +119,18 @@ Private Sub PostCategory
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Category already exist"
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Insert new row
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("category_name", _
 	"created_date")
@@ -145,7 +146,6 @@ Private Sub PostCategory
 		HRM.ResponseObject = DB.First
 		HRM.ResponseMessage = "Category created successfully"
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -159,6 +159,7 @@ Private Sub PutCategoryById
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End Try
+	
 	Dim str As String = WebApiUtils.RequestDataText(Request)
 	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
@@ -171,6 +172,7 @@ Private Sub PutCategoryById
 	Else
 		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
 	End If
+	
 	' Check whether required keys are provided
 	If data.ContainsKey("category_name") = False Then
 		HRM.ResponseCode = 400
@@ -178,6 +180,7 @@ Private Sub PutCategoryById
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Check conflict category name
 	DB.Open
 	DB.Table = "tbl_categories"
@@ -187,40 +190,42 @@ Private Sub PutCategoryById
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Category already exist"
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Find row by id
+	DB.Open
+	DB.Table = "tbl_categories"
 	DB.Find(id)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Category not found"
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Update row by id
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("category_name", _
 	"modified_date")
 	DB.Parameters = Array(data.Get("category_name"), _
 	data.GetDefault("created_date", WebApiUtils.CurrentDateTime))
-	DB.Id = id
+	DB.Condition = "id = ?"
+	DB.Parameter = id
 	DB.Save
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
@@ -231,7 +236,6 @@ Private Sub PutCategoryById
 		HRM.ResponseMessage = "Category updated successfully"
 		HRM.ResponseObject = DB.First
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -245,25 +249,26 @@ Private Sub DeleteCategoryById
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End Try
+	
+	' Find row by id
 	DB.Open
 	DB.Table = "tbl_categories"
-	' Find row by id
 	DB.Find(id)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Category not found"
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Delete row
+	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Id = id
 	DB.Delete
@@ -274,6 +279,5 @@ Private Sub DeleteCategoryById
 		HRM.ResponseCode = 200
 		HRM.ResponseMessage = "Category deleted successfully"
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
