@@ -51,7 +51,6 @@ Private Sub GetAllProducts
 		HRM.ResponseCode = 200
 		HRM.ResponseData = DB.Results
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -65,6 +64,7 @@ Public Sub GetProductsByCategoryId
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End Try
+	
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
@@ -80,7 +80,6 @@ Public Sub GetProductsByCategoryId
 		HRM.ResponseCode = 200
 		HRM.ResponseData = DB.Results
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -106,6 +105,7 @@ Public Sub SearchByKeywords
 		Return
 	End If
 	Dim SearchForText As String = data.Get("keyword")
+	
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
@@ -123,6 +123,5 @@ Public Sub SearchByKeywords
 		HRM.ResponseCode = 200
 		HRM.ResponseData = DB.Results
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
