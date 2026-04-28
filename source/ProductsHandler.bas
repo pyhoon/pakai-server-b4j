@@ -33,11 +33,11 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Else If Path = "/hx/products/search" Then
 		HandleSearch
 	Else If Path = "/hx/products/add" Then
-		HandleAddModal
+		HandleModalAdd
 	Else If Path.StartsWith("/hx/products/edit/") Then
-		HandleEditModal
+		HandleModalEdit
 	Else If Path.StartsWith("/hx/products/delete/") Then
-		HandleDeleteModal
+		HandleModalDelete
 	Else
 		HandleProducts
 	End If
@@ -276,12 +276,12 @@ Private Sub HandleSearch
 End Sub
 
 ' Add modal
-Private Sub HandleAddModal
-	App.WriteHtml(Response, CreateAddModal)
+Private Sub HandleModalAdd
+	App.WriteHtml(Response, ModalAdd)
 End Sub
 
 ' Edit modal
-Private Sub HandleEditModal
+Private Sub HandleModalEdit
 	Try
 		Dim id As Int = Path.SubString("/hx/products/edit/".Length)
 	Catch
@@ -309,11 +309,11 @@ Private Sub HandleEditModal
 		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, False))
 	End If
 	DB.Close
-	App.WriteHtml2(Response, CreateEditModal(category_id), row)
+	App.WriteHtml2(Response, ModalEdit(category_id), row)
 End Sub
 
 ' Delete modal
-Private Sub HandleDeleteModal
+Private Sub HandleModalDelete
 	Try
 		Dim id As Int = Path.SubString("/hx/products/delete/".Length)
 	Catch
@@ -338,7 +338,7 @@ Private Sub HandleDeleteModal
 		row.Put("id", id)
 	End If
 	DB.Close
-	App.WriteHtml2(Response, CreateDeleteModal.build, row)
+	App.WriteHtml2(Response, ModalDelete.build, row)
 End Sub
 
 ' Handle CRUD operations
@@ -550,7 +550,7 @@ Private Sub CreateProductsRow As MiniHtml
 	Return MH.ConvertFromBytes(App.ctx.Get("/products/table/row"))
 End Sub
 
-Private Sub CreateAddModal As String
+Private Sub ModalAdd As String
 	If App.ctx.ContainsKey("/hx/products/add") = False Then
 		Dim form1 As MiniHtml = MH.Form
 		form1.attr("hx-post", "/hx/products")
@@ -661,7 +661,7 @@ Private Sub CreateAddModal As String
 	Return form1.build
 End Sub
 
-Private Sub CreateEditModal (CategoryId As String) As String
+Private Sub ModalEdit (CategoryId As String) As String
 	If App.ctx.ContainsKey("/hx/products/edit") = False Then
 		Dim form1 As MiniHtml = MH.Form
 		form1.attr("hx-put", "/hx/products")
@@ -780,7 +780,7 @@ Private Sub CreateEditModal (CategoryId As String) As String
 	Return form1.build
 End Sub
 
-Private Sub CreateDeleteModal As MiniHtml
+Private Sub ModalDelete As MiniHtml
 	If App.ctx.ContainsKey("/hx/products/delete") = False Then
 		Dim form1 As MiniHtml = MH.Form
 		form1.attr("hx-delete", "/hx/products")
