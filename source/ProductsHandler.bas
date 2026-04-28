@@ -30,8 +30,6 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 		RenderPage
 	Else If Path = "/hx/products/table" Then
 		HandleTable
-	Else If Path = "/hx/products/search" Then
-		HandleSearch
 	Else If Path = "/hx/products/add" Then
 		HandleModalAdd
 	Else If Path.StartsWith("/hx/products/edit/") Then
@@ -47,10 +45,10 @@ Private Sub RenderPage
 	If App.ctx.ContainsKey("/") = False Then
 		Dim main1 As MainView
 		main1.Initialize
-		main1.LoadContent(ContentContainer)
+		main1.LoadContent(ContainerContent)
 		main1.LoadSubContent(GitHubLink)
-		main1.LoadModal(ModalContainer)
-		main1.LoadToast(ToastContainer)
+		main1.LoadModal(ContainerModal)
+		main1.LoadToast(ContainerToast)
 
 		Dim page1 As MiniHtml = main1.Render
 		Dim ulist1 As MiniHtml = GetUList(page1)
@@ -93,7 +91,7 @@ Private Sub RenderPage
 		doc.Write("<!DOCTYPE html>")
 		doc.Write(page1.build)
 		App.ctx.Put("/", doc.ToString)
-		File.WriteString(File.DirApp, "products.html", doc.ToString)
+		'File.WriteString(File.DirApp, "products.html", doc.ToString)
 	End If
 	App.WriteHtml2(Response, App.ctx.Get("/"), App.ctx)
 End Sub
@@ -108,7 +106,7 @@ Private Sub GetUList (dom As MiniHtml) As MiniHtml
 	Return ulist1
 End Sub
 
-Private Sub ContentContainer As MiniHtml
+Private Sub ContainerContent As MiniHtml
 	Dim content1 As MiniHtml = MH.Div.cls("row mt-3")
 	Dim col12 As MiniHtml = MH.Div.up(content1).cls("col-md-12")
 	Dim form1 As MiniHtml = MH.Form.up(col12).cls("form mb-3")
@@ -127,7 +125,7 @@ Private Sub ContentContainer As MiniHtml
 	Dim searchBtn As MiniHtml = MH.Button.up(group1)
 	searchBtn.cls("btn btn-danger btn-md pl-3 pr-3 ml-3 mt-2")
 	searchBtn.text("Submit")
-	searchBtn.attr("hx-post", "/hx/products/search")
+	searchBtn.attr("hx-post", "/hx/products/table")
 	searchBtn.attr("hx-target", "#products-container")
 	searchBtn.attr("hx-swap", "innerHTML")
 	Dim col2 As MiniHtml = MH.Div.up(row1).cls("col-md-6 col-lg-6")
@@ -179,7 +177,7 @@ Private Sub GitHubLink As MiniHtml
 	Return div1
 End Sub
 
-Private Sub ModalContainer As MiniHtml
+Private Sub ContainerModal As MiniHtml
 	Dim modal1 As MiniHtml = MH.Div
 	modal1.attr("id", "modal-container")
 	modal1.cls("modal fade")
@@ -193,7 +191,7 @@ Private Sub ModalContainer As MiniHtml
 	Return modal1
 End Sub
 
-Private Sub ToastContainer As MiniHtml
+Private Sub ContainerToast As MiniHtml
 	Dim div1 As MiniHtml = MH.Div
 	div1.cls("position-fixed end-0 p-3")
 	div1.sty("z-index: 2000")
@@ -215,64 +213,9 @@ Private Sub ToastContainer As MiniHtml
 	Return div1
 End Sub
 
-' Return table HTML
+' Return default or search results table
 Private Sub HandleTable
-	App.WriteHtml(Response, CreateProductsTable.build)
-End Sub
-
-' Search product using keyword
-Private Sub HandleSearch
-	If App.ctx.ContainsKey("/hx/products/search") = False Then
-		Dim table1 As MiniHtml = MH.Table
-		table1.cls("table table-bordered table-hover rounded small")
-		Dim thead1 As MiniHtml = MH.Thead.up(table1).cls("table-light")
-		MH.Th.up(thead1).sty("text-align: right; width: 50px").text("#")
-		MH.Th.up(thead1).text("Code")
-		MH.Th.up(thead1).text("Name")
-		MH.Th.up(thead1).text("Category")
-		MH.Th.up(thead1).sty("text-align: right").text("Price")
-		MH.Th.up(thead1).sty("text-align: center; width: 120px").text("Actions")
-		MH.Tbody.up(table1)
-		App.ctx.Put("/hx/products/search", table1)
-		File.WriteString(File.DirApp, "products-search.html", table1.build)
-	End If
-
-	DB.Open
-	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	'DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
-	DB.Join("JOIN", "tbl_categories c", Array("p.category_id = c.id"))
-	Dim keyword As String = Request.GetParameter("keyword")
-	If keyword <> "" Then
-		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
-		DB.Parameters = Array("%" & keyword & "%", "%" & keyword.ToUpperCase & "%", "%" & keyword.ToUpperCase & "%")
-	End If
-	DB.OrderBy = CreateMap("p.id": "DESC")
-	DB.Query
-	If DB.Error.IsInitialized Then
-		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-		DB.Close
-		Return
-	End If
-	Dim rows As List = DB.Results
-	DB.Close
-
-	Dim table1 As MiniHtml = App.ctx.Get("/hx/products/search")
-	Dim tbody1 As MiniHtml = table1.Child(1)
-	tbody1.Children.Clear ' remove all children
-	For Each row As Map In rows
-		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, True))
-		Dim tr1 As MiniHtml = CreateProductsRow
-		tr1.Child(0).text2(row.Get("id"))
-		tr1.Child(1).text2(row.Get("code"))
-		tr1.Child(2).text2(row.Get("name"))
-		tr1.Child(3).text2(row.Get("category"))
-		tr1.Child(4).text2(row.Get("price"))
-		tr1.Child(5).Child(0).attr("hx-get", "/hx/products/edit/" & row.Get("id"))
-		tr1.Child(5).Child(1).attr("hx-get", "/hx/products/delete/" & row.Get("id"))
-		tr1.up(tbody1)
-	Next
-	App.WriteHtml(Response, table1.build)
+	App.WriteHtml(Response, ProductsTable.build)
 End Sub
 
 ' Add modal
@@ -288,7 +231,8 @@ Private Sub HandleModalEdit
 		Log(LastException)
 		ShowAlert($"Error: ${LastException.Message}"$, "danger")
 		Return
-	End Try	
+	End Try
+	
 	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("category_id category", "product_code code", "product_name name", "product_price price")
@@ -297,7 +241,6 @@ Private Sub HandleModalEdit
 	DB.Query
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-		DB.Close
 		Return
 	End If
 	Dim row As Map
@@ -308,7 +251,6 @@ Private Sub HandleModalEdit
 		row.Put("id", id)
 		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, False))
 	End If
-	DB.Close
 	App.WriteHtml2(Response, ModalEdit(category_id), row)
 End Sub
 
@@ -321,6 +263,7 @@ Private Sub HandleModalDelete
 		ShowAlert($"Error: ${LastException.Message}"$, "danger")
 		Return
 	End Try
+	
 	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("id", "product_code code", "product_name name")
@@ -329,7 +272,6 @@ Private Sub HandleModalDelete
 	DB.Query
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-		DB.Close
 		Return
 	End If
 	Dim row As Map
@@ -337,8 +279,7 @@ Private Sub HandleModalDelete
 		row = DB.First
 		row.Put("id", id)
 	End If
-	DB.Close
-	App.WriteHtml2(Response, ModalDelete.build, row)
+	App.WriteHtml2(Response, ModalDelete, row)
 End Sub
 
 ' Handle CRUD operations
@@ -365,27 +306,24 @@ Private Sub HandleProducts
 			DB.Query
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found Then
 				ShowAlert("Product Code already exists!", "warning")
-				DB.Close
 				Return
 			End If
 
 			' Insert new row
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "created_date")
 			DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
 			DB.Save
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Product", "created", "Product created successfully!", "success")
-			DB.Close
 		Case "PUT"
 			' Update
 			Dim id As Int = Request.GetParameter("id")
@@ -408,65 +346,62 @@ Private Sub HandleProducts
 			DB.Find(id)
 			If DB.Found = False Then
 				ShowAlert("Product not found!", "warning")
-				DB.Close
 				Return
 			End If
-
+			
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Conditions = Array("product_code = ?", "id <> ?")
 			DB.Parameters = Array(code, id)
 			DB.Query
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found Then
 				ShowAlert("Product Code already exists!", "warning")
-				DB.Close
 				Return
 			End If
 			
 			' Update row
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "modified_date")
 			DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
-			DB.Id = id
+			DB.Condition = "id = ?"
+			DB.Parameter = id
 			DB.Save
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Product", "updated", "Product updated successfully!", "info")
-			DB.Close
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
+			
 			DB.Open
 			DB.Table = "tbl_products"
 			DB.Find(id)
 			If DB.Found = False Then
 				ShowAlert("Product not found!", "warning")
-				DB.Close
 				Return
 			End If
 
 			' Delete row
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Id = id
 			DB.Delete
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
-			DB.Close
 	End Select
 End Sub
 
-Private Sub CreateProductsTable As MiniHtml
+Private Sub ProductsTable As MiniHtml
 	If App.ctx.ContainsKey("/products/table") = False Then
 		Dim table1 As MiniHtml = MH.Table
 		table1.cls("table table-bordered table-hover rounded small")
@@ -479,28 +414,30 @@ Private Sub CreateProductsTable As MiniHtml
 		MH.Th.up(thead1).sty("text-align: center; width: 120px").text("Actions")
 		MH.Tbody.up(table1)
 		App.ctx.Put("/products/table", table1)
-		File.WriteString(File.DirApp, "products-table.html", table1.build)
+		'File.WriteString(File.DirApp, "products-table.html", table1.build.Trim)
 	End If
 
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	'DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
 	DB.Join("JOIN", "tbl_categories c", Array("p.category_id = c.id"))
+	Dim keyword As String = Request.GetParameter("keyword")
+	If keyword <> "" Then
+		DB.Conditions = Array("UPPER(p.product_code) LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
+		DB.Parameters = Array("%" & keyword.ToUpperCase & "%", "%" & keyword.ToUpperCase & "%", "%" & keyword.ToUpperCase & "%")
+	End If
 	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-	End If	
-	Dim rows As List = DB.Results
-	DB.Close
+	End If
 	
 	Dim table1 As MiniHtml = App.ctx.Get("/products/table")
 	Dim tbody1 As MiniHtml = table1.Child(1)
 	tbody1.Children.Clear ' remove all children
-	For Each row As Map In rows
+	For Each row As Map In DB.Results
 		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, True))
-		Dim tr1 As MiniHtml = CreateProductsRow
+		Dim tr1 As MiniHtml = ProductsTableRow
 		tr1.Child(0).text2(row.Get("id"))
 		tr1.Child(1).text2(row.Get("code"))
 		tr1.Child(2).text2(row.Get("name"))
@@ -513,14 +450,14 @@ Private Sub CreateProductsTable As MiniHtml
 	Return table1
 End Sub
 
-Private Sub CreateProductsRow As MiniHtml
+Private Sub ProductsTableRow As MiniHtml
 	If App.ctx.ContainsKey("/products/table/row") = False Then
 		Dim tr1 As MiniHtml = MH.Tr
-		MH.Td.up(tr1).cls("align-middle").sty("text-align: right").text("%id%")
-		MH.Td.up(tr1).cls("align-middle").text("%code%")
-		MH.Td.up(tr1).cls("align-middle").text("%name%")
-		MH.Td.up(tr1).cls("align-middle").text("%category%")
-		MH.Td.up(tr1).cls("align-middle").sty("text-align: right").text("%price%")
+		MH.Td.up(tr1).cls("align-middle").sty("text-align: right").text("$id$")
+		MH.Td.up(tr1).cls("align-middle").text("$code$")
+		MH.Td.up(tr1).cls("align-middle").text("$name$")
+		MH.Td.up(tr1).cls("align-middle").text("$category$")
+		MH.Td.up(tr1).cls("align-middle").sty("text-align: right").text("$price$")
 		Dim td6 As MiniHtml = MH.Td.up(tr1)
 		td6.cls("align-middle text-center px-1 py-1")
 
@@ -545,7 +482,7 @@ Private Sub CreateProductsRow As MiniHtml
 		a2.attr("title", "Delete")
 
 		App.ctx.Put("/products/table/row", tr1.ConvertToBytes)
-		File.WriteString(File.DirApp, "products-table-row.html", tr1.build)
+		'File.WriteString(File.DirApp, "products-table-row.html", tr1.build.Trim)
 	End If
 	Return MH.ConvertFromBytes(App.ctx.Get("/products/table/row"))
 End Sub
@@ -628,7 +565,7 @@ Private Sub ModalAdd As String
 		button2.text("Cancel")
 
 		App.ctx.Put("/hx/products/add", form1)
-		File.WriteString(File.DirApp, "products-add.html", form1.build)
+		'File.WriteString(File.DirApp, "products-add.html", form1.build.Trim)
 	End If
 	
 	Dim form1 As MiniHtml = App.ctx.Get("/hx/products/add")
@@ -649,9 +586,7 @@ Private Sub ModalAdd As String
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 	End If
-	Dim rows As List = DB.Results
-	DB.Close
-	For Each row As Map In rows
+	For Each row As Map In DB.Results
 		Dim catid As Int = row.Get("id")
 		Dim catname As String = row.Get("name")
 		Dim option2 As MiniHtml = MH.Option.up(select1)
@@ -747,7 +682,7 @@ Private Sub ModalEdit (CategoryId As String) As String
 		button2.text("Cancel")
 
 		App.ctx.Put("/hx/products/edit", form1)
-		File.WriteString(File.DirApp, "products-edit.html", form1.build)
+		'File.WriteString(File.DirApp, "products-edit.html", form1.build.Trim)
 	End If
 	
 	Dim form1 As MiniHtml = App.ctx.Get("/hx/products/edit")
@@ -767,9 +702,7 @@ Private Sub ModalEdit (CategoryId As String) As String
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 	End If
-	Dim rows As List = DB.Results
-	DB.Close
-	For Each row As Map In rows
+	For Each row As Map In DB.Results
 		Dim catid As Int = row.Get("id")
 		Dim catname As String = row.Get("name")
 		Dim option2 As MiniHtml = MH.Option.up(select1)
@@ -780,7 +713,7 @@ Private Sub ModalEdit (CategoryId As String) As String
 	Return form1.build
 End Sub
 
-Private Sub ModalDelete As MiniHtml
+Private Sub ModalDelete As String
 	If App.ctx.ContainsKey("/hx/products/delete") = False Then
 		Dim form1 As MiniHtml = MH.Form
 		form1.attr("hx-delete", "/hx/products")
@@ -815,9 +748,11 @@ Private Sub ModalDelete As MiniHtml
 		button2.text("Cancel")
 
 		App.ctx.Put("/hx/products/delete", form1)
-		File.WriteString(File.DirApp, "products-delete.html", form1.build)
+		'File.WriteString(File.DirApp, "products-delete.html", form1.build.Trim)
 	End If
-	Return App.ctx.Get("/hx/products/delete")
+	
+	Dim form1 As MiniHtml = App.ctx.Get("/hx/products/delete")
+	Return form1.build
 End Sub
 
 Private Sub ShowAlert (message As String, status As String)
@@ -829,7 +764,7 @@ Private Sub ShowToast (entity As String, action As String, message As String, st
 	Dim div1 As MiniHtml = MH.Div
 	div1.attr("id", "products-container")
 	div1.attr("hx-swap-oob", "true")
-	CreateProductsTable.up(div1)
+	ProductsTable.up(div1)
 
 	Dim script1 As MiniJs
 	script1.Initialize
