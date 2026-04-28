@@ -15,15 +15,12 @@ Library1=endsmeet
 Library2=jcore
 Library3=miniormutils
 Library4=webapiutils
-Module1=CategoriesApiHandler
-Module2=CategoriesWebHandler
-Module3=FindApiHandler
-Module4=HttpsFilter
-Module5=ProductsApiHandler
-Module6=ProductsWebHandler
+Module1=CategoriesWebHandler
+Module2=HttpsFilter
+Module3=ProductsWebHandler
 NumberOfFiles=4
 NumberOfLibraries=4
-NumberOfModules=6
+NumberOfModules=3
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
