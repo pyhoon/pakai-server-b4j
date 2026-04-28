@@ -41,7 +41,7 @@ Private Sub GetAllProducts
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
+	DB.Join("JOIN", "tbl_categories c", Array("p.category_id = c.id"))
 	DB.OrderBy = CreateMap("p.id": "")
 	DB.Query
 	If DB.Error.IsInitialized Then
@@ -67,8 +67,8 @@ Public Sub GetProductsByCategoryId
 	End Try
 	DB.Open
 	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id AS id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
+	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
+	DB.Join("JOIN", "tbl_categories c", Array("p.category_id = c.id"))
 	DB.Condition = "c.id = ?"
 	DB.Parameter = id
 	DB.OrderBy = CreateMap("p.id": "")
@@ -108,8 +108,8 @@ Public Sub SearchByKeywords
 	Dim SearchForText As String = data.Get("keyword")
 	DB.Open
 	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
+	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
+	DB.Join("JOIN", "tbl_categories c", Array("p.category_id = c.id"))
 	If SearchForText <> "" Then
 		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
 		DB.Parameters = Array("%" & SearchForText & "%", "%" & SearchForText.ToUpperCase & "%", "%" & SearchForText.ToUpperCase & "%")

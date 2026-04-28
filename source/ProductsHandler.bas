@@ -93,6 +93,7 @@ Private Sub RenderPage
 		doc.Write("<!DOCTYPE html>")
 		doc.Write(page1.build)
 		App.ctx.Put("/", doc.ToString)
+		File.WriteString(File.DirApp, "products.html", doc.ToString)
 	End If
 	App.WriteHtml2(Response, App.ctx.Get("/"), App.ctx)
 End Sub
@@ -207,10 +208,10 @@ Private Sub ToastContainer As MiniHtml
 	div3.cls("toast-body")
 	div3.attr("id", "toast-body")
 	div3.text("Operation successful!")
-	Dim button1 As MiniHtml = MH.Button.up(div2)
-	button1.attr("type", "button")
-	button1.cls("btn-close btn-close-white me-2 m-auto")
-	button1.attr("data-bs-dismiss", "toast")
+	Dim close1 As MiniHtml = MH.Button.up(div2)
+	close1.attr("type", "button")
+	close1.cls("btn-close btn-close-white me-2 m-auto")
+	close1.attr("data-bs-dismiss", "toast")
 	Return div1
 End Sub
 
@@ -233,12 +234,14 @@ Private Sub HandleSearch
 		MH.Th.up(thead1).sty("text-align: center; width: 120px").text("Actions")
 		MH.Tbody.up(table1)
 		App.ctx.Put("/hx/products/search", table1)
+		File.WriteString(File.DirApp, "products-search.html", table1.build)
 	End If
 
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name AS name", "p.product_price price")
-	DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
+	'DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
+	DB.Join("JOIN", "tbl_categories c", Array("p.category_id = c.id"))
 	Dim keyword As String = Request.GetParameter("keyword")
 	If keyword <> "" Then
 		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
@@ -476,12 +479,14 @@ Private Sub CreateProductsTable As MiniHtml
 		MH.Th.up(thead1).sty("text-align: center; width: 120px").text("Actions")
 		MH.Tbody.up(table1)
 		App.ctx.Put("/products/table", table1)
+		File.WriteString(File.DirApp, "products-table.html", table1.build)
 	End If
 
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
+	'DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
+	DB.Join("JOIN", "tbl_categories c", Array("p.category_id = c.id"))
 	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
 	If DB.Error.IsInitialized Then
@@ -540,6 +545,7 @@ Private Sub CreateProductsRow As MiniHtml
 		a2.attr("title", "Delete")
 
 		App.ctx.Put("/products/table/row", tr1.ConvertToBytes)
+		File.WriteString(File.DirApp, "products-table-row.html", tr1.build)
 	End If
 	Return MH.ConvertFromBytes(App.ctx.Get("/products/table/row"))
 End Sub
@@ -556,7 +562,7 @@ Private Sub CreateAddModal As String
 		Dim h51 As MiniHtml = MH.H5.up(modalHeader)
 		h51.cls("modal-title").text("Add Product")
 		Dim close1 As MiniHtml = MH.Button.up(modalHeader)
-		close1.attr("type","button")
+		close1.attr("type", "button")
 		close1.cls("btn-close")
 		close1.attr("data-bs-dismiss", "modal")
 	
@@ -611,17 +617,18 @@ Private Sub CreateAddModal As String
 		input4.cls("form-control")
 
 		Dim modalFooter As MiniHtml = MH.Div.up(form1).cls("modal-footer")
+		Dim button1 As MiniHtml = MH.Button.up(modalFooter)
+		button1.attr("type", "submit")
+		button1.cls("btn btn-success px-3")
+		button1.text("Create")
 		Dim button2 As MiniHtml = MH.Button.up(modalFooter)
-		button2.attr("type", "submit")
-		button2.cls("btn btn-success px-3")
-		button2.text("Create")
-		Dim input5 As MiniHtml = MH.Input.up(modalFooter)
-		input5.attr("type", "button")
-		input5.cls("btn btn-secondary px-3")
-		input5.attr("data-bs-dismiss", "modal")
-		input5.attr("value", "Cancel")
+		button2.attr("type", "button")
+		button2.cls("btn btn-secondary px-3")
+		button2.attr("data-bs-dismiss", "modal")
+		button2.text("Cancel")
 
 		App.ctx.Put("/hx/products/add", form1)
+		File.WriteString(File.DirApp, "products-add.html", form1.build)
 	End If
 	
 	Dim form1 As MiniHtml = App.ctx.Get("/hx/products/add")
@@ -733,13 +740,14 @@ Private Sub CreateEditModal (CategoryId As String) As String
 		Dim button1 As MiniHtml = MH.Button.up(modalFooter)
 		button1.cls("btn btn-primary px-3")
 		button1.text("Update")
-		Dim button2 As MiniHtml = MH.Input.up(modalFooter)
+		Dim button2 As MiniHtml = MH.Button.up(modalFooter)
 		button2.attr("type", "button")
 		button2.cls("btn btn-secondary px-3")
 		button2.attr("data-bs-dismiss", "modal")
-		button2.attr("value", "Cancel")
+		button2.text("Cancel")
 
 		App.ctx.Put("/hx/products/edit", form1)
+		File.WriteString(File.DirApp, "products-edit.html", form1.build)
 	End If
 	
 	Dim form1 As MiniHtml = App.ctx.Get("/hx/products/edit")
@@ -772,7 +780,7 @@ Private Sub CreateEditModal (CategoryId As String) As String
 	Return form1.build
 End Sub
 
-Private Sub CreateDeleteModal As MiniHtml ' As String
+Private Sub CreateDeleteModal As MiniHtml
 	If App.ctx.ContainsKey("/hx/products/delete") = False Then
 		Dim form1 As MiniHtml = MH.Form
 		form1.attr("hx-delete", "/hx/products")
@@ -800,13 +808,14 @@ Private Sub CreateDeleteModal As MiniHtml ' As String
 		Dim button1 As MiniHtml = MH.Button.up(modalFooter)
 		button1.cls("btn btn-danger px-3")
 		button1.text("Delete")
-		Dim input1 As MiniHtml = MH.Input.up(modalFooter)
-		input1.attr("type", "button")
-		input1.cls("btn btn-secondary px-3")
-		input1.attr("data-bs-dismiss", "modal")
-		input1.attr("value", "Cancel")
+		Dim button2 As MiniHtml = MH.Button.up(modalFooter)
+		button2.attr("type", "button")
+		button2.cls("btn btn-secondary px-3")
+		button2.attr("data-bs-dismiss", "modal")
+		button2.text("Cancel")
 
 		App.ctx.Put("/hx/products/delete", form1)
+		File.WriteString(File.DirApp, "products-delete.html", form1.build)
 	End If
 	Return App.ctx.Get("/hx/products/delete")
 End Sub
