@@ -52,7 +52,6 @@ Private Sub GetProducts
 		HRM.ResponseCode = 200
 		HRM.ResponseData = DB.Results
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -65,7 +64,8 @@ Private Sub GetProductById
 		HRM.ResponseError = "Invalid id value"
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
-	End Try	
+	End Try
+	
 	DB.Open
 	DB.Table = "tbl_products"
 	DB.Find(id)
@@ -81,7 +81,6 @@ Private Sub GetProductById
 			HRM.ResponseError = "Product not found"
 		End If
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -99,6 +98,7 @@ Private Sub PostProduct
 	Else
 		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
 	End If
+	
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys
@@ -109,6 +109,7 @@ Private Sub PostProduct
 			Return
 		End If
 	Next
+	
 	' Check conflict product code
 	DB.Open
 	DB.Table = "tbl_products"
@@ -118,18 +119,18 @@ Private Sub PostProduct
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Product already exist"
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Insert new row
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("category_id", _
 	"product_code", _
@@ -151,7 +152,6 @@ Private Sub PostProduct
 		HRM.ResponseObject = DB.First
 		HRM.ResponseMessage = "Product created successfully"
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -164,7 +164,8 @@ Private Sub PutProductById
 		HRM.ResponseError = "Invalid id value"
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
-	End Try	
+	End Try
+	
 	Dim str As String = WebApiUtils.RequestDataText(Request)
 	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
 		HRM.ResponseCode = 422
@@ -177,6 +178,7 @@ Private Sub PutProductById
 	Else
 		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
 	End If
+	
 	' Check whether required keys are provided
 	Dim RequiredKeys As List = Array As String("category_id", "product_code", "product_name") ' "product_price" is optional
 	For Each requiredkey As String In RequiredKeys
@@ -187,6 +189,7 @@ Private Sub PutProductById
 			Return
 		End If
 	Next
+	
 	' Check conflict product code
 	DB.Open
 	DB.Table = "tbl_products"
@@ -196,34 +199,35 @@ Private Sub PutProductById
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If DB.Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Product Code already exist"
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Find row by id
+	DB.Open
+	DB.Table = "tbl_products"
 	DB.Find(id)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Update row by id
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("category_id", _
 	"product_code", _
@@ -235,7 +239,8 @@ Private Sub PutProductById
 	data.Get("product_name"), _
 	data.GetDefault("product_price", 0), _
 	data.GetDefault("modified_date", WebApiUtils.CurrentDateTime))
-	DB.Id = id
+	DB.Condition = "id = ?"
+	DB.Parameter = id
 	DB.Save
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
@@ -246,7 +251,6 @@ Private Sub PutProductById
 		HRM.ResponseMessage = "Product updated successfully"
 		HRM.ResponseObject = DB.First
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -259,26 +263,27 @@ Private Sub DeleteProductById
 		HRM.ResponseError = "Invalid id value"
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
-	End Try	
+	End Try
+	
+	' Find row by id
 	DB.Open
 	DB.Table = "tbl_products"
-	' Find row by id
 	DB.Find(id)
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = DB.Error.Message
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	If DB.Found = False Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
-		DB.Close
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
+	
 	' Delete row
+	DB.Open
 	DB.Table = "tbl_products"
 	DB.Id = id
 	DB.Delete
@@ -289,6 +294,5 @@ Private Sub DeleteProductById
 		HRM.ResponseCode = 200
 		HRM.ResponseMessage = "Product deleted successfully"
 	End If
-	DB.Close
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
