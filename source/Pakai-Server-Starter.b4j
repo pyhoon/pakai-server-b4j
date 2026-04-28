@@ -87,13 +87,13 @@ Sub AppStart (Args() As String)
 	App.Rest("/hx/categories/*", "CategoriesWebHandler")
 	
 	' For REST API
-	Api = App.api
-	App.Route("/api/find", "FindApiHandler", Array("get", "post"))
-	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
-	App.Rest("/api/products/*", "ProductsApiHandler")
-	App.Rest("/api/categories/*", "CategoriesApiHandler")
+	'Api = App.api
+	'App.Route("/api/find", "FindApiHandler", Array("get", "post"))
+	'App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
+	'App.Rest("/api/products/*", "ProductsApiHandler")
+	'App.Rest("/api/categories/*", "CategoriesApiHandler")
 	'App.Get("/help", "HelpWebHandler")
-	Api.EnableHelp = True
+	'Api.EnableHelp = True
 	
 	App.Start
 	App.LogStartupMessage
