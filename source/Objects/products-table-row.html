@@ -1,0 +1,12 @@
+<tr>
+  <td class="align-middle" style="text-align: right">$id$</td>
+  <td class="align-middle">$code$</td>
+  <td class="align-middle">$name$</td>
+  <td class="align-middle">$category$</td>
+  <td class="align-middle" style="text-align: right">$price$</td>
+  <td class="align-middle text-center px-1 py-1">
+    <a class="edit text-primary mx-2" hx-get="/hx/products/edit/$id$" hx-target="#modal-content" hx-trigger="click" data-bs-toggle="modal" data-bs-target="#modal-container" title="Edit">
+      <i class="bi bi-pencil"></i></a>
+    <a class="delete text-danger mx-2" hx-get="/hx/products/delete/$id$" hx-target="#modal-content" hx-trigger="click" data-bs-toggle="modal" data-bs-target="#modal-container" title="Delete">
+      <i class="bi bi-trash3"></i></a></td>
+</tr>

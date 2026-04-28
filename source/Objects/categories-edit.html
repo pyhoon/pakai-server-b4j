@@ -1,0 +1,19 @@
+<form hx-put="/hx/categories" hx-target="#modal-messages" hx-swap="innerHTML">
+  <div class="modal-header">
+    <h5 class="modal-title">Edit Category</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  </div>
+  <div class="modal-body">
+    <div id="modal-messages"></div>
+    <input type="hidden" name="id" value="$id$">
+    <div class="form-group">
+      <label for="name">Name 
+        <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" id="name" name="name" value="$name$" required>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary px-3">Update</button>
+    <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+  </div>
+</form>
