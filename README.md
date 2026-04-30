@@ -1,6 +1,6 @@
 # Pakai Server - Web Application framework
 
-Version: 6.60
+Version: 6.70
 
 Create Web API or Application Backend Server using B4J project template
 
@@ -10,7 +10,10 @@ Create Web API or Application Backend Server using B4J project template
 ---
 
 ## Templates
-- Pakai Server (6.60).b4xtemplate
+- Pakai Server (6.70).b4xtemplate
+- Pakai Server Api (6.70).b4xtemplate
+- Pakai Server Web (6.70).b4xtemplate
+- Pakai Server Starter (6.70).b4xtemplate
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
@@ -40,49 +43,13 @@ Create Web API or Application Backend Server using B4J project template
 
 ### Code Example
 ```b4x
-Private Sub CreateProductsTable As MiniHtml
-	If App.ctx.ContainsKey("/products/table") = False Then
-		Dim table1 As MiniHtml = MH.Table
-		table1.cls("table table-bordered table-hover rounded small")
-		Dim thead1 As MiniHtml = MH.Thead.cls("table-light").up(table1)
-		MH.Th.up(thead1).sty("text-align: right; width: 50px").text("#")
-		MH.Th.up(thead1).text("Code")
-		MH.Th.up(thead1).text("Name")
-		MH.Th.up(thead1).text("Category")
-		MH.Th.up(thead1).sty("text-align: right").text("Price")
-		MH.Th.up(thead1).sty("text-align: center; width: 120px").text("Actions")
-		MH.Tbody.up(table1)
-		App.ctx.Put("/products/table", table1)
+Private Sub HandleModalAdd
+	Dim CacheName As String = "Categories Add Modal"
+	If ExistInCache(CacheName) = False Then
+		WriteToCache(CacheName, ModalAdd)
 	End If
-
-	DB.Open
-	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join = DB.CreateJoin("", "tbl_categories c", Array("p.category_id = c.id"))
-	DB.OrderBy = CreateMap("p.id": "DESC")
-	DB.Query
-	If DB.Error.IsInitialized Then
-		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-	End If	
-	Dim rows As List = DB.Results
-	DB.Close
-	
-	Dim table1 As MiniHtml = App.ctx.Get("/products/table")
-	Dim tbody1 As MiniHtml = table1.Child(1)
-	tbody1.Children.Clear ' remove all children
-	For Each row As Map In rows
-		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, True))
-		Dim tr1 As MiniHtml = CreateProductsRow
-		tr1.Child(0).text2(row.Get("id"))
-		tr1.Child(1).text2(row.Get("code"))
-		tr1.Child(2).text2(row.Get("name"))
-		tr1.Child(3).text2(row.Get("category"))
-		tr1.Child(4).text2(row.Get("price"))
-		tr1.Child(5).Child(0).attr("hx-get", "/hx/products/edit/" & row.Get("id"))
-		tr1.Child(5).Child(1).attr("hx-get", "/hx/products/delete/" & row.Get("id"))
-		tr1.up(tbody1)
-	Next
-	Return table1
+	Dim modal1 As MiniHtml = ReadFromCache(CacheName)
+	App.WriteHtml(Response, modal1.build)
 End Sub
 ```
 
