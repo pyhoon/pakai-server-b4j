@@ -53,11 +53,6 @@ End Sub
 
 Private Sub RenderPage
 	Dim page As String = LoadFromCache("/products")
-	'Dim help As String
-	'If App.api.EnableHelp Then
-	'	help = HelpLink
-	'End If
-	'App.ctx.Put("help", help)
 	App.WriteHtml2(Response, page, App.ctx)
 End Sub
 
@@ -338,16 +333,6 @@ Private Sub ProductsTable As String
 	Dim elem_table As String = LoadFromCache("/hx/products/table")
 	Return elem_table.Replace("<tbody></tbody>", SB.ToString)
 End Sub
-
-'Private Sub HelpLink As String
-'	Return $"
-'<li class="nav-item d-block d-lg-block">
-'  <a href="/help" class="nav-link float-end">
-'    API 
-'	<i class="bi bi-gear me-2" title="API"></i>
-'  </a>
-'</li>"$
-'End Sub
 
 Private Sub ShowAlert (message As String, status As String)
 	Dim div1 As StringBuilder

@@ -10,6 +10,6 @@ ModuleClosedNodes0=
 ModuleClosedNodes1=
 ModuleClosedNodes2=
 ModuleClosedNodes3=
-NavigationStack=ProductsWebHandler,HandleAddModal,65,0,ProductsWebHandler,HandleEditModal,117,0,ProductsWebHandler,HandleDeleteModal,155,0,ProductsWebHandler,HandleProducts,279,0,ProductsWebHandler,ProductsTable,306,0,CategoriesWebHandler,HandleEditModal,79,0,CategoriesWebHandler,HandleDeleteModal,108,0,CategoriesWebHandler,HandleCategories,228,1,CategoriesWebHandler,CategoriesTable,256,0,Main,CreateDatabase,207,0
+NavigationStack=Main,CreateDatabase,192,0,ProductsWebHandler,Handle,46,0,ProductsWebHandler,ProductsTable,333,0,ProductsWebHandler,ShowAlert,335,0,CategoriesWebHandler,CategoriesTable,275,0,CategoriesWebHandler,RenderPage,48,0,CategoriesWebHandler,Handle,41,0,ProductsWebHandler,RenderPage,48,0,Main,AppStart,63,0
 SelectedBuild=0
 VisibleModules=
