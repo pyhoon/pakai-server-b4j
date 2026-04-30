@@ -17,14 +17,13 @@ Library3=minicss
 Library4=minihtml
 Library5=minijs
 Library6=miniormutils
-Library7=webapiutils
 Module1=CategoriesHandler
 Module2=HttpsFilter
 Module3=MainView
 Module4=MH
 Module5=ProductsHandler
 NumberOfFiles=4
-NumberOfLibraries=7
+NumberOfLibraries=6
 NumberOfModules=5
 Version=10.5
 @EndOfDesignText@
