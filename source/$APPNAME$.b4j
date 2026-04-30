@@ -34,7 +34,7 @@ Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
 ' Product:   Pakai Server
-' Version:   6.60
+' Version:   6.70
 ' License:   MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -48,10 +48,12 @@ Version=10.5
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
 #Region  Macros
-#Macro: Title, ModelGenerator, ide://run?file=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
-#Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\..\B4X\libget.jar&args=%PROJECT%&librariesrefresh=True
-#Macro: Title, GetResources, ide://run?file=%ADDITIONAL%\..\B4X\resget.jar&args=%PROJECT%&args=true
-'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.*&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
+' Download modgen: https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar
+' Download libget: https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar
+#Macro: Title, ModelGenerator, ide://run?file=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
+#Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\libget.jar&args=%PROJECT%&librariesrefresh=True
+'#Macro: Title, GetResources, ide://run?file=%ADDITIONAL%\resget.jar&args=%PROJECT%&args=true
+'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.ini&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
 '#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
 '#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
 #End Region
@@ -60,7 +62,7 @@ Sub Process_Globals
 	Public App 				As EndsMeet
 	Public Api 				As ApiSettings
 	Public DBS 				As MiniORMSettings
-	Public Const VERSION 	As String = "6.60"
+	Public Const VERSION 	As String = "6.70"
 	Public Const COLOR_RED 	As Int = 0xFFFF0000
 	Public Const COLOR_BLUE As Int = 0xFF0000FF
 End Sub

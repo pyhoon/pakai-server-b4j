@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.60
+' Version 6.70
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -88,7 +88,6 @@ Private Sub HandleEditModal
 	DB.Condition = "id = ?"
 	DB.Parameter = id
 	DB.Query
-	DB.Close
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 		Return
@@ -118,7 +117,6 @@ Private Sub HandleDeleteModal
 	DB.Condition = "id = ?"
 	DB.Parameter = id
 	DB.Query
-	DB.Close
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 		Return
@@ -147,7 +145,6 @@ Private Sub HandleCategories
 			DB.Conditions = Array("category_name = ?")
 			DB.Parameters = Array(name)
 			DB.Query
-			DB.Close
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 				Return
@@ -161,7 +158,6 @@ Private Sub HandleCategories
 			DB.Columns = Array("category_name", "created_date")
 			DB.Parameters = Array(name, Main.CurrentDateTime)
 			DB.Save
-			DB.Close
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 				Return
@@ -174,7 +170,6 @@ Private Sub HandleCategories
 			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Find(id)
-			DB.Close
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 				Return
@@ -187,7 +182,6 @@ Private Sub HandleCategories
 			DB.Conditions = Array("category_name = ?", "id <> ?")
 			DB.Parameters = Array(name, id)
 			DB.Query
-			DB.Close
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 				Return
@@ -203,7 +197,6 @@ Private Sub HandleCategories
 			DB.Parameters = Array(name, Main.CurrentDateTime)
 			DB.Id = id
 			DB.Save
-			DB.Close
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 				Return
@@ -215,7 +208,6 @@ Private Sub HandleCategories
 			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Find(id)
-			DB.Close
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 				Return
@@ -228,7 +220,6 @@ Private Sub HandleCategories
 			DB.Condition = "category_id = ?"
 			DB.Parameter = id
 			DB.Query
-			DB.Close
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 				Return
@@ -241,7 +232,6 @@ Private Sub HandleCategories
 			DB.Table = "tbl_categories"
 			DB.Id = id
 			DB.Delete
-			DB.Close
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 				Return
@@ -269,7 +259,6 @@ Private Sub CategoriesTable As String
 	DB.Columns = Array("id", "category_name AS name")
 	DB.OrderBy = CreateMap("id": "DESC")
 	DB.Query
-	DB.Close
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 		Return "              <tbody></tbody>"

@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.60
+' Version 6.70
 Sub Class_Globals
 	Private DB As MiniORM
 	Private App As EndsMeet
@@ -18,7 +18,6 @@ End Sub
 
 Public Sub Initialize
 	DB = Main.DB
-	DB.ShowExtraLogs = True
 	App = Main.App
 End Sub
 
@@ -39,7 +38,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	Log($"${Method}: ${Path}"$)
 	If Path = "/" Then
 		RenderPage
-	Else If Path = "/hx/products/table" Then ' Or Path = "/hx/products/search" Then
+	Else If Path = "/hx/products/table" Then
 		HandleTable
 	Else If Path = "/hx/products/add" Then
 		HandleAddModal
@@ -73,7 +72,6 @@ Private Sub HandleAddModal
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name name")
 	DB.Query
-	DB.Close
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 	End If
@@ -112,7 +110,6 @@ Private Sub HandleEditModal
 	DB.Condition = "id = ?"
 	DB.Parameter = id
 	DB.Query
-	'DB.Close
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 		Return
@@ -127,7 +124,6 @@ Private Sub HandleEditModal
 		DB.Table = "tbl_categories"
 		DB.Columns = Array("id", "category_name name")
 		DB.Query
-		'DB.Close
 		If DB.Error.IsInitialized Then
 			ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 		End If
@@ -150,7 +146,6 @@ Private Sub HandleEditModal
 	EditModal = WebApiUtils.ReplaceMap(EditModal, row1)
 	EditModal = EditModal.Replace($"<select class="form-select" id="category2" name="category" required></select>"$, select1.ToString)
 	App.WriteHtml(Response, EditModal)
-	'App.WriteHtml2(Response, EditModal, row1)
 End Sub
 
 ' Delete modal
@@ -169,7 +164,6 @@ Private Sub HandleDeleteModal
 	DB.Condition = "id = ?"
 	DB.Parameter = id
 	DB.Query
-	DB.Close
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 		Return
@@ -208,12 +202,10 @@ Private Sub HandleProducts
 			DB.Query
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found Then
 				ShowAlert("Product Code already exists!", "warning")
-				DB.Close
 				Return
 			End If
 
@@ -224,11 +216,9 @@ Private Sub HandleProducts
 			DB.Save
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Product", "created", "Product created successfully!", "success")
-			DB.Close
 		Case "PUT"
 			' Update
 			Dim id As Int = Request.GetParameter("id")
@@ -251,7 +241,6 @@ Private Sub HandleProducts
 			DB.Find(id)
 			If DB.Found = False Then
 				ShowAlert("Product not found!", "warning")
-				DB.Close
 				Return
 			End If
 			
@@ -262,12 +251,10 @@ Private Sub HandleProducts
 			DB.Query
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			If DB.Found Then
 				ShowAlert("Product Code already exists!", "warning")
-				DB.Close
 				Return
 			End If
 			
@@ -280,11 +267,9 @@ Private Sub HandleProducts
 			DB.Save
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Product", "updated", "Product updated successfully!", "info")
-			DB.Close
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
@@ -293,7 +278,6 @@ Private Sub HandleProducts
 			DB.Find(id)
 			If DB.Found = False Then
 				ShowAlert("Product not found!", "warning")
-				DB.Close
 				Return
 			End If
 
@@ -303,11 +287,9 @@ Private Sub HandleProducts
 			DB.Delete
 			If DB.Error.IsInitialized Then
 				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-				DB.Close
 				Return
 			End If
 			ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
-			DB.Close
 	End Select
 End Sub
 
@@ -336,7 +318,6 @@ Private Sub ProductsTable As String
 	End If
 	DB.OrderBy = CreateMap("p.id": "DESC")
 	DB.Query
-	DB.Close
 	If DB.Error.IsInitialized Then
 		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
 		Return "              <tbody></tbody>"

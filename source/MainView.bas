@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Main View
-' Version 6.60
+' Version 6.70
 Sub Class_Globals
 	Private mModal As MiniHtml
 	Private mToast As MiniHtml
@@ -97,11 +97,11 @@ Private Sub PageBody As MiniHtml
 	Dim collapse1 As MiniHtml = MH.Div.up(div1)
 	collapse1.cls("collapse navbar-collapse")
 	collapse1.attr("id", "navbarCollapse")
-	Dim ulist1 As MiniHtml = MH.Ul.up(collapse1)
-	ulist1.cls("navbar-nav navbar-brand ms-auto mb-md-0")
-	Dim list1 As MiniHtml = MH.Li.up(ulist1)
-	list1.cls("nav-item d-block d-lg-none")
-	Dim a1 As MiniHtml = MH.Anchor.up(list1)
+	Dim navbar1 As MiniHtml = MH.Ul.up(collapse1)
+	navbar1.cls("navbar-nav navbar-brand ms-auto mb-md-0")
+	Dim navitem1 As MiniHtml = MH.Li.up(navbar1)
+	navitem1.cls("nav-item d-block d-lg-none")
+	Dim a1 As MiniHtml = MH.Anchor.up(navitem1)
 	a1.cls("nav-link float-end")
 	a1.attr("href", "https://paypal.me/aeric80/")
 	a1.attr("target", "_blank")

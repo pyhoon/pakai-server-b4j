@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Api Handler class
-' Version 6.60
+' Version 6.70
 Sub Class_Globals
 	Private DB As MiniORM
 	Private HRM As HttpResponseMessage
@@ -142,6 +142,7 @@ Private Sub PostProduct
 	data.Get("product_name"), _
 	data.GetDefault("product_price", 0), _
 	data.GetDefault("created_date", WebApiUtils.CurrentDateTime))
+	DB.ReturnRow = True
 	DB.Save
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
@@ -241,6 +242,7 @@ Private Sub PutProductById
 	data.GetDefault("modified_date", WebApiUtils.CurrentDateTime))
 	DB.Condition = "id = ?"
 	DB.Parameter = id
+	DB.ReturnRow = True
 	DB.Save
 	If DB.Error.IsInitialized Then
 		HRM.ResponseCode = 422
