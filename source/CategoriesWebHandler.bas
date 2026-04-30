@@ -154,6 +154,7 @@ Private Sub HandleCategories
 				Return
 			End If
 			' Insert new row
+			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Columns = Array("category_name", "created_date")
 			DB.Parameters = Array(name, Main.CurrentDateTime)
@@ -178,6 +179,7 @@ Private Sub HandleCategories
 				ShowAlert("Category not found!", "warning")
 				Return
 			End If
+			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Conditions = Array("category_name = ?", "id <> ?")
 			DB.Parameters = Array(name, id)
@@ -216,6 +218,7 @@ Private Sub HandleCategories
 				ShowAlert("Category not found!", "warning")
 				Return
 			End If
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Condition = "category_id = ?"
 			DB.Parameter = id
@@ -229,6 +232,7 @@ Private Sub HandleCategories
 				Return
 			End If
 			' Delete row
+			DB.Open
 			DB.Table = "tbl_categories"
 			DB.Id = id
 			DB.Delete

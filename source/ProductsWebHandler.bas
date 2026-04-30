@@ -210,6 +210,7 @@ Private Sub HandleProducts
 			End If
 
 			' Insert new row
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "created_date")
 			DB.Parameters = Array(category, code, name, price, Main.CurrentDateTime)
@@ -282,6 +283,7 @@ Private Sub HandleProducts
 			End If
 
 			' Delete row
+			DB.Open
 			DB.Table = "tbl_products"
 			DB.Id = id
 			DB.Delete
