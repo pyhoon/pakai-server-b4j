@@ -63,7 +63,13 @@ End Sub
 
 ' Add modal
 Private Sub HandleAddModal
-	Dim Rows As List = Model.Read
+	Dim CM As CategoriesModel
+	CM.Initialize
+	Dim Categories As List = CM.Read
+	If CM.Error.IsInitialized Then
+		ShowAlert($"Database error: ${CM.Error.Message}"$, "danger")
+		Return
+	End If	
 	If Model.Error.IsInitialized Then
 		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 	End If
@@ -71,9 +77,9 @@ Private Sub HandleAddModal
 	select1.Initialize
 	select1.Append(CRLF).Append($"      <select class="form-select" id="category2" name="category" required>"$)
 	select1.Append(CRLF).Append($"        <option value="" disabled>Select Category</option>"$)
-	For Each row As Map In Rows
-		Dim cat_id As Int = row.Get("id")
-		Dim cat_name As String = row.Get("name")
+	For Each Row As Map In Categories
+		Dim cat_id As Int = Row.Get("id")
+		Dim cat_name As String = Row.Get("category_name")
 		select1.Append(CRLF).Append($"        <option value="${cat_id}""$)
 		select1.Append(">")
 		select1.Append(cat_name)
@@ -115,7 +121,7 @@ Private Sub HandleEditModal
 		select1.Append(CRLF).Append($"        <option value="" disabled>Select Category</option>"$)
 		For Each Row As Map In Categories
 			Dim cat_id As Int = Row.Get("id")
-			Dim cat_name As String = Row.Get("name")
+			Dim cat_name As String = Row.Get("category_name")
 			select1.Append(CRLF).Append($"        <option value="${cat_id}""$)
 			If cat_id = Product.Get("category_id") Then select1.Append(" selected")
 			select1.Append(">")
@@ -124,7 +130,12 @@ Private Sub HandleEditModal
 		Next
 		select1.Append("      </select>")
 	End If
+	Product.Put("code", Product.Get("product_code"))
+	Product.Put("name", Product.Get("product_name"))
+	Product.Put("category", Product.Get("category_name"))
+	Product.Put("price", NumberFormat2(Product.Get("product_price"), 1, 2, 2, False))
 	Dim EditModal As String = LoadFromCache("/hx/products/edit")
+	
 	EditModal = WebApiUtils.ReplaceMap(EditModal, Product)
 	EditModal = EditModal.Replace($"<select class="form-select" id="category2" name="category" required></select>"$, select1.ToString)
 	App.WriteHtml(Response, EditModal)
@@ -146,6 +157,10 @@ Private Sub HandleDeleteModal
 	End If
 	Dim DeleteModal As String = LoadFromCache("/hx/products/delete")
 	'DeleteModal = DeleteModal.Replace($"<select class="form-select" id="category2" name="category" required></select>"$, select1.ToString)
+	Row.Put("code", Row.Get("product_code"))
+	Row.Put("name", Row.Get("product_name"))
+	Row.Put("category", Row.Get("category_name"))
+	Row.Put("price", NumberFormat2(Row.Get("product_price"), 1, 2, 2, False))
 	App.WriteHtml2(Response, DeleteModal, Row)
 End Sub
 
@@ -274,7 +289,10 @@ Private Sub ProductsTable As String
 	SB.Initialize
 	SB.Append(CRLF).Append("              <tbody>")
 	For Each row As Map In Rows
-		row.Put("price", NumberFormat2(row.Get("price"), 1, 2, 2, False))
+		row.Put("code", row.Get("product_code"))
+		row.Put("name", row.Get("product_name"))
+		row.Put("category", row.Get("category_name"))
+		row.Put("price", NumberFormat2(row.Get("product_price"), 1, 2, 2, False))
 		Dim elem_row As String = LoadFromCache("/hx/products/table/row")
 		elem_row = WebApiUtils.ReplaceMap(elem_row, row)
 		SB.Append(CRLF).Append("                " & elem_row)

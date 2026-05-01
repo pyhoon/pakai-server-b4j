@@ -17,7 +17,7 @@ End Sub
 Public Sub GetRowById (Id As Int) As Map
 	DB.Open
 	DB.Table = "tbl_categories"
-	DB.Columns = Array("id", "category_name AS name")
+	'DB.Columns = Array("id", "category_name")
 	DB.Condition = "id = ?"
 	DB.Parameter = Id
 	DB.Query

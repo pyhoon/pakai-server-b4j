@@ -215,6 +215,7 @@ Private Sub CategoriesTable As String
 	SB.Initialize
 	SB.Append(CRLF).Append("              <tbody>")
 	For Each Row As Map In Rows
+		Row.Put("name", Row.Get("category_name"))
 		Dim elem_row As String = LoadFromCache("/hx/categories/table/row")
 		elem_row = WebApiUtils.ReplaceMap(elem_row, Row)
 		SB.Append(CRLF).Append("                " & elem_row)
