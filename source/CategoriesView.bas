@@ -293,7 +293,7 @@ Private Sub ModalEdit As MiniHtml
 	input1.cls("form-control")
 	input1.attr("id", "name")
 	input1.attr("name", "name")
-	input1.attr("value", "$name$")
+	input1.attr("value", "$category_name$")
 	input1.required
 	Dim modalFooter As MiniHtml = MH.Div.up(form1).cls("modal-footer")
 	Dim button1 As MiniHtml = MH.Button.up(modalFooter)
@@ -327,7 +327,7 @@ Private Sub ModalDelete As MiniHtml
 	input1.attr("name", "id")
 	input1.attr("value", "$id$")
 	input1.up(modalBody)
-	MH.P.up(modalBody).text($"Delete $name$?"$)
+	MH.P.up(modalBody).text($"Delete $category_name$?"$)
 	Dim modalFooter As MiniHtml = MH.Div.up(form1).cls("modal-footer")
 	Dim button1 As MiniHtml = MH.Button.up(modalFooter)
 	button1.attr("type", "submit")
