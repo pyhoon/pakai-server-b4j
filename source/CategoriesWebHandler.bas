@@ -95,21 +95,6 @@ Private Sub HandleDeleteModal
 		Return
 	End Try
 	
-'	DB.Open
-'	DB.Table = "tbl_categories"
-'	DB.Columns = Array("id", "category_name AS name")
-'	DB.Condition = "id = ?"
-'	DB.Parameter = id
-'	DB.Query
-'	If DB.Error.IsInitialized Then
-'		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-'		Return
-'	End If
-'	Dim row As Map
-'	If DB.Found Then
-'		row = DB.First
-'	End If
-	
 	Dim Row As Map = Model.GetRowById(id)
 	If Model.Error.IsInitialized Then
 		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")

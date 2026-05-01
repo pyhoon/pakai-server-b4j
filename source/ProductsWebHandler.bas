@@ -124,45 +124,6 @@ Private Sub HandleEditModal
 		Next
 		select1.Append("      </select>")
 	End If
-	
-'	DB.Open
-'	DB.Table = "tbl_products"
-'	DB.Columns = Array("id", "category_id category", "product_code code", "product_name name", "product_price price")
-'	DB.Condition = "id = ?"
-'	DB.Parameter = id
-'	DB.Query
-'	If DB.Error.IsInitialized Then
-'		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-'		Return
-'	End If
-'	If DB.Found Then
-'		Dim row1 As Map = DB.First
-'		Dim category_id As Int = row1.Get("category")
-'		'row1.Put("id", id)
-'		row1.Put("price", NumberFormat2(row1.Get("price"), 1, 2, 2, False))
-'		
-'		DB.Open
-'		DB.Table = "tbl_categories"
-'		DB.Columns = Array("id", "category_name name")
-'		DB.Query
-'		If DB.Error.IsInitialized Then
-'			ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
-'		End If
-'		Dim select1 As StringBuilder
-'		select1.Initialize
-'		select1.Append(CRLF).Append($"      <select class="form-select" id="category2" name="category" required>"$)
-'		select1.Append(CRLF).Append($"        <option value="" disabled>Select Category</option>"$)
-'		For Each row2 As Map In DB.Results
-'			Dim cat_id As Int = row2.Get("id")
-'			Dim cat_name As String = row2.Get("name")
-'			select1.Append(CRLF).Append($"        <option value="${cat_id}""$)
-'			If cat_id = category_id Then select1.Append(" selected")
-'			select1.Append(">")
-'			select1.Append(cat_name)
-'			select1.Append("        </option>")
-'		Next
-'		select1.Append("      </select>")
-'	End If
 	Dim EditModal As String = LoadFromCache("/hx/products/edit")
 	EditModal = WebApiUtils.ReplaceMap(EditModal, Product)
 	EditModal = EditModal.Replace($"<select class="form-select" id="category2" name="category" required></select>"$, select1.ToString)

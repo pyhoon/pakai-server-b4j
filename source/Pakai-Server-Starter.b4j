@@ -40,6 +40,10 @@ Version=10.5
 #Else
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
+#Region  Tools
+' libget: https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar
+' modgen: https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar
+#End Region
 #Region  Macros
 '1 - Create $APPNAME$.b4j
 '2 - Open $APPNAME$.b4j
@@ -53,8 +57,6 @@ Version=10.5
 #Macro: Title, Step 4, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\Pakai+Server+Starter+(6.80).b4xtemplate&args=%ADDITIONAL%
 #Macro: Title, Step 5, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 'For release
-' Download modgen: https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar
-' Download libget: https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar
 #Macro: Title, ModelGenerator, ide://run?file=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
 #Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\libget.jar&args=%PROJECT%&librariesrefresh=True
 '#Macro: Title, GetResources, ide://run?file=%ADDITIONAL%\resget.jar&args=%PROJECT%&args=true
