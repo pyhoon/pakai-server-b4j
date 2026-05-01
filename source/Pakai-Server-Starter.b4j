@@ -15,17 +15,19 @@ Library1=endsmeet
 Library2=jcore
 Library3=miniormutils
 Library4=webapiutils
-Module1=CategoriesWebHandler
-Module2=HttpsFilter
-Module3=ProductsWebHandler
+Module1=CategoriesModel
+Module2=CategoriesWebHandler
+Module3=HttpsFilter
+Module4=ProductsModel
+Module5=ProductsWebHandler
 NumberOfFiles=4
 NumberOfLibraries=4
-NumberOfModules=3
+NumberOfModules=5
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
 ' Product:   Pakai Server
-' Version:   6.70
+' Version:   6.80
 ' License:   MIT License
 ' Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -42,13 +44,13 @@ Version=10.5
 '1 - Create $APPNAME$.b4j
 '2 - Open $APPNAME$.b4j
 '    -> Remove all macros for Step 1 to 5
-'3 - Create Pakai Server (6.70).b4xtemplate
+'3 - Create Pakai Server (6.80).b4xtemplate
 '4 - Copy to B4J Additional Libraries folder
 '5 - Check Release folder
 #Macro: Title, Step 1, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\Pakai-Server-Starter.b4j&args=%PROJECT%\$APPNAME$.b4j
 #Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
-#Macro: Title, Step 3, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+Starter+(6.70).b4xtemplate&args=Files&args=$APPNAME$.*&args=*WebHandler.bas&args=HttpsFilter.bas&args=libs.json&args=res.json&args=..\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js&args=Objects\categories*.html&args=Objects\products*.html
-#Macro: Title, Step 4, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\Pakai+Server+Starter+(6.70).b4xtemplate&args=%ADDITIONAL%
+#Macro: Title, Step 3, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+Starter+(6.80).b4xtemplate&args=Files&args=$APPNAME$.*&args=*WebHandler.bas&args=*Model.bas&args=HttpsFilter.bas&args=libs.json&args=res.json&args=..\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js&args=Objects\categories*.html&args=Objects\products*.html
+#Macro: Title, Step 4, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\Pakai+Server+Starter+(6.80).b4xtemplate&args=%ADDITIONAL%
 #Macro: Title, Step 5, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
 'For release
 ' Download modgen: https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar
@@ -65,7 +67,7 @@ Sub Process_Globals
 	Public App 				As EndsMeet
 	Public Api 				As ApiSettings
 	Public DBS 				As MiniORMSettings
-	Public Const VERSION 	As String = "6.70"
+	Public Const VERSION 	As String = "6.80"
 	Public Const COLOR_RED 	As Int = 0xFFFF0000
 	Public Const COLOR_BLUE As Int = 0xFF0000FF
 End Sub

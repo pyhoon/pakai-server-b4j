@@ -5,20 +5,20 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.70
+' Version 6.80
 Sub Class_Globals
-	Private DB As MiniORM
 	Private App As EndsMeet
 	Private Path As String
 	Private Method As String
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private FileMap As Map
+	Private Model As CategoriesModel
 End Sub
 
 Public Sub Initialize
-	DB = Main.DB
 	App = Main.App
+	Model.Initialize
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -76,24 +76,13 @@ Private Sub HandleEditModal
 		ShowAlert($"Error: ${LastException.Message}"$, "danger")
 		Return
 	End Try
-
-	DB.Open
-	DB.Table = "tbl_categories"
-	DB.Columns = Array("id", "category_name AS name")
-	DB.Condition = "id = ?"
-	DB.Parameter = id
-	DB.Query
-	If DB.Error.IsInitialized Then
-		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+	Dim Row As Map = Model.GetRowById(id)
+	If Model.Error.IsInitialized Then
+		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 		Return
 	End If
-	Dim row As Map
-	If DB.Found Then
-		row = DB.First
-	End If
-	
 	Dim EditModal As String = LoadFromCache("/hx/categories/edit")
-	App.WriteHtml2(Response, EditModal, row)
+	App.WriteHtml2(Response, EditModal, Row)
 End Sub
 
 ' Delete modal
@@ -106,23 +95,28 @@ Private Sub HandleDeleteModal
 		Return
 	End Try
 	
-	DB.Open
-	DB.Table = "tbl_categories"
-	DB.Columns = Array("id", "category_name AS name")
-	DB.Condition = "id = ?"
-	DB.Parameter = id
-	DB.Query
-	If DB.Error.IsInitialized Then
-		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+'	DB.Open
+'	DB.Table = "tbl_categories"
+'	DB.Columns = Array("id", "category_name AS name")
+'	DB.Condition = "id = ?"
+'	DB.Parameter = id
+'	DB.Query
+'	If DB.Error.IsInitialized Then
+'		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+'		Return
+'	End If
+'	Dim row As Map
+'	If DB.Found Then
+'		row = DB.First
+'	End If
+	
+	Dim Row As Map = Model.GetRowById(id)
+	If Model.Error.IsInitialized Then
+		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 		Return
 	End If
-	Dim row As Map
-	If DB.Found Then
-		row = DB.First
-	End If
-	
 	Dim DeleteModal As String = LoadFromCache("/hx/categories/delete")
-	App.WriteHtml2(Response, DeleteModal, row)
+	App.WriteHtml2(Response, DeleteModal, Row)
 End Sub
 
 ' Handle CRUD operations
@@ -135,27 +129,19 @@ Private Sub HandleCategories
 				ShowAlert("Category name must be at least 2 characters long.", "warning")
 				Return
 			End If
-			DB.Open
-			DB.Table = "tbl_categories"
-			DB.Conditions = Array("category_name = ?")
-			DB.Parameters = Array(name)
-			DB.Query
-			If DB.Error.IsInitialized Then
-				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+			Dim Found As Boolean = Model.FindRowByName(name)
+			If Model.Error.IsInitialized Then
+				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
 			End If
-			If DB.Found Then
+			If Found Then
 				ShowAlert("Category already exists!", "warning")
 				Return
 			End If
 			' Insert new row
-			DB.Open
-			DB.Table = "tbl_categories"
-			DB.Columns = Array("category_name", "created_date")
-			DB.Parameters = Array(name, Main.CurrentDateTime)
-			DB.Save
-			If DB.Error.IsInitialized Then
-				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+			Model.Create(name, Main.CurrentDateTime)
+			If Model.Error.IsInitialized Then
+				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Category", "created", "Category created successfully!", "success")
@@ -163,76 +149,58 @@ Private Sub HandleCategories
 			' Update
 			Dim id As Int = Request.GetParameter("id")
 			Dim name As String = Request.GetParameter("name")
-			DB.Open
-			DB.Table = "tbl_categories"
-			DB.Find(id)
-			If DB.Error.IsInitialized Then
-				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+			Dim Found As Boolean = Model.FindRowById(id)
+			If Model.Error.IsInitialized Then
+				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
 			End If
-			If DB.Found = False Then
+			If Not(Found) Then
 				ShowAlert("Category not found!", "warning")
 				Return
 			End If
-			DB.Open
-			DB.Table = "tbl_categories"
-			DB.Conditions = Array("category_name = ?", "id <> ?")
-			DB.Parameters = Array(name, id)
-			DB.Query
-			If DB.Error.IsInitialized Then
-				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+			Dim Found As Boolean = Model.FindRowByCategoryNameNotEqualId(name, id)
+			If Model.Error.IsInitialized Then
+				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
 			End If
-			If DB.Found Then
+			If Found Then
 				ShowAlert("Category already exists!", "warning")
 				Return
 			End If
 			' Update row
-			DB.Open
-			DB.Table = "tbl_categories"
-			DB.Columns = Array("category_name", "modified_date")
-			DB.Parameters = Array(name, Main.CurrentDateTime)
-			DB.Id = id
-			DB.Save
-			If DB.Error.IsInitialized Then
-				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+			Model.Update(id, name, Main.CurrentDateTime)
+			If Model.Error.IsInitialized Then
+				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Category", "updated", "Category updated successfully!", "info")
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
-			DB.Open
-			DB.Table = "tbl_categories"
-			DB.Find(id)
-			If DB.Error.IsInitialized Then
-				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+			Dim Found As Boolean = Model.FindRowById(id)
+			If Model.Error.IsInitialized Then
+				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
 			End If
-			If DB.Found = False Then
+			If Not(Found) Then
 				ShowAlert("Category not found!", "warning")
 				Return
 			End If
-			DB.Open
-			DB.Table = "tbl_products"
-			DB.Condition = "category_id = ?"
-			DB.Parameter = id
-			DB.Query
-			If DB.Error.IsInitialized Then
-				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+			
+			Dim Found As Boolean = Model.FindProductByCategoryId(id)
+			If Model.Error.IsInitialized Then
+				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
 			End If
-			If DB.Found Then
+			If Found Then
 				ShowAlert("Cannot delete category with associated products!", "warning")
 				Return
 			End If
+			
 			' Delete row
-			DB.Open
-			DB.Table = "tbl_categories"
-			DB.Id = id
-			DB.Delete
-			If DB.Error.IsInitialized Then
-				ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+			Model.Delete(id)
+			If Model.Error.IsInitialized Then
+				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Category", "deleted", "Category deleted successfully!", "danger")
@@ -253,22 +221,17 @@ Private Sub LoadFromCache (Key As String) As String
 End Sub
 
 Private Sub CategoriesTable As String
-	DB.Open
-	DB.Table = "tbl_categories"
-	DB.Columns = Array("id", "category_name AS name")
-	DB.OrderBy = CreateMap("id": "DESC")
-	DB.Query
-	If DB.Error.IsInitialized Then
-		ShowAlert($"Database error: ${DB.Error.Message}"$, "danger")
+	Dim Rows As List = Model.Read
+	If Model.Error.IsInitialized Then
+		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 		Return "              <tbody></tbody>"
 	End If
-	
 	Dim SB As StringBuilder
 	SB.Initialize
 	SB.Append(CRLF).Append("              <tbody>")
-	For Each row As Map In DB.Results
+	For Each Row As Map In Rows
 		Dim elem_row As String = LoadFromCache("/hx/categories/table/row")
-		elem_row = WebApiUtils.ReplaceMap(elem_row, row)
+		elem_row = WebApiUtils.ReplaceMap(elem_row, Row)
 		SB.Append(CRLF).Append("                " & elem_row)
 	Next
 	SB.Append(CRLF).Append("              </tbody>")

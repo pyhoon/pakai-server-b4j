@@ -5,19 +5,19 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Api Handler class
-' Version 6.70
+' Version 6.80
 Sub Class_Globals
-	Private DB As MiniORM
-	Private HRM As HttpResponseMessage
-	Private Request As ServletRequest
-	Private Response As ServletResponse
 	Private Path As String
 	Private Method As String
+	Private Request As ServletRequest
+	Private Response As ServletResponse
+	Private HRM As HttpResponseMessage
+	Private Model As ProductsModel
 End Sub
 
 Public Sub Initialize
-	DB = Main.DB
 	HRM = Main.HRM
+	Model.Initialize
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -42,15 +42,13 @@ End Sub
 
 Private Sub GetProducts
 	Log($"${Method}: ${Path}"$)
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Query
-	If DB.Error.IsInitialized Then
+	Dim Data As List = Model.Read
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
+		HRM.ResponseError = Model.Error.Message
 	Else
 		HRM.ResponseCode = 200
-		HRM.ResponseData = DB.Results
+		HRM.ResponseData = Data
 	End If
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
@@ -66,16 +64,14 @@ Private Sub GetProductById
 		Return
 	End Try
 	
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Find(id)
-	If DB.Error.IsInitialized Then
+	Dim Row As Map = Model.GetRowById(id)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
+		HRM.ResponseError = Model.Error.Message
 	Else
-		If DB.Found Then
+		If Model.Found Then
 			HRM.ResponseCode = 200
-			HRM.ResponseObject = DB.First
+			HRM.ResponseObject = Row
 		Else
 			HRM.ResponseCode = 404
 			HRM.ResponseError = "Product not found"
@@ -110,19 +106,20 @@ Private Sub PostProduct
 		End If
 	Next
 	
+	Dim category_id As Int = data.Get("category_id")
+	Dim product_code As String = data.Get("product_code")
+	Dim product_name As String = data.Get("product_name")
+	Dim product_price As Double = data.GetDefault("product_price", 0)
+	
 	' Check conflict product code
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Conditions = Array("product_code = ?")
-	DB.Parameters = Array(data.Get("product_code"))
-	DB.Query
-	If DB.Error.IsInitialized Then
+	Dim Found As Boolean = Model.FindRowByProductCode(product_code)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
+		HRM.ResponseError = Model.Error.Message
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
-	If DB.Found Then
+	If Found Then
 		HRM.ResponseCode = 409
 		HRM.ResponseError = "Product already exist"
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
@@ -130,29 +127,18 @@ Private Sub PostProduct
 	End If
 	
 	' Insert new row
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Columns = Array("category_id", _
-	"product_code", _
-	"product_name", _
-	"product_price", _
-	"created_date")
-	DB.Parameters = Array(data.Get("category_id"), _
-	data.Get("product_code"), _
-	data.Get("product_name"), _
-	data.GetDefault("product_price", 0), _
-	data.GetDefault("created_date", WebApiUtils.CurrentDateTime))
-	DB.ReturnRow = True
-	DB.Save
-	If DB.Error.IsInitialized Then
+	Model.Create(category_id, product_code, product_name, product_price, WebApiUtils.CurrentDateTime)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
-	Else
-		' Retrieve new row
-		HRM.ResponseCode = 201
-		HRM.ResponseObject = DB.First
-		HRM.ResponseMessage = "Product created successfully"
+		HRM.ResponseError = Model.Error.Message
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
 	End If
+	
+	' Retrieve new row
+	HRM.ResponseCode = 201
+	HRM.ResponseObject = Model.First
+	HRM.ResponseMessage = "Product created successfully"
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -191,68 +177,55 @@ Private Sub PutProductById
 		End If
 	Next
 	
-	' Check conflict product code
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Conditions = Array("product_code = ?", "id <> ?")
-	DB.Parameters = Array(data.Get("product_code"), id)
-	DB.Query
-	If DB.Error.IsInitialized Then
-		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
-		WebApiUtils.ReturnHttpResponse(HRM, Response)
-		Return
-	End If
-	If DB.Found Then
-		HRM.ResponseCode = 409
-		HRM.ResponseError = "Product Code already exist"
-		WebApiUtils.ReturnHttpResponse(HRM, Response)
-		Return
-	End If
-	
 	' Find row by id
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Find(id)
-	If DB.Error.IsInitialized Then
+	Dim Found As Boolean = Model.FindRowById(id)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
+		HRM.ResponseError = Model.Error.Message
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
-	If DB.Found = False Then
+	If Not(Found) Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
 	
-	' Update row by id
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Columns = Array("category_id", _
-	"product_code", _
-	"product_name", _
-	"product_price", _
-	"modified_date")
-	DB.Parameters = Array(data.Get("category_id"), _
-	data.Get("product_code"), _
-	data.Get("product_name"), _
-	data.GetDefault("product_price", 0), _
-	data.GetDefault("modified_date", WebApiUtils.CurrentDateTime))
-	DB.Condition = "id = ?"
-	DB.Parameter = id
-	DB.ReturnRow = True
-	DB.Save
-	If DB.Error.IsInitialized Then
+	Dim category_id As Int = data.Get("category_id")
+	Dim product_code As String = data.Get("product_code")
+	Dim product_name As String = data.Get("product_name")
+	Dim product_price As Double = data.GetDefault("product_price", 0)
+	
+	' Check conflict product code
+	Dim Found As Boolean = Model.FindRowByProductCodeNotEqualId(product_code, id)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
-	Else
-		' Return updated row
-		HRM.ResponseCode = 200
-		HRM.ResponseMessage = "Product updated successfully"
-		HRM.ResponseObject = DB.First
+		HRM.ResponseError = Model.Error.Message
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
 	End If
+	If Found Then
+		HRM.ResponseCode = 409
+		HRM.ResponseError = "Product Code already exist"
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+	
+	' Update row by id
+	Model.Update(id, category_id, product_code, product_name, product_price, WebApiUtils.CurrentDateTime)
+	If Model.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = Model.Error.Message
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+
+	' Return updated row
+	HRM.ResponseCode = 200
+	HRM.ResponseMessage = "Product updated successfully"
+	HRM.ResponseObject = Model.First
+
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
@@ -268,16 +241,14 @@ Private Sub DeleteProductById
 	End Try
 	
 	' Find row by id
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Find(id)
-	If DB.Error.IsInitialized Then
+	Dim Found As Boolean = Model.FindRowById(id)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
+		HRM.ResponseError = Model.Error.Message
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
-	If DB.Found = False Then
+	If Not(Found) Then
 		HRM.ResponseCode = 404
 		HRM.ResponseError = "Product not found"
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
@@ -285,16 +256,14 @@ Private Sub DeleteProductById
 	End If
 	
 	' Delete row
-	DB.Open
-	DB.Table = "tbl_products"
-	DB.Id = id
-	DB.Delete
-	If DB.Error.IsInitialized Then
+	Model.Delete(id)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
-	Else
-		HRM.ResponseCode = 200
-		HRM.ResponseMessage = "Product deleted successfully"
+		HRM.ResponseError = Model.Error.Message
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
 	End If
+	HRM.ResponseCode = 200
+	HRM.ResponseMessage = "Product deleted successfully"
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub

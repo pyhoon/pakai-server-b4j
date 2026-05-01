@@ -5,19 +5,19 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Find Api Handler class
-' Version 6.70
+' Version 6.80
 Sub Class_Globals
-	Private DB As MiniORM
-	Private HRM As HttpResponseMessage
-	Private Request As ServletRequest
-	Private Response As ServletResponse
 	Private Path As String
 	Private Method As String
+	Private Request As ServletRequest
+	Private Response As ServletResponse
+	Private HRM As HttpResponseMessage
+	Private Model As ProductsModel
 End Sub
 
 Public Sub Initialize
-	DB = Main.DB
 	HRM = Main.HRM
+	Model.Initialize
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -38,18 +38,13 @@ End Sub
 
 Private Sub GetAllProducts
 	Log($"${Method}: ${Path}"$)
-	DB.Open
-	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join("", "tbl_categories c", Array("p.category_id = c.id"))
-	DB.OrderBy = CreateMap("p.id": "")
-	DB.Query
-	If DB.Error.IsInitialized Then
+	Dim Data As List = Model.Read
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
+		HRM.ResponseError = Model.Error.Message
 	Else
 		HRM.ResponseCode = 200
-		HRM.ResponseData = DB.Results
+		HRM.ResponseData = Data
 	End If
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
@@ -65,20 +60,13 @@ Public Sub GetProductsByCategoryId
 		Return
 	End Try
 	
-	DB.Open
-	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join("", "tbl_categories c", Array("p.category_id = c.id"))
-	DB.Condition = "c.id = ?"
-	DB.Parameter = id
-	DB.OrderBy = CreateMap("p.id": "")
-	DB.Query
-	If DB.Error.IsInitialized Then
+	Dim Data As List = Model.GetRowsByCategoryId(id)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
+		HRM.ResponseError = Model.Error.Message
 	Else
 		HRM.ResponseCode = 200
-		HRM.ResponseData = DB.Results
+		HRM.ResponseData = Data
 	End If
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
@@ -104,24 +92,15 @@ Public Sub SearchByKeywords
 		WebApiUtils.ReturnHttpResponse(HRM, Response)
 		Return
 	End If
-	Dim SearchForText As String = data.Get("keyword")
+	Dim keyword As String = data.Get("keyword")
 	
-	DB.Open
-	DB.Table = "tbl_products p"
-	DB.Columns = Array("p.id id", "p.category_id catid", "c.category_name category", "p.product_code code", "p.product_name name", "p.product_price price")
-	DB.Join("", "tbl_categories c", Array("p.category_id = c.id"))
-	If SearchForText <> "" Then
-		DB.Conditions = Array("p.product_code LIKE ? Or UPPER(p.product_name) LIKE ? Or UPPER(c.category_name) LIKE ?")
-		DB.Parameters = Array("%" & SearchForText & "%", "%" & SearchForText.ToUpperCase & "%", "%" & SearchForText.ToUpperCase & "%")
-	End If
-	DB.OrderBy = CreateMap("p.id": "")
-	DB.Query
-	If DB.Error.IsInitialized Then
+	Dim results As List = Model.Search(keyword)
+	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
-		HRM.ResponseError = DB.Error.Message
+		HRM.ResponseError = Model.Error.Message
 	Else
 		HRM.ResponseCode = 200
-		HRM.ResponseData = DB.Results
+		HRM.ResponseData = results
 	End If
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
