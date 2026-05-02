@@ -150,6 +150,6 @@ Private Sub BodyFooter As MiniHtml
 	Dim span1 As MiniHtml = MH.Span.up(caption1)
 	span1.sty("color: red")
 	MH.Icon.up(span1).cls("bi bi-heart")
-	caption1.text(" powered by B4X")
+	caption1.text(" in B4X")
 	Return footer1
 End Sub

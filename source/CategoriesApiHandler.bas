@@ -123,7 +123,7 @@ Private Sub PostCategory
 	End If
 	
 	' Insert new row
-	Model.Create(name, WebApiUtils.CurrentDateTime)
+	Model.Create(name, Main.CurrentDateTime)
 	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = Model.Error.Message
@@ -203,7 +203,7 @@ Private Sub PutCategoryById
 	End If
 	
 	' Update row by id
-	Model.Update(id, name, WebApiUtils.CurrentDateTime)
+	Model.Update(id, name, Main.CurrentDateTime)
 	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = Model.Error.Message

@@ -19,10 +19,11 @@ Library5=minijs
 Library6=miniormutils
 Library7=webapiutils
 Module1=CategoriesApiHandler
-Module10=ProductsApiHandler
-Module11=ProductsHandler
-Module12=ProductsModel
-Module13=ProductsView
+Module10=ORM
+Module11=ProductsApiHandler
+Module12=ProductsHandler
+Module13=ProductsModel
+Module14=ProductsView
 Module2=CategoriesHandler
 Module3=CategoriesModel
 Module4=CategoriesView
@@ -33,14 +34,14 @@ Module8=MainView
 Module9=MH
 NumberOfFiles=4
 NumberOfLibraries=7
-NumberOfModules=13
+NumberOfModules=14
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
-' Product:   Pakai Server
-' Version:   6.80
-' License:   MIT License
-' Developer: Poon Yip Hoon (Aeric)
+'Product:   Pakai Server
+'Version:   6.80
+'License:   MIT License
+'Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
 #MergeLibraries: True
 #End Region
@@ -51,10 +52,6 @@ Version=10.5
 #Else
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
-#Region  Tools
-' libget: https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar
-' modgen: https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar
-#End Region
 #Region  Macros
 '1 - Create $APPNAME$.b4j
 '2 - Open $APPNAME$.b4j
@@ -62,26 +59,25 @@ Version=10.5
 '3 - Create Pakai Server (6.80).b4xtemplate
 '4 - Copy to B4J Additional Libraries folder
 '5 - Check Release folder
-#Macro: Title, Step 1, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\Pakai-Server.b4j&args=%PROJECT%\$APPNAME$.b4j
+#Macro: Title, Step 1, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\Pakai-Server.b4j&Args=%PROJECT%\$APPNAME$.b4j
 #Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
-#Macro: Title, Step 3, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&args=-cMf&args=%PROJECT%\..\release\Pakai+Server+(6.80).b4xtemplate&args=Files&args=$APPNAME$.*&args=CategoriesHandler.bas&args=ProductsHandler.bas&args=HelpHandler.bas&args=*Model.bas&args=*View.bas&args=MH.bas&args=HttpsFilter.bas&args=*ApiHandler.bas&args=libs.json&args=res.json&args=..\LICENSE&args=Objects\www\assets\img&args=Objects\www\assets\css\main.css&args=Objects\www\assets\js\app.js
-#Macro: Title, Step 4, ide://run?file=%COMSPEC%&args=/c&args=copy&args=%PROJECT%\..\release\Pakai+Server+(6.80).b4xtemplate&args=%ADDITIONAL%
-#Macro: Title, Step 5, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\..\release
+#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+(6.80).b4xtemplate&Args=Files&Args=$APPNAME$.*&Args=CategoriesHandler.bas&Args=ProductsHandler.bas&Args=HelpHandler.bas&Args=*Model.bas&Args=*View.bas&Args=MH.bas&Args=ORM.bas&Args=HttpsFilter.bas&Args=*ApiHandler.bas&Args=libs.json&Args=res.json&Args=..\LICENSE&Args=Objects\www\assets\img&Args=Objects\www\assets\css\main.css&Args=Objects\www\assets\js\app.js
+#Macro: Title, Step 4, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\..\release\Pakai+Server+(6.80).b4xtemplate&Args=%ADDITIONAL%
+#Macro: Title, Step 5, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
 'For release
-#Macro: Title, GetLibraries, ide://run?file=%ADDITIONAL%\libget.jar&args=%PROJECT%&librariesrefresh=True
-#Macro: Title, ModelGenerator, ide://run?file=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
-'#Macro: Title, Backup, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&args=Files&args=Objects\www&args=Objects\config.ini&args=Objects\LICENSE&args=*.bas&args=*.b4j&args=*.b4j.meta&args=libs.json
-'#Macro: Title, Distribute, ide://run?file=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&args=-cMf&args=Dist.zip&args=www&args=*.jar&args=*.ini
-'#Macro: Title, Objects, ide://run?file=%WINDIR%\SysWOW64\explorer.exe&args=%PROJECT%\Objects
+#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
+#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
+'#Macro: Title, Backup, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&Args=Files&Args=Objects\www&Args=Objects\config.ini&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
+'#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
+'#Macro: Title, Distribute, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&Args=-cMf&Args=Dist.zip&Args=www&Args=*.jar&Args=*.ini
 #End Region
+'Download tools:
+'<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link> | <link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 Sub Process_Globals
-	Public DB 				As MiniORM
-	Public App 				As EndsMeet
-	Public Api 				As ApiSettings
-	Public DBS 				As MiniORMSettings
-	Public Const VERSION 	As String = "6.80"
-	Public Const COLOR_RED 	As Int = 0xFFFF0000
-	Public Const COLOR_BLUE As Int = 0xFF0000FF
+	Public DB 	As MiniORM
+	Public App 	As EndsMeet
+	Public Api	As ApiSettings
+	Public Const APP_VERSION As String = "1.00"
 	Type AlertInfo (Message As String, Status As String)
 	Type ToastInfo (Entity As String, Action As String, Message As String, Status As String)
 End Sub
@@ -96,6 +92,7 @@ Sub AppStart (Args() As String)
 	'App.ssl.Enabled = True
 	'App.RedirectToHttps = True
 	#End If
+	
 	' Frontend using HTMX and AlpineJS
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
@@ -103,25 +100,25 @@ Sub AppStart (Args() As String)
 	App.Rest("/hx/categories/*", "CategoriesHandler")
 	
 	' For REST API
-	Api = App.api
 	App.Route("/api/find", "FindApiHandler", Array("get", "post"))
 	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
 	App.Rest("/api/products/*", "ProductsApiHandler")
 	App.Rest("/api/categories/*", "CategoriesApiHandler")
 	App.Get("/help", "HelpHandler")
-	Api.EnableHelp = True
 	
 	App.Start
 	App.LogStartupMessage
-	App.ctx.Put("VERSION", VERSION)
-	Log($"App version: ${VERSION}"$)
+	App.ctx.Put("VERSION", APP_VERSION)
+	Log($"App version: ${APP_VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
-	InitDatabase
+	
+	Api = App.api
+	Api.EnableHelp = True
+	ORM.InitDatabase
 	StartMessageLoop
 End Sub
 
-' Initialize global HttpResponseMessage instance
 Public Sub HRM As HttpResponseMessage
 	Dim HRM1 As HttpResponseMessage
 	HRM1.Initialize
@@ -130,145 +127,6 @@ Public Sub HRM As HttpResponseMessage
 	HRM1.ContentType = Api.ContentType
 	HRM1.PayloadType = Api.PayloadType
 	Return HRM1
-End Sub
-
-Private Sub InitDatabase
-	Try
-		Dim dbvar As String = "sqlite"
-		#If MariaDB
-		Dim dbvar As String = "mariadb"
-		#End If
-		#If MySQL
-		Dim dbvar As String = "mysql"
-		#End If
-		If File.Exists(File.DirApp, $"${dbvar}.ini"$) = False Then
-			File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)
-		End If
-		Dim ctx As Map = File.ReadMap(File.DirApp, $"${dbvar}.ini"$)
-		DB.Initialize
-		'DB.ShowExtraLogs = True
-		DBS.Initialize
-		DBS.DBType = ctx.GetDefault("DbType", "")
-		Select DBS.DBType
-			Case DB.MARIADB, DB.MYSQL
-				DBS.DBHost = ctx.GetDefault("DbHost", "")
-				DBS.DBPort = ctx.GetDefault("DbPort", "")
-				DBS.DBName = ctx.GetDefault("DbName", "")
-				DBS.Driver = ctx.GetDefault("DriverClass", "")
-				DBS.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
-				DBS.User = ctx.GetDefault("User", "")
-				DBS.Password = ctx.GetDefault("Password", "")
-				DBS.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
-			Case DB.SQLITE
-				DBS.DBDir = ctx.GetDefault("DbDir", File.DirApp)
-				DBS.DBFile = ctx.GetDefault("DbFile", "Pakai.db")
-				DBS.JournalMode = "WAL"
-			Case Else
-				LogColor($"${DBS.DBType} not supported!"$, COLOR_RED)
-				Log("Application is terminated.")
-				ExitApplication
-		End Select
-		DB.Settings = DBS
-
-		LogColor("Checking database...", COLOR_BLUE)
-		Select DB.DbType
-			Case DB.SQLITE
-				Dim DBExist As Boolean = DB.Exist
-			Case DB.MARIADB, DB.MYSQL
-				Wait For (DB.InitSchemaAsync) Complete (Success As Boolean)
-				If Success = False Then
-					LogColor("Database initilialization failed!", COLOR_RED)
-					Log("Application is terminated.")
-					ExitApplication
-				End If
-				If DB.Test = False Then
-					LogColor("Database connection test failed!", COLOR_RED)
-					Log("Application is terminated.")
-					ExitApplication
-				End If
-				Wait For (DB.ExistAsync) Complete (DBExist As Boolean)
-			Case Else
-				LogColor("Database type is unknown!", COLOR_RED)
-				ExitApplication
-		End Select
-		If DBExist = False Then
-			LogColor($"${DB.DbType} database not existed!"$, COLOR_RED)
-			CreateDatabase
-			Return
-		End If
-		LogColor($"${DB.DbType} database existed!"$, COLOR_BLUE)
-		If UsePool(DB.DbType) Then
-			DB.InitPool
-		End If
-		' Create new tables after database has already created
-		'UsersModel.CreateUsersTable
-	Catch
-		LogError(LastException.Message)
-		LogColor("Error checking database!", COLOR_RED)
-		Log("Application is terminated.")
-		ExitApplication
-	End Try
-End Sub
-
-Public Sub UsePool (Name As String) As Boolean
-	Dim DbArray() As String = Array As String(DB.MARIADB, DB.MYSQL)
-	Return DbArray.As(List).IndexOf(Name) > -1
-End Sub
-
-' Create Database Tables and Populate Data
-Private Sub CreateDatabase
-	LogColor("Creating database...", COLOR_BLUE)
-	If UsePool(DB.DbType) Then
-		Wait For (DB.CreateDatabaseAsync) Complete (Success As Boolean)
-	Else
-		Dim Success As Boolean = DB.CreateSQLite
-	End If
-	If Not(Success) Then
-		LogColor("Database creation failed!", COLOR_RED)
-		Return
-	End If
-	
-	LogColor("Creating tables...", COLOR_BLUE)
-	If UsePool(DB.DbType) Then
-		DB.InitPool
-	End If
-
-	DB.ShowExtraLogs = True
-	DB.UseTimestamps = True
-	DB.QueryExecute = False
-	DB.QueryAddToBatch = True
-	
-	DB.Table = "tbl_categories"
-	DB.Columns.Add(CreateMap("Name": "category_name", "Null": False))
-	DB.Create
-
-	DB.Columns = Array("category_name")
-	DB.Inserts = Array("Hardwares")
-	DB.Inserts = Array("Toys")
-
-	DB.Table = "tbl_products"
-	DB.Columns.Add(CreateMap("Name": "category_id", "Type": DB.INTEGER, "Null": False))
-	DB.Columns.Add(CreateMap("Name": "product_code", "Length": "12", "Null": False))
-	DB.Columns.Add(CreateMap("Name": "product_name", "Null": False))
-	DB.Columns.Add(CreateMap("Name": "product_price", "Type": DB.DECIMAL, "Length": "10,2", "Null": False, "Default": "0.00"))
-	DB.Columns.Add(CreateMap("Name": "product_image", "Type": DB.BLOB))
-	DB.Foreign = "category_id"
-	DB.References("tbl_categories", "id")
-	DB.Create
-	
-	DB.Columns = Array("category_id", "product_code", "product_name", "product_price")
-	DB.Inserts = Array(2, "T001", "Teddy Bear", 99.9)
-	DB.Inserts = Array(1, "H001", "Hammer", 15.75)
-	DB.Inserts = Array(2, "T002", "Optimus Prime", 1000)
-	
-	Wait For (DB.ExecuteBatchAsync) Complete (Success As Boolean)
-	If Success Then
-		LogColor("Database is created successfully!", COLOR_BLUE)
-	Else
-		LogColor("Database creation failed!", COLOR_RED)
-	End If
-	DB.Close
-	DB.QueryExecute = True
 End Sub
 
 Public Sub CurrentDateTime As String
