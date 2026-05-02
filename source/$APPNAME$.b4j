@@ -13,28 +13,17 @@ FileGroup4=config
 Group=App
 Library1=endsmeet
 Library2=jcore
-Library3=minicss
-Library4=minihtml
-Library5=minijs
-Library6=miniormutils
-Library7=webapiutils
-Module1=CategoriesApiHandler
-Module10=ORM
-Module11=ProductsApiHandler
-Module12=ProductsHandler
-Module13=ProductsModel
-Module14=ProductsView
-Module2=CategoriesHandler
-Module3=CategoriesModel
-Module4=CategoriesView
-Module5=FindApiHandler
-Module6=HelpHandler
-Module7=HttpsFilter
-Module8=MainView
-Module9=MH
+Library3=miniormutils
+Library4=webapiutils
+Module1=CategoriesModel
+Module2=CategoriesWebHandler
+Module3=HttpsFilter
+Module4=ORM
+Module5=ProductsModel
+Module6=ProductsWebHandler
 NumberOfFiles=4
-NumberOfLibraries=7
-NumberOfModules=14
+NumberOfLibraries=4
+NumberOfModules=6
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
@@ -58,12 +47,9 @@ Version=10.5
 'Download tools:
 '<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link> | <link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 Sub Process_Globals
-	Public DB 	As MiniORM
-	Public App 	As EndsMeet
-	Public Api	As ApiSettings
+	Public DB	As MiniORM
+	Public App	As EndsMeet
 	Public Const APP_VERSION As String = "1.00"
-	Type AlertInfo (Message As String, Status As String)
-	Type ToastInfo (Entity As String, Action As String, Message As String, Status As String)
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -78,17 +64,10 @@ Sub AppStart (Args() As String)
 	#End If
 	
 	' Frontend using HTMX and AlpineJS
-	App.Get("", "ProductsHandler")
-	App.Get("/categories", "CategoriesHandler")
-	App.Rest("/hx/products/*", "ProductsHandler")
-	App.Rest("/hx/categories/*", "CategoriesHandler")
-	
-	' For REST API
-	App.Route("/api/find", "FindApiHandler", Array("get", "post"))
-	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
-	App.Rest("/api/products/*", "ProductsApiHandler")
-	App.Rest("/api/categories/*", "CategoriesApiHandler")
-	App.Get("/help", "HelpHandler")
+	App.Get("", "ProductsWebHandler")
+	App.Get("/categories", "CategoriesWebHandler")
+	App.Rest("/hx/products/*", "ProductsWebHandler")
+	App.Rest("/hx/categories/*", "CategoriesWebHandler")
 	
 	App.Start
 	App.LogStartupMessage
@@ -97,20 +76,8 @@ Sub AppStart (Args() As String)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
 	
-	Api = App.api
-	Api.EnableHelp = True
 	ORM.InitDatabase
 	StartMessageLoop
-End Sub
-
-Public Sub HRM As HttpResponseMessage
-	Dim HRM1 As HttpResponseMessage
-	HRM1.Initialize
-	HRM1.VerboseMode = Api.VerboseMode
-	HRM1.OrderedKeys = Api.OrderedKeys
-	HRM1.ContentType = Api.ContentType
-	HRM1.PayloadType = Api.PayloadType
-	Return HRM1
 End Sub
 
 Public Sub CurrentDateTime As String
@@ -120,22 +87,4 @@ Public Sub CurrentDateTime As String
 	Dim Now As String = DateTime.Date(DateTime.Now)
 	DateTime.DateFormat = CurrentDateFormat
 	Return Now
-End Sub
-
-Public Sub CreateAlertInfo (Message As String, Status As String) As AlertInfo
-	Dim t1 As AlertInfo
-	t1.Initialize
-	t1.Message = Message
-	t1.Status = Status
-	Return t1
-End Sub
-
-Public Sub CreateToastInfo (Entity As String, Action As String, Message As String, Status As String) As ToastInfo
-	Dim t1 As ToastInfo
-	t1.Initialize
-	t1.Entity = Entity
-	t1.Action = Action
-	t1.Message = Message
-	t1.Status = Status
-	Return t1
 End Sub

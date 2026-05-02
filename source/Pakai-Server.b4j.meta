@@ -43,6 +43,6 @@ ModuleClosedNodes6=
 ModuleClosedNodes7=
 ModuleClosedNodes8=
 ModuleClosedNodes9=
-NavigationStack=Main,AppStart,75,6,Main,Process_Globals,40,3
+NavigationStack=Main,AppStart,75,6,Main,Process_Globals,40,3,ORM,InitDatabase,11,0
 SelectedBuild=0
 VisibleModules=
