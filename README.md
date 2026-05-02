@@ -1,6 +1,6 @@
 # Pakai Server - Web Application framework
 
-Version: 6.70
+Version: 6.80
 
 Create Web API or Application Backend Server using B4J project template
 
@@ -10,10 +10,10 @@ Create Web API or Application Backend Server using B4J project template
 ---
 
 ## Templates
-- Pakai Server (6.70).b4xtemplate
-- Pakai Server Api (6.70).b4xtemplate
-- Pakai Server Web (6.70).b4xtemplate
-- Pakai Server Starter (6.70).b4xtemplate
+- Pakai Server (6.80).b4xtemplate
+- Pakai Server Api (6.80).b4xtemplate
+- Pakai Server Web (6.80).b4xtemplate
+- Pakai Server Starter (6.80).b4xtemplate
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
@@ -43,14 +43,12 @@ Create Web API or Application Backend Server using B4J project template
 
 ### Code Example
 ```b4x
-Private Sub HandleModalAdd
-	Dim CacheName As String = "Categories Add Modal"
-	If ExistInCache(CacheName) = False Then
-		WriteToCache(CacheName, ModalAdd)
-	End If
-	Dim modal1 As MiniHtml = ReadFromCache(CacheName)
-	App.WriteHtml(Response, modal1.build)
-End Sub
+Dim CacheName As String = "Categories Add Modal"
+If ExistInCache(CacheName) = False Then
+	WriteToCache(CacheName, ModalAdd)
+End If
+Dim modal1 As MiniHtml = ReadFromCache(CacheName)
+Return modal1.build
 ```
 
 **Support this project**
