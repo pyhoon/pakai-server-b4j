@@ -15,7 +15,7 @@ End Sub
 
 Public Sub InitDatabase
 	Try
-		LogColor("Configuration database...", COLOR_BLUE)
+		LogColor("Configuring database...", COLOR_BLUE)
 		Dim dbvar As String = "sqlite"
 		#If MariaDB
 		Dim dbvar As String = "mariadb"
