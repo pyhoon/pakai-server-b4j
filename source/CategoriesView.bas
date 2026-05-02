@@ -52,17 +52,17 @@ Public Sub Modal (Action As String) As String
 			Dim CacheName As String = "Categories Add Modal"
 			If ExistInCache(CacheName) = False Then
 				WriteToCache(CacheName, ModalAdd)
-			End If			
+			End If
 		Case "Edit"
 			Dim CacheName As String = "Categories Edit Modal"
 			If ExistInCache(CacheName) = False Then
 				WriteToCache(CacheName, ModalEdit)
-			End If			
+			End If
 		Case "Delete"
 			Dim CacheName As String = "Categories Delete Modal"
 			If ExistInCache(CacheName) = False Then
 				WriteToCache(CacheName, ModalDelete)
-			End If			
+			End If
 	End Select
 	Dim modal1 As MiniHtml = ReadFromCache(CacheName)
 	Return modal1.build
@@ -251,13 +251,7 @@ Private Sub ModalAdd As MiniHtml
 	button2.cls("btn btn-secondary px-3")
 	button2.attr("data-bs-dismiss", "modal")
 	button2.text("Cancel")
-	
-	Dim CacheName As String = "Categories Add Modal"
-	If ExistInCache(CacheName) = False Then
-		WriteToCache(CacheName, form1)
-	End If
-	Dim modal1 As MiniHtml = ReadFromCache(CacheName)
-	Return modal1
+	Return form1
 End Sub
 
 Private Sub ModalEdit As MiniHtml
