@@ -14,7 +14,7 @@ Public Sub Initialize
 	DB = Main.DB
 End Sub
 
-Public Sub GetRowById (Id As Int) As Map	
+Public Sub GetRowById (Id As Int) As Map
 	DB.Open
 	DB.Table = "tbl_products"
 	DB.Columns = Array("id", "category_id", "product_code", "product_name", "product_price")

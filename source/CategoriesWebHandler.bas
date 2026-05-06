@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.80
+' Version 6.90
 Sub Class_Globals
 	Private App As EndsMeet
 	Private Path As String
@@ -13,7 +13,7 @@ Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private FileMap As Map
-	Private Model As CategoriesModel
+	Private Model As CategoriesRepo
 End Sub
 
 Public Sub Initialize
@@ -217,7 +217,7 @@ Private Sub CategoriesTable As String
 	For Each Row As Map In Rows
 		Row.Put("name", Row.Get("category_name"))
 		Dim elem_row As String = LoadFromCache("/hx/categories/table/row")
-		elem_row = WebApiUtils.ReplaceMap(elem_row, Row)
+		elem_row = WebUtils.ReplaceMap(elem_row, Row)
 		SB.Append(CRLF).Append("                " & elem_row)
 	Next
 	SB.Append(CRLF).Append("              </tbody>")

@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.80
+' Version 6.90
 Sub Class_Globals
 	Private App As EndsMeet
 	Private Path As String
@@ -13,7 +13,7 @@ Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private FileMap As Map
-	Private Model As ProductsModel
+	Private Model As ProductsRepo
 End Sub
 
 Public Sub Initialize
@@ -63,7 +63,7 @@ End Sub
 
 ' Add modal
 Private Sub HandleAddModal
-	Dim CM As CategoriesModel
+	Dim CM As CategoriesRepo
 	CM.Initialize
 	Dim Categories As List = CM.Read
 	If CM.Error.IsInitialized Then
@@ -102,7 +102,7 @@ Private Sub HandleEditModal
 		Return
 	End Try
 
-	Dim CM As CategoriesModel
+	Dim CM As CategoriesRepo
 	CM.Initialize
 	Dim Categories As List = CM.Read
 	If CM.Error.IsInitialized Then
@@ -114,7 +114,7 @@ Private Sub HandleEditModal
 		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 		Return
 	End If
-	If Model.Found Then
+	If Product.Size > 0 Then
 		Dim select1 As StringBuilder
 		select1.Initialize
 		select1.Append(CRLF).Append($"      <select class="form-select" id="category2" name="category" required>"$)
@@ -136,7 +136,7 @@ Private Sub HandleEditModal
 	Product.Put("price", NumberFormat2(Product.Get("product_price"), 1, 2, 2, False))
 	Dim EditModal As String = LoadFromCache("/hx/products/edit")
 	
-	EditModal = WebApiUtils.ReplaceMap(EditModal, Product)
+	EditModal = WebUtils.ReplaceMap(EditModal, Product)
 	EditModal = EditModal.Replace($"<select class="form-select" id="category2" name="category" required></select>"$, select1.ToString)
 	App.WriteHtml(Response, EditModal)
 End Sub
@@ -294,7 +294,7 @@ Private Sub ProductsTable As String
 		row.Put("category", row.Get("category_name"))
 		row.Put("price", NumberFormat2(row.Get("product_price"), 1, 2, 2, False))
 		Dim elem_row As String = LoadFromCache("/hx/products/table/row")
-		elem_row = WebApiUtils.ReplaceMap(elem_row, row)
+		elem_row = WebUtils.ReplaceMap(elem_row, row)
 		SB.Append(CRLF).Append("                " & elem_row)
 	Next
 	SB.Append(CRLF).Append("              </tbody>")
