@@ -51,7 +51,7 @@ Version=10.5
 '5 - Check Release folder
 #Macro: Title, Step 1, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\Pakai-Server-Starter.b4j&Args=%PROJECT%\$APPNAME$.b4j
 #Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
-#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+Starter+(6.90).b4xtemplate&Args=Files&Args=$APPNAME$.*&Args=*WebHandler.bas&Args=*Model.bas&Args=ORM.bas&Args=HttpsFilter.bas&Args=libs.json&Args=res.json&Args=..\LICENSE&Args=Objects\www\assets\img&Args=Objects\www\assets\css\main.css&Args=Objects\www\assets\js\app.js&Args=Objects\categories*.html&Args=Objects\products*.html
+#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+Starter+(6.90).b4xtemplate&Args=Files&Args=$APPNAME$.*&Args=*WebHandler.bas&Args=*Repo.bas&Args=SQL.bas&Args=WebUtils.bas&Args=HttpsFilter.bas&Args=libs.json&Args=res.json&Args=..\LICENSE&Args=Objects\www\assets\img&Args=Objects\www\assets\css\main.css&Args=Objects\www\assets\js\app.js&Args=Objects\categories*.html&Args=Objects\products*.html
 #Macro: Title, Step 4, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\..\release\Pakai+Server+Starter+(6.90).b4xtemplate&Args=%ADDITIONAL%
 #Macro: Title, Step 5, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
 'For release

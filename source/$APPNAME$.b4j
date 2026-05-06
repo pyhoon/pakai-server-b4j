@@ -11,19 +11,20 @@ FileGroup2=config
 FileGroup3=config
 FileGroup4=config
 Group=App
-Library1=endsmeet
-Library2=jcore
-Library3=miniormutils
-Library4=webapiutils
-Module1=CategoriesModel
+Library1=byteconverter
+Library2=endsmeet
+Library3=jcore
+Library4=jsql
+Module1=CategoriesRepo
 Module2=CategoriesWebHandler
 Module3=HttpsFilter
-Module4=ORM
-Module5=ProductsModel
-Module6=ProductsWebHandler
+Module4=ProductsRepo
+Module5=ProductsWebHandler
+Module6=SQL
+Module7=WebUtils
 NumberOfFiles=4
 NumberOfLibraries=4
-NumberOfModules=6
+NumberOfModules=7
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
@@ -47,8 +48,9 @@ Version=10.5
 'Download tools:
 '<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link> | <link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 Sub Process_Globals
-	Public DB	As MiniORM
+	Public DB	As SQL 
 	Public App	As EndsMeet
+	Public Pool As ConnectionPool
 	Public Const APP_VERSION As String = "1.00"
 End Sub
 
@@ -76,7 +78,8 @@ Sub AppStart (Args() As String)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
 	
-	ORM.InitDatabase
+	SQL.InitDatabase
+	SQL.CheckDatabase
 	StartMessageLoop
 End Sub
 

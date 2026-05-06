@@ -22,6 +22,6 @@ ModuleClosedNodes4=
 ModuleClosedNodes5=
 ModuleClosedNodes6=
 ModuleClosedNodes7=
-NavigationStack=SQL,CheckDatabase,117,6,CategoriesWebHandler,Class_Globals,9,0,CategoriesWebHandler,Initialize,14,0,Main,Process_Globals,38,0,Main,AppStart,66,0,SQL,CreateSQLite,197,0,SQL,InitDatabase,50,0,ProductsRepo,Class_Globals,2,0,ProductsRepo,Initialize,6,0,CategoriesRepo,Initialize,9,0
+NavigationStack=SQL,CheckDatabase,117,6,CategoriesWebHandler,Class_Globals,9,0,CategoriesWebHandler,Initialize,14,0,Main,Process_Globals,38,0,SQL,CreateSQLite,197,0,SQL,InitDatabase,50,0,ProductsRepo,Class_Globals,2,0,ProductsRepo,Initialize,6,0,CategoriesRepo,Initialize,9,0,Main,AppStart,66,0
 SelectedBuild=0
 VisibleModules=2,5,1,4
