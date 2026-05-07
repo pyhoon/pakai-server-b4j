@@ -2,7 +2,7 @@
 
 Version: 6.80
 
-Create Web API or Application Backend Server using B4J project template
+B4J Fullstack Server Application and Web API Framework
 
 ### Preview
 ![Index](pakai-index.png)
