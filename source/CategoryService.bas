@@ -1,5 +1,5 @@
 ﻿B4J=true
-Group=Handlers
+Group=BLL
 ModulesStructureVersion=1
 Type=Class
 Version=10.3
@@ -7,26 +7,17 @@ Version=10.3
 ' Categories Handler class
 ' Version 6.90
 Sub Class_Globals
-	Private App As EndsMeet
-	Private Path As String
-	Private Method As String
-	Private Request As ServletRequest
+	Private App      As EndsMeet
+	Private Path     As String
+	Private Method   As String
+	Private FileMap  As Map
+	Private Request  As ServletRequest
 	Private Response As ServletResponse
-	Private FileMap As Map
-	Private Model As CategoriesRepo
+	Private CR    	 As CategoryRepository
 End Sub
 
 Public Sub Initialize
 	App = Main.App
-	Model.Initialize
-End Sub
-
-Sub Handle (req As ServletRequest, resp As ServletResponse)
-	Request = req
-	Response = resp
-	Path = Request.RequestURI
-	Method = Request.Method.ToUpperCase
-	
 	FileMap.Initialize
 	FileMap.Put("/categories", "categories.html")
 	FileMap.Put("/hx/categories/table", "categories-table.html")
@@ -34,7 +25,13 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	FileMap.Put("/hx/categories/add", "categories-add.html")
 	FileMap.Put("/hx/categories/edit", "categories-edit.html")
 	FileMap.Put("/hx/categories/delete", "categories-delete.html")
-	
+End Sub
+
+Sub Handle (req As ServletRequest, resp As ServletResponse)
+	Request = req
+	Response = resp
+	Path = Request.RequestURI
+	Method = Request.Method.ToUpperCase	
 	Log($"${Method}: ${Path}"$)
 	If Path = "/categories" Then
 		RenderPage
@@ -76,9 +73,10 @@ Private Sub HandleEditModal
 		ShowAlert($"Error: ${LastException.Message}"$, "danger")
 		Return
 	End Try
-	Dim Row As Map = Model.GetRowById(id)
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+	CR.Initialize
+	Dim Row As Map = CR.GetRowById(id)
+	If CR.Error.IsInitialized Then
+		ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 		Return
 	End If
 	Dim EditModal As String = LoadFromCache("/hx/categories/edit")
@@ -95,9 +93,10 @@ Private Sub HandleDeleteModal
 		Return
 	End Try
 	
-	Dim Row As Map = Model.GetRowById(id)
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+	CR.Initialize
+	Dim Row As Map = CR.GetRowById(id)
+	If CR.Error.IsInitialized Then
+		ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 		Return
 	End If
 	Dim DeleteModal As String = LoadFromCache("/hx/categories/delete")
@@ -114,9 +113,10 @@ Private Sub HandleCategories
 				ShowAlert("Category name must be at least 2 characters long.", "warning")
 				Return
 			End If
-			Dim Found As Boolean = Model.FindRowByName(name)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			CR.Initialize
+			Dim Found As Boolean = CR.FindRowByName(name)
+			If CR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Found Then
@@ -124,9 +124,10 @@ Private Sub HandleCategories
 				Return
 			End If
 			' Insert new row
-			Model.Create(name, Main.CurrentDateTime)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			CR.Initialize
+			CR.Create(name, Main.CurrentDateTime)
+			If CR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Category", "created", "Category created successfully!", "success")
@@ -134,18 +135,20 @@ Private Sub HandleCategories
 			' Update
 			Dim id As Int = Request.GetParameter("id")
 			Dim name As String = Request.GetParameter("name")
-			Dim Found As Boolean = Model.FindRowById(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			CR.Initialize
+			Dim Found As Boolean = CR.FindRowById(id)
+			If CR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Not(Found) Then
 				ShowAlert("Category not found!", "warning")
 				Return
 			End If
-			Dim Found As Boolean = Model.FindRowByCategoryNameNotEqualId(name, id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			CR.Initialize
+			Dim Found As Boolean = CR.FindRowByCategoryNameNotEqualId(name, id)
+			If CR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Found Then
@@ -153,18 +156,20 @@ Private Sub HandleCategories
 				Return
 			End If
 			' Update row
-			Model.Update(id, name, Main.CurrentDateTime)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			CR.Initialize
+			CR.Update(id, name, Main.CurrentDateTime)
+			If CR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Category", "updated", "Category updated successfully!", "info")
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
-			Dim Found As Boolean = Model.FindRowById(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			CR.Initialize
+			Dim Found As Boolean = CR.FindRowById(id)
+			If CR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Not(Found) Then
@@ -172,9 +177,10 @@ Private Sub HandleCategories
 				Return
 			End If
 			
-			Dim Found As Boolean = Model.FindProductByCategoryId(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			CR.Initialize
+			Dim Found As Boolean = CR.FindProductByCategoryId(id)
+			If CR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Found Then
@@ -183,9 +189,10 @@ Private Sub HandleCategories
 			End If
 			
 			' Delete row
-			Model.Delete(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			CR.Initialize
+			CR.Delete(id)
+			If CR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Category", "deleted", "Category deleted successfully!", "danger")
@@ -196,7 +203,6 @@ Private Sub LoadFromCache (Key As String) As String
 	If App.ctx.ContainsKey(Key) Then
 		Return App.ctx.Get(Key)
 	End If
-	
 	Dim FileName As String = FileMap.Get(Key)
 	If File.Exists(File.DirApp, FileName) Then
 		Dim element As String = File.ReadString(File.DirApp, FileName)
@@ -206,9 +212,10 @@ Private Sub LoadFromCache (Key As String) As String
 End Sub
 
 Private Sub CategoriesTable As String
-	Dim Rows As List = Model.Read
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+	CR.Initialize
+	Dim Rows As List = CR.Read
+	If CR.Error.IsInitialized Then
+		ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 		Return "              <tbody></tbody>"
 	End If
 	Dim SB As StringBuilder

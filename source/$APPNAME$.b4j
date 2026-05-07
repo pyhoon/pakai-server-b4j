@@ -15,12 +15,12 @@ Library1=byteconverter
 Library2=endsmeet
 Library3=jcore
 Library4=jsql
-Module1=CategoriesRepo
-Module2=CategoriesWebHandler
-Module3=HttpsFilter
-Module4=ProductsRepo
-Module5=ProductsWebHandler
-Module6=SQL
+Module1=CategoryRepository
+Module2=CategoryService
+Module3=DAL
+Module4=HttpsFilter
+Module5=ProductRepository
+Module6=ProductService
 Module7=WebUtils
 NumberOfFiles=4
 NumberOfLibraries=4
@@ -39,6 +39,7 @@ Version=10.5
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
 #Region  Macros
+#Macro: Title, CloseDB, ide://run?File=%ADDITIONAL%\closedb.jar
 #Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
 #Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
 '#Macro: Title, Backup, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&Args=Files&Args=Objects\www&Args=Objects\config.ini&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
@@ -66,10 +67,10 @@ Sub AppStart (Args() As String)
 	#End If
 	
 	' Frontend using HTMX and AlpineJS
-	App.Get("", "ProductsWebHandler")
-	App.Get("/categories", "CategoriesWebHandler")
-	App.Rest("/hx/products/*", "ProductsWebHandler")
-	App.Rest("/hx/categories/*", "CategoriesWebHandler")
+	App.Get("", "ProductService")
+	App.Get("/categories", "CategoryService")
+	App.Rest("/hx/products/*", "ProductService")
+	App.Rest("/hx/categories/*", "CategoryService")
 	
 	App.Start
 	App.LogStartupMessage
@@ -78,8 +79,8 @@ Sub AppStart (Args() As String)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
 	
-	SQL.InitDatabase
-	SQL.CheckDatabase
+	DAL.InitDatabase
+	DAL.CheckDatabase
 	StartMessageLoop
 End Sub
 

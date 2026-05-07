@@ -1,5 +1,5 @@
 ﻿B4J=true
-Group=Repositories
+Group=DAL
 ModulesStructureVersion=1
 Type=Class
 Version=10.5
@@ -18,6 +18,15 @@ Public Sub Initialize
 	#End If	
 End Sub
 
+' Close SQL object
+Public Sub Finalize
+	#If MARIADB Or MYSQL
+	If Initialized(SQL1) Then SQL1.Close
+	#Else
+	Return
+	#End If	
+End Sub
+
 Public Sub GetRowById (Id As Int) As Map
 	Dim row As Map
 	Dim query As String = "SELECT id, category_id, product_code, product_name, product_price FROM tbl_products WHERE id = ?"
@@ -31,6 +40,7 @@ Public Sub GetRowById (Id As Int) As Map
 		row.Put("product_price", rs.GetString("product_price"))
 	Loop
 	rs.Close
+	Finalize
 	Return row
 End Sub
 
@@ -51,6 +61,7 @@ Public Sub GetRowsByCategoryId (Category_Id As Int) As List
 		rows.Add(row)
 	Loop
 	rs.Close
+	Finalize
 	Return rows
 End Sub
 
@@ -62,6 +73,7 @@ Public Sub FindRowById (Id As Int) As Boolean
 		Found = True
 	Loop
 	rs.Close
+	Finalize
 	Return Found
 End Sub
 
@@ -73,6 +85,7 @@ Public Sub FindRowByProductCode (Code As String) As Boolean
 		found = True
 	Loop
 	rs.Close
+	Finalize
 	Return found
 End Sub
 
@@ -84,6 +97,7 @@ Public Sub FindRowByProductCodeNotEqualId (Code As String, Id As Int) As Boolean
 		found = True
 	Loop
 	rs.Close
+	Finalize
 	Return found
 End Sub
 
@@ -112,6 +126,7 @@ Public Sub Search (keyword As String) As List
 		rows.Add(row)
 	Loop
 	rs.Close
+	Finalize
 	Return rows
 End Sub
 
@@ -120,8 +135,16 @@ Public Sub Error As Exception
 End Sub
 
 Public Sub Create (Category As Int, Code As String, Name As String, Price As Double, Created_Date As String)
-	Dim query As String = "INSERT INTO tbl_products (category_id, product_code, product_name, product_price) VALUES (?, ?, ?, ?)"
-	SQL1.ExecNonQuery2(query, Array(Category, Code, Name, Price))
+	Try
+		Dim query As String = "INSERT INTO tbl_products (category_id, product_code, product_name, product_price) VALUES (?, ?, ?, ?)"
+		SQL1.BeginTransaction
+		SQL1.ExecNonQuery2(query, Array(Category, Code, Name, Price))
+		SQL1.TransactionSuccessful
+	Catch
+		Log(LastException.Message)
+		SQL1.RollBack
+	End Try
+	Finalize
 End Sub
 
 Public Sub Read As List
@@ -141,15 +164,32 @@ Public Sub Read As List
 		rows.Add(row)
 	Loop
 	rs.Close
+	Finalize
 	Return rows
 End Sub
 
 Public Sub Update (Id As Int, Category As Int, Code As String, Name As String, Price As Double, Modified_Date As String)
-	Dim query As String = "UPDATE tbl_products SET category_id = ?, product_code = ?, product_name = ?, product_price = ? WHERE id = ?"
-	SQL1.ExecNonQuery2(query, Array(Category, Code, Name, Price, Id))
+	Try
+		Dim query As String = "UPDATE tbl_products SET category_id = ?, product_code = ?, product_name = ?, product_price = ? WHERE id = ?"
+		SQL1.BeginTransaction
+		SQL1.ExecNonQuery2(query, Array(Category, Code, Name, Price, Id))
+		SQL1.TransactionSuccessful
+	Catch
+		Log(LastException.Message)
+		SQL1.RollBack
+	End Try
+	Finalize
 End Sub
 
 Public Sub Delete (Id As Int)
-	Dim query As String = "DELETE FROM tbl_products WHERE id = ?"
-	SQL1.ExecNonQuery2(query, Array(Id))
+	Try
+		Dim query As String = "DELETE FROM tbl_products WHERE id = ?"
+		SQL1.BeginTransaction
+		SQL1.ExecNonQuery2(query, Array(Id))
+		SQL1.TransactionSuccessful
+	Catch
+		Log(LastException.Message)
+		SQL1.RollBack
+	End Try
+	Finalize
 End Sub

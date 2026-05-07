@@ -4,7 +4,7 @@ ModulesStructureVersion=1
 Type=StaticCode
 Version=10.5
 @EndOfDesignText@
-' ORM module
+' DAL module
 ' Version 6.90
 Sub Process_Globals
 	Private SQL1 As SQL
@@ -52,16 +52,16 @@ Public Sub InitDatabase
 				 'MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
 				SQL1.Initialize2(Driver, JdbcUrl, User, Password)
 			Case "SQLITE"
-				DBDir = ctx.GetDefault("DbDir", File.DirApp)
+				DBDir = ctx.GetDefault("DbDir", "")
+				DBFile = ctx.GetDefault("DbFile", "")
 				If DBDir = "" Then DBDir = File.DirApp
-				DBFile = ctx.GetDefault("DbFile", "Pakai.db")
+				If DBFile = "" Then DBFile = "pakai.db"
 				Main.DB = SQL1
 			Case Else
 				LogColor($"${DBType} not supported!"$, COLOR_RED)
 				Log("Application is terminated.")
 				ExitApplication
 		End Select
-		'CheckDatabase
 	Catch
 		LogError(LastException.Message)
 		LogColor("Error initialize database!", COLOR_RED)
@@ -96,11 +96,11 @@ Public Sub CheckDatabase
 				End If
 				Dim DBExist As Boolean
 				Dim qry As String = "SELECT * FROM SCHEMATA WHERE SCHEMA_NAME = ?"
-				Dim RS As ResultSet = SQL1.ExecQuery2(qry, Array As String(DBName))
-				Do While RS.NextRow
+				Dim rs As ResultSet = SQL1.ExecQuery2(qry, Array As String(DBName))
+				Do While rs.NextRow
 					DBExist = True
 				Loop
-				RS.Close
+				rs.Close
 			Case Else
 				LogColor("Database type is unknown!", COLOR_RED)
 				ExitApplication
@@ -120,6 +120,7 @@ Public Sub CheckDatabase
 			Main.DB = ConnectionPool.GetConnection
 		Else
 			SQL1.InitializeSQLite(DBDir, DBFile, False)
+			SQL1.ExecQuerySingleResult("PRAGMA journal_mode = WAL")
 			Main.DB = SQL1
 		End If
 		' Create new tables after database has already created
@@ -156,7 +157,7 @@ Private Sub CreateDatabase
 		Main.Pool = ConnectionPool
 	End If
 	
-	If UsePool(DBType) Then	
+	If UsePool(DBType) Then
 		Dim query As String = "CREATE TABLE tbl_categories (id int NOT NULL AUTO_INCREMENT, category_name varchar(255) NOT NULL, created_date timestamp DEFAULT CURRENT_TIMESTAMP, modified_date datetime ON UPDATE CURRENT_TIMESTAMP, deleted_date datetime)"
 	Else
 		Dim query As String = "CREATE TABLE tbl_categories (id INTEGER, category_name TEXT NOT NULL, created_date TEXT DEFAULT (datetime('now')), modified_date TEXT, deleted_date TEXT, PRIMARY KEY(id AUTOINCREMENT))"
@@ -172,7 +173,6 @@ Private Sub CreateDatabase
 	Else
 		Dim query As String = "CREATE TABLE tbl_products (id INTEGER, category_id INTEGER, product_code TEXT NOT NULL, product_name TEXT NOT NULL, product_price NUMERIC NOT NULL DEFAULT (0.00), product_image BLOB, created_date TEXT DEFAULT (datetime('now')), modified_date TEXT, deleted_date TEXT, PRIMARY KEY(id AUTOINCREMENT), FOREIGN KEY (category_id) REFERENCES tbl_categories (id))"
 	End If
-	Log(query)
 	SQL1.AddNonQueryToBatch(query, Null)
 	
 	Dim query As String = "INSERT INTO tbl_products (category_id, product_code, product_name, product_price) VALUES (?, ?, ?, ?)"
@@ -187,20 +187,13 @@ Private Sub CreateDatabase
 	Else
 		LogColor("Database creation failed!", COLOR_RED)
 	End If
-	'SQL1.Close
 	Main.DB = SQL1
 End Sub
 
 Public Sub CreateSQLite As Boolean
 	Try
-		If DBDir = "" Then
-			DBDir = File.DirApp
-		End If
-		If DBFile = "" Then
-			DBFile = "Pakai.db"
-		End If
 		SQL1.InitializeSQLite(DBDir, DBFile, True)
-		SQL1.ExecQuerySingleResult("PRAGMA journal_mode = wal")
+		SQL1.ExecQuerySingleResult("PRAGMA journal_mode = WAL")
 		Return True
 	Catch
 		LogColor(LastException.Message, COLOR_RED)
@@ -210,6 +203,7 @@ End Sub
 
 Public Sub CreateDatabaseAsync As ResumableSub
 	Try
+		Dim Success As Boolean
 		If SQL1.IsInitialized = False Then
 			Dim JdbcUrl As String = ctx.Get("JdbcUrl")
 			JdbcUrl = JdbcUrl.Replace("{DbHost}", DBHost)
@@ -224,10 +218,18 @@ Public Sub CreateDatabaseAsync As ResumableSub
 		Dim	CharSet As String = "utf8mb4"
 		Dim Collate As String = "utf8mb4_unicode_ci"
 		Dim qry As String = $"CREATE DATABASE ${DBName} CHARACTER SET ${CharSet} COLLATE ${Collate}"$
+		SQL1.BeginTransaction
 		SQL1.ExecNonQuery(qry)
-		Return True
+		SQL1.TransactionSuccessful
+		Success = True
 	Catch
 		LogColor(LastException.Message, COLOR_RED)
-		Return False
+		SQL1.RollBack
 	End Try
+	CloseDatabase
+	Return Success
+End Sub
+
+Public Sub CloseDatabase
+	If Initialized(SQL1) Then SQL1.Close
 End Sub

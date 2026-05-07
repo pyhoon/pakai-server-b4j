@@ -1,5 +1,5 @@
 ﻿B4J=true
-Group=Handlers
+Group=BLL
 ModulesStructureVersion=1
 Type=Class
 Version=10.3
@@ -7,26 +7,17 @@ Version=10.3
 ' Products Handler class
 ' Version 6.90
 Sub Class_Globals
-	Private App As EndsMeet
-	Private Path As String
-	Private Method As String
-	Private Request As ServletRequest
+	Private App      As EndsMeet
+	Private Path     As String
+	Private Method   As String
+	Private FileMap  As Map
+	Private Request  As ServletRequest
 	Private Response As ServletResponse
-	Private FileMap As Map
-	Private Model As ProductsRepo
+	Private PR       As ProductRepository
 End Sub
 
 Public Sub Initialize
 	App = Main.App
-	Model.Initialize
-End Sub
-
-Sub Handle (req As ServletRequest, resp As ServletResponse)
-	Request = req
-	Response = resp
-	Path = Request.RequestURI
-	Method = Request.Method.ToUpperCase
-	
 	FileMap.Initialize
 	FileMap.Put("/products", "products.html")
 	FileMap.Put("/hx/products/table", "products-table.html")
@@ -34,7 +25,13 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	FileMap.Put("/hx/products/add", "products-add.html")
 	FileMap.Put("/hx/products/edit", "products-edit.html")
 	FileMap.Put("/hx/products/delete", "products-delete.html")
-	
+End Sub
+
+Sub Handle (req As ServletRequest, resp As ServletResponse)
+	Request = req
+	Response = resp
+	Path = Request.RequestURI
+	Method = Request.Method.ToUpperCase
 	Log($"${Method}: ${Path}"$)
 	If Path = "/" Then
 		RenderPage
@@ -63,15 +60,12 @@ End Sub
 
 ' Add modal
 Private Sub HandleAddModal
-	Dim CM As CategoriesRepo
-	CM.Initialize
-	Dim Categories As List = CM.Read
-	If CM.Error.IsInitialized Then
-		ShowAlert($"Database error: ${CM.Error.Message}"$, "danger")
+	Dim CR As CategoryRepository
+	CR.Initialize
+	Dim Categories As List = CR.Read
+	If CR.Error.IsInitialized Then
+		ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 		Return
-	End If	
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 	End If
 	Dim select1 As StringBuilder
 	select1.Initialize
@@ -102,16 +96,17 @@ Private Sub HandleEditModal
 		Return
 	End Try
 
-	Dim CM As CategoriesRepo
-	CM.Initialize
-	Dim Categories As List = CM.Read
-	If CM.Error.IsInitialized Then
-		ShowAlert($"Database error: ${CM.Error.Message}"$, "danger")
+	Dim CR As CategoryRepository
+	CR.Initialize
+	Dim Categories As List = CR.Read
+	If CR.Error.IsInitialized Then
+		ShowAlert($"Database error: ${CR.Error.Message}"$, "danger")
 		Return
 	End If
-	Dim Product As Map = Model.GetRowById(id)
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+	PR.Initialize
+	Dim Product As Map = PR.GetRowById(id)
+	If PR.Error.IsInitialized Then
+		ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 		Return
 	End If
 	If Product.Size > 0 Then
@@ -150,13 +145,13 @@ Private Sub HandleDeleteModal
 		ShowAlert($"Error: ${LastException.Message}"$, "danger")
 		Return
 	End Try
-	Dim Row As Map = Model.GetRowById(id)
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+	PR.Initialize
+	Dim Row As Map = PR.GetRowById(id)
+	If PR.Error.IsInitialized Then
+		ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 		Return
 	End If
 	Dim DeleteModal As String = LoadFromCache("/hx/products/delete")
-	'DeleteModal = DeleteModal.Replace($"<select class="form-select" id="category2" name="category" required></select>"$, select1.ToString)
 	Row.Put("code", Row.Get("product_code"))
 	Row.Put("name", Row.Get("product_name"))
 	Row.Put("category", Row.Get("category_name"))
@@ -181,9 +176,10 @@ Private Sub HandleProducts
 			End If
 			
 			' Check conflict
-			Dim Found As Boolean = Model.FindRowByProductCode(code)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			PR.Initialize
+			Dim Found As Boolean = PR.FindRowByProductCode(code)
+			If PR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Found Then
@@ -192,9 +188,10 @@ Private Sub HandleProducts
 			End If
 
 			' Insert new row
-			Model.Create(category, code, name, price, Main.CurrentDateTime)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			PR.Initialize
+			PR.Create(category, code, name, price, Main.CurrentDateTime)
+			If PR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Product", "created", "Product created successfully!", "success")
@@ -215,9 +212,10 @@ Private Sub HandleProducts
 				Return
 			End If
 			
-			Dim Found As Boolean = Model.FindRowById(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			PR.Initialize
+			Dim Found As Boolean = PR.FindRowById(id)
+			If PR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Not(Found) Then
@@ -225,9 +223,10 @@ Private Sub HandleProducts
 				Return
 			End If
 			
-			Dim Found As Boolean = Model.FindRowByProductCodeNotEqualId(code, id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			PR.Initialize
+			Dim Found As Boolean = PR.FindRowByProductCodeNotEqualId(code, id)
+			If PR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Found Then
@@ -236,18 +235,20 @@ Private Sub HandleProducts
 			End If
 			
 			' Update row
-			Model.Update(id, category, code, name, price, Main.CurrentDateTime)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			PR.Initialize
+			PR.Update(id, category, code, name, price, Main.CurrentDateTime)
+			If PR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Product", "updated", "Product updated successfully!", "info")
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
-			Dim Found As Boolean = Model.FindRowById(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			PR.Initialize
+			Dim Found As Boolean = PR.FindRowById(id)
+			If PR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 				Return
 			End If
 			If Not(Found) Then
@@ -256,9 +257,10 @@ Private Sub HandleProducts
 			End If
 
 			' Delete row
-			Model.Delete(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+			PR.Initialize
+			PR.Delete(id)
+			If PR.Error.IsInitialized Then
+				ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 				Return
 			End If
 			ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
@@ -269,7 +271,6 @@ Private Sub LoadFromCache (Key As String) As String
 	If App.ctx.ContainsKey(Key) Then
 		Return App.ctx.Get(Key)
 	End If
-	
 	Dim FileName As String = FileMap.Get(Key)
 	If File.Exists(File.DirApp, FileName) Then
 		Dim element As String = File.ReadString(File.DirApp, FileName)
@@ -280,9 +281,10 @@ End Sub
 
 Private Sub ProductsTable As String
 	Dim keyword As String = Request.GetParameter("keyword")
-	Dim Rows As List = Model.Search(keyword)
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+	PR.Initialize
+	Dim Rows As List = PR.Search(keyword)
+	If PR.Error.IsInitialized Then
+		ShowAlert($"Database error: ${PR.Error.Message}"$, "danger")
 		Return "              <tbody></tbody>"
 	End If
 	Dim SB As StringBuilder

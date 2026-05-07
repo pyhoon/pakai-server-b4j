@@ -1,5 +1,5 @@
 ﻿B4J=true
-Group=Repositories
+Group=DAL
 ModulesStructureVersion=1
 Type=Class
 Version=10.5
@@ -18,6 +18,15 @@ Public Sub Initialize
 	#End If
 End Sub
 
+' Close SQL object
+Public Sub Finalize
+	#If MARIADB Or MYSQL
+	If Initialized(SQL1) Then SQL1.Close
+	#Else
+	Return
+	#End If	
+End Sub
+
 Public Sub GetRowById (Id As Int) As Map
 	Dim row As Map
 	Dim query As String = "SELECT * FROM tbl_categories WHERE id = ?"
@@ -28,6 +37,7 @@ Public Sub GetRowById (Id As Int) As Map
 		row.Put("category_name", rs.GetString("category_name"))
 	Loop
 	rs.Close
+	Finalize
 	Return row
 End Sub
 
@@ -39,6 +49,7 @@ Public Sub FindRowById (Id As Int) As Boolean
 		found = True
 	Loop
 	rs.Close
+	Finalize
 	Return found
 End Sub
 
@@ -50,6 +61,7 @@ Public Sub FindRowByName (Name As String) As Boolean
 		found = True
 	Loop
 	rs.Close
+	Finalize
 	Return found
 End Sub
 
@@ -61,6 +73,7 @@ Public Sub FindRowByCategoryNameNotEqualId (Name As String, Id As Int) As Boolea
 		found = True
 	Loop
 	rs.Close
+	Finalize
 	Return found	
 End Sub
 
@@ -72,6 +85,7 @@ Public Sub FindProductByCategoryId (Id As Int) As Boolean
 		found = True
 	Loop
 	rs.Close
+	Finalize
 	Return found
 End Sub
 
@@ -82,10 +96,14 @@ End Sub
 Public Sub Create (Name As String, Created_Date As String)
 	Try
 		Dim query As String = "INSERT INTO tbl_categories (category_name, created_date) VALUES (?, ?)"
+		SQL1.BeginTransaction
 		SQL1.ExecNonQuery2(query, Array(Name, Created_Date))
+		SQL1.TransactionSuccessful
 	Catch
-		Log(LastException)
+		Log(LastException.Message)
+		SQL1.RollBack
 	End Try
+	Finalize
 End Sub
 
 Public Sub Read As List
@@ -101,15 +119,32 @@ Public Sub Read As List
 		rows.Add(row)
 	Loop
 	rs.Close
+	Finalize
 	Return rows
 End Sub
 
 Public Sub Update (Id As Int, Name As String, Modified_Date As String)
-	Dim query As String = "UPDATE tbl_categories SET category_name = ? WHERE id = ?"
-	SQL1.ExecNonQuery2(query, Array(Name, Id))
+	Try
+		Dim query As String = "UPDATE tbl_categories SET category_name = ? WHERE id = ?"
+		SQL1.BeginTransaction
+		SQL1.ExecNonQuery2(query, Array(Name, Id))
+		SQL1.TransactionSuccessful
+	Catch
+		Log(LastException.Message)
+		SQL1.RollBack
+	End Try
+	Finalize
 End Sub
 
 Public Sub Delete (Id As Int)
-	Dim query As String = "DELETE FROM tbl_categories WHERE id = ?"
-	SQL1.ExecNonQuery2(query, Array(Id))
+	Try
+		Dim query As String = "DELETE FROM tbl_categories WHERE id = ?"
+		SQL1.BeginTransaction
+		SQL1.ExecNonQuery2(query, Array(Id))
+		SQL1.TransactionSuccessful
+	Catch
+		Log(LastException.Message)
+		SQL1.RollBack
+	End Try
+	Finalize
 End Sub
