@@ -13,7 +13,6 @@ B4J Fullstack Server Application and Web API Framework
 - Pakai Server (6.80).b4xtemplate
 - Pakai Server Api (6.80).b4xtemplate
 - Pakai Server Web (6.80).b4xtemplate
-- Pakai Server Starter (6.80).b4xtemplate
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
