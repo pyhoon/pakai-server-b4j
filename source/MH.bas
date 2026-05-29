@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.5
 @EndOfDesignText@
 ' MiniHtml Helper
-' Version 6.80
+' Version 6.90
 Sub Process_Globals
 
 End Sub

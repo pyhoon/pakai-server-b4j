@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.80
+' Version 6.90
 Sub Class_Globals
 	Private App As EndsMeet
 	Private Path As String
@@ -19,7 +19,7 @@ End Sub
 Public Sub Initialize
 	App = Main.App
 	View.Initialize
-	Model.Initialize	
+	Model.Initialize
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
