@@ -1,5 +1,5 @@
 {
-    "Version": "6.80",
+    "Version": "6.90",
     "Libraries": [
         {
             "Name": "EndsMeet.b4xlib",
@@ -18,9 +18,9 @@
         {
             "Name": "MiniHtml.b4xlib",
             "Platform": "B4X",
-            "Version": 2.10,
-            "Link": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v2.10/MiniHtml.b4xlib",
-            "Update": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v2.10/update.json"
+            "Version": 2.40,
+            "Link": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v2.40/MiniHtml.b4xlib",
+            "Update": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v2.40/update.json"
         },
         {
             "Name": "MiniJS.b4xlib",
@@ -32,9 +32,9 @@
         {
             "Name": "MiniORMUtils.b4xlib",
             "Platform": "B4X",
-            "Version": 5.60,
-            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v5.60/MiniORMUtils.b4xlib",
-            "Update": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v5.60/update.json"
+            "Version": 6.00,
+            "Link": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v6.00/MiniORMUtils.b4xlib",
+            "Update": "https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v6.00/update.json"
         },
         {
             "Name": "WebApiUtils.b4xlib",
@@ -54,6 +54,6 @@
             "Platform": "B4J",
             "Version": 3.56,
             "Link": "https://dlm.mariadb.com/4461085/Connectors/java/connector-java-3.5.6/mariadb-java-client-3.5.6.jar"
-        }        
+        }
     ]
 }
