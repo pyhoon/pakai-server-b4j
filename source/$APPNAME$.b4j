@@ -11,23 +11,37 @@ FileGroup2=config
 FileGroup3=config
 FileGroup4=config
 Group=App
-Library1=byteconverter
-Library2=endsmeet
-Library3=jcore
-Library4=jsql
-Module1=CategoryRepository
-Module2=CategoryService
-Module3=DAL
-Module4=HttpsFilter
-Module5=ProductRepository
-Module6=ProductService
-Module7=WebUtils
+Library1=endsmeet
+Library2=jcore
+Library3=minicss
+Library4=minihtml
+Library5=minijs
+Library6=miniormutils
+Library7=webapiutils
+Module1=CategoriesApiHandler
+Module10=ORM
+Module11=ProductsApiHandler
+Module12=ProductsHandler
+Module13=ProductsModel
+Module14=ProductsView
+Module2=CategoriesHandler
+Module3=CategoriesModel
+Module4=CategoriesView
+Module5=FindApiHandler
+Module6=HelpHandler
+Module7=HttpsFilter
+Module8=MainView
+Module9=MH
 NumberOfFiles=4
-NumberOfLibraries=4
-NumberOfModules=7
+NumberOfLibraries=7
+NumberOfModules=14
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
+'Product:   Pakai Server
+'Version:   6.90
+'License:   MIT License
+'Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
 #MergeLibraries: True
 #End Region
@@ -39,8 +53,7 @@ Version=10.5
 #AdditionalJar: sqlite-jdbc-3.7.2
 #End If
 #Region  Macros
-#Macro: Title, CloseDB, ide://run?File=%ADDITIONAL%\closedb.jar
-#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
+'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
 #Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
 '#Macro: Title, Backup, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&Args=Files&Args=Objects\www&Args=Objects\config.ini&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
 '#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
@@ -49,10 +62,12 @@ Version=10.5
 'Download tools:
 '<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link> | <link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 Sub Process_Globals
-	Public DB	As SQL 
-	Public App	As EndsMeet
-	Public Pool As ConnectionPool
+	Public DB 	As MiniORM
+	Public App 	As EndsMeet
+	Public Api	As ApiSettings
 	Public Const APP_VERSION As String = "1.00"
+	Type AlertInfo (Message As String, Status As String)
+	Type ToastInfo (Entity As String, Action As String, Message As String, Status As String)
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -67,10 +82,17 @@ Sub AppStart (Args() As String)
 	#End If
 	
 	' Frontend using HTMX and AlpineJS
-	App.Get("", "ProductService")
-	App.Get("/categories", "CategoryService")
-	App.Rest("/hx/products/*", "ProductService")
-	App.Rest("/hx/categories/*", "CategoryService")
+	App.Get("", "ProductsHandler")
+	App.Get("/categories", "CategoriesHandler")
+	App.Rest("/hx/products/*", "ProductsHandler")
+	App.Rest("/hx/categories/*", "CategoriesHandler")
+	
+	' For REST API
+	App.Route("/api/find", "FindApiHandler", Array("get", "post"))
+	App.Get("/api/find/products-by-category_id/*", "FindApiHandler")
+	App.Rest("/api/products/*", "ProductsApiHandler")
+	App.Rest("/api/categories/*", "CategoriesApiHandler")
+	App.Get("/help", "HelpHandler")
 	
 	App.Start
 	App.LogStartupMessage
@@ -79,9 +101,20 @@ Sub AppStart (Args() As String)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
 	
-	DAL.InitDatabase
-	DAL.CheckDatabase
+	Api = App.api
+	Api.EnableHelp = True
+	ORM.InitDatabase
 	StartMessageLoop
+End Sub
+
+Public Sub HRM As HttpResponseMessage
+	Dim HRM1 As HttpResponseMessage
+	HRM1.Initialize
+	HRM1.VerboseMode = Api.VerboseMode
+	HRM1.OrderedKeys = Api.OrderedKeys
+	HRM1.ContentType = Api.ContentType
+	HRM1.PayloadType = Api.PayloadType
+	Return HRM1
 End Sub
 
 Public Sub CurrentDateTime As String
@@ -91,4 +124,22 @@ Public Sub CurrentDateTime As String
 	Dim Now As String = DateTime.Date(DateTime.Now)
 	DateTime.DateFormat = CurrentDateFormat
 	Return Now
+End Sub
+
+Public Sub CreateAlertInfo (Message As String, Status As String) As AlertInfo
+	Dim t1 As AlertInfo
+	t1.Initialize
+	t1.Message = Message
+	t1.Status = Status
+	Return t1
+End Sub
+
+Public Sub CreateToastInfo (Entity As String, Action As String, Message As String, Status As String) As ToastInfo
+	Dim t1 As ToastInfo
+	t1.Initialize
+	t1.Entity = Entity
+	t1.Action = Action
+	t1.Message = Message
+	t1.Status = Status
+	Return t1
 End Sub

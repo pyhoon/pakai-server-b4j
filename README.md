@@ -1,6 +1,6 @@
 # Pakai Server - Web Application framework
 
-Version: 6.80
+Version: 6.90
 
 B4J Fullstack Server Application and Web API Framework
 
@@ -10,9 +10,9 @@ B4J Fullstack Server Application and Web API Framework
 ---
 
 ## Templates
-- Pakai Server (6.80).b4xtemplate
-- Pakai Server Api (6.80).b4xtemplate
-- Pakai Server Web (6.80).b4xtemplate
+- Pakai Server (6.90).b4xtemplate
+- Pakai Server Api (6.90).b4xtemplate
+- Pakai Server Web (6.90).b4xtemplate
 
 ## Depends on
 - [EndsMeet.b4xlib](https://github.com/pyhoon/EndsMeet)
