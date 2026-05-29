@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Products View
-' Version 6.80
+' Version 6.90
 Sub Class_Globals
 	Private App As EndsMeet
 End Sub
@@ -40,9 +40,8 @@ Public Sub Show As String
 	End If
 	Dim page1 As MiniHtml = ReadFromCache(CacheName)
 	Dim doc As MiniHtml
-	doc.Initialize("")
-	doc.Write("<!DOCTYPE html>")
-	doc.Write(page1.build)
+	doc.Initialize("doctype")
+	doc.Append(page1.build)
 	Return doc.ToString
 End Sub
 
@@ -54,9 +53,7 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 				WriteToCache(CacheName, ModalAdd)
 			End If
 			Dim modal1 As MiniHtml = ReadFromCache(CacheName)
-			Dim modalBody As MiniHtml = modal1.Child(1)
-			Dim group1 As MiniHtml = modalBody.Child(1)
-			Dim select1 As MiniHtml = group1.Child(1)
+			Dim select1 As MiniHtml = modal1.ChildById("category1")
 			select1.Children.Clear
 			Dim option1 As MiniHtml = MH.Option.up(select1)
 			option1.attr("value", "")
@@ -75,11 +72,9 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 				WriteToCache(CacheName, ModalEdit)
 			End If
 			Dim modal1 As MiniHtml = ReadFromCache(CacheName)
-			Dim modalBody As MiniHtml = modal1.Child(1)
-			Dim id1 As MiniHtml = modalBody.Child(1)
+			Dim id1 As MiniHtml = modal1.ChildById("id")
 			id1.attr("value", Data.Get("id"))
-			Dim group1 As MiniHtml = modalBody.Child(2)
-			Dim select1 As MiniHtml = group1.Child(1)
+			Dim select1 As MiniHtml = modal1.ChildById("category2")
 			select1.Children.Clear
 			Dim option1 As MiniHtml = MH.Option.up(select1)
 			option1.attr("value", "")
@@ -91,14 +86,11 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 				option2.text(row.Get("category_name"))
 				If row.Get("id") = Data.Get("category_id") Then option2.selected
 			Next
-			Dim group2 As MiniHtml = modalBody.Child(3)
-			Dim input2 As MiniHtml = group2.Child(1)
+			Dim input2 As MiniHtml = modal1.ChildById("code")
 			input2.attr("value", Data.Get("product_code"))
-			Dim group3 As MiniHtml = modalBody.Child(4)
-			Dim input3 As MiniHtml = group3.Child(1)
+			Dim input3 As MiniHtml = modal1.ChildById("name")
 			input3.attr("value", Data.Get("product_name"))
-			Dim group4 As MiniHtml = modalBody.Child(5)
-			Dim input4 As MiniHtml = group4.Child(1)
+			Dim input4 As MiniHtml = modal1.ChildById("price")
 			Dim price As String = NumberFormat2(Data.Get("product_price"), 1, 2, 2, False)
 			input4.attr("value", price)
 			Return modal1.build
@@ -108,10 +100,9 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 				WriteToCache(CacheName, ModalDelete)
 			End If
 			Dim modal1 As MiniHtml = ReadFromCache(CacheName)
-			Dim modalBody As MiniHtml = modal1.Child(1)
-			Dim id1 As MiniHtml = modalBody.Child(1)
+			Dim id1 As MiniHtml = modal1.ChildById("id")
 			id1.attr("value", Data.Get("id"))
-			Dim p1 As MiniHtml = modalBody.Child(2)
+			Dim p1 As MiniHtml = modal1.ChildById("p1")
 			p1.text2($"Delete ${Data.Get("product_name")} (${Data.Get("product_code")})?"$)
 			Return modal1.build
 		Case Else
@@ -154,11 +145,11 @@ Private Sub ProductsPage As MiniHtml
 	main1.LoadModal(ContainerModal)
 	main1.LoadToast(ContainerToast)
 	Dim page1 As MiniHtml = main1.Render
-	Dim navitem1 As MiniHtml = GetNavItem(page1)
-	CategoriesLink.up(navitem1)
+	Dim navitem1 As MiniHtml = page1.ChildById("nav-item")
 	If App.api.EnableHelp Then
 		HelpLink.up(navitem1)
 	End If
+	CategoriesLink.up(navitem1)
 	Return page1
 End Sub
 
@@ -203,16 +194,6 @@ Private Sub ContainerContent As MiniHtml
 	Return content1
 End Sub
 
-' Retrieve Nav item element
-Private Sub GetNavItem (dom As MiniHtml) As MiniHtml
-	Dim body1 As MiniHtml = dom.Child(1)
-	Dim nav1 As MiniHtml = body1.Child(1)
-	Dim container1 As MiniHtml = nav1.Child(0)
-	Dim navbar1 As MiniHtml = container1.Child(3)
-	Dim ulist1 As MiniHtml = navbar1.Child(0)
-	Return ulist1
-End Sub
-
 Private Sub ProductsTableFilled (data As List) As MiniHtml
 	Dim CacheName As String = "Products Table"
 	If ExistInCache(CacheName) = False Then
@@ -225,17 +206,17 @@ Private Sub ProductsTableFilled (data As List) As MiniHtml
 	End If
 
 	Dim table1 As MiniHtml = ReadFromCache("Products Table")
-	Dim tbody1 As MiniHtml = table1.Child(1)
+	Dim tbody1 As MiniHtml = table1.ChildByName("tbody")
 	tbody1.Children.Clear
 	For Each row As Map In data
 		Dim tr1 As MiniHtml = ReadFromCache("Products Table Row") ' bytes()
-		tr1.Child(0).text2(row.Get("id"))
-		tr1.Child(1).text2(row.Get("product_code"))
-		tr1.Child(2).text2(row.Get("product_name"))
-		tr1.Child(3).text2(row.Get("category_name"))
-		tr1.Child(4).text2(NumberFormat2(row.Get("product_price"), 1, 2, 2, True))
-		tr1.Child(5).Child(0).attr("hx-get", "/hx/products/edit/" & row.Get("id"))
-		tr1.Child(5).Child(1).attr("hx-get", "/hx/products/delete/" & row.Get("id"))
+		tr1.ChildByIndex(0).text2(row.Get("id"))
+		tr1.ChildByIndex(1).text2(row.Get("product_code"))
+		tr1.ChildByIndex(2).text2(row.Get("product_name"))
+		tr1.ChildByIndex(3).text2(row.Get("category_name"))
+		tr1.ChildByIndex(4).text2(NumberFormat2(row.Get("product_price"), 1, 2, 2, True))
+		tr1.ChildByIndex(5).ChildByIndex(0).attr("hx-get", "/hx/products/edit/" & row.Get("id"))
+		tr1.ChildByIndex(5).ChildByIndex(1).attr("hx-get", "/hx/products/delete/" & row.Get("id"))
 		tr1.up(tbody1)
 	Next
 	Return table1
@@ -257,11 +238,11 @@ End Sub
 
 Private Sub ProductsTableRow As MiniHtml
 	Dim tr1 As MiniHtml = MH.Tr
-	MH.Td.up(tr1).cls("align-middle").sty("text-align: right")'.text("{id}")
-	MH.Td.up(tr1).cls("align-middle")'.text("{code}")
-	MH.Td.up(tr1).cls("align-middle")'.text("{name}")
-	MH.Td.up(tr1).cls("align-middle")'.text("{category}")
-	MH.Td.up(tr1).cls("align-middle").sty("text-align: right")'.text("{price}")
+	MH.Td.up(tr1).cls("align-middle").sty("text-align: right")
+	MH.Td.up(tr1).cls("align-middle")
+	MH.Td.up(tr1).cls("align-middle")
+	MH.Td.up(tr1).cls("align-middle")
+	MH.Td.up(tr1).cls("align-middle").sty("text-align: right")
 	Dim td6 As MiniHtml = MH.Td.up(tr1)
 	td6.cls("align-middle text-center px-1 py-1")
 	Dim a1 As MiniHtml = MH.Anchor.up(td6)
@@ -374,6 +355,7 @@ Private Sub ModalEdit As MiniHtml
 	Dim id1 As MiniHtml = MH.Input.up(modalBody)
 	id1.attr("type", "hidden")
 	id1.attr("name", "id")
+	id1.attr("id", "id")
 	Dim group1 As MiniHtml = MH.Div.up(modalBody)
 	group1.cls("form-group")
 	Dim label1 As MiniHtml = MH.Label.up(group1)
@@ -399,6 +381,7 @@ Private Sub ModalEdit As MiniHtml
 	input2.attr("type", "text")
 	input2.cls("form-control")
 	input2.attr("name", "code")
+	input2.attr("id", "code")
 	input2.required
 	Dim group3 As MiniHtml = MH.Div.up(modalBody)
 	group3.cls("form-group")
@@ -412,6 +395,7 @@ Private Sub ModalEdit As MiniHtml
 	input3.cls("form-control")
 	input3.attr("id", "name")
 	input3.attr("name", "name")
+	input3.attr("id", "name")
 	input3.required
 	Dim group4 As MiniHtml = MH.Div.up(modalBody)
 	group4.cls("form-group")
@@ -421,6 +405,7 @@ Private Sub ModalEdit As MiniHtml
 	input4.attr("type", "text")
 	input4.cls("form-control")
 	input4.attr("name", "price")
+	input4.attr("id", "price")
 	Dim modalFooter As MiniHtml = MH.Div.up(form1).cls("modal-footer")
 	Dim button1 As MiniHtml = MH.Button.up(modalFooter)
 	button1.cls("btn btn-primary px-3")
@@ -451,7 +436,8 @@ Private Sub ModalDelete As MiniHtml
 	Dim id1 As MiniHtml = MH.Input.up(modalBody)
 	id1.attr("type", "hidden")
 	id1.attr("name", "id")
-	MH.P.up(modalBody)
+	id1.attr("id", "id")
+	MH.P.up(modalBody).Id = "p1"
 	Dim modalFooter As MiniHtml = MH.Div.up(form1).cls("modal-footer")
 	Dim button1 As MiniHtml = MH.Button.up(modalFooter)
 	button1.cls("btn btn-danger px-3")

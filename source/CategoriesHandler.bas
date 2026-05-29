@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.80
+' Version 6.90
 Sub Class_Globals
 	Private App As EndsMeet
 	Private Path As String

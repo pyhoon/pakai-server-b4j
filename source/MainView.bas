@@ -5,7 +5,7 @@ Type=Class
 Version=10.3
 @EndOfDesignText@
 ' Main View
-' Version 6.80
+' Version 6.90
 Sub Class_Globals
 	Private mModal As MiniHtml
 	Private mToast As MiniHtml
@@ -99,8 +99,10 @@ Private Sub PageBody As MiniHtml
 	collapse1.attr("id", "navbarCollapse")
 	Dim navbar1 As MiniHtml = MH.Ul.up(collapse1)
 	navbar1.cls("navbar-nav navbar-brand ms-auto mb-md-0")
+	
 	Dim navitem1 As MiniHtml = MH.Li.up(navbar1)
 	navitem1.cls("nav-item d-block d-lg-none")
+	navitem1.Id = "nav-item"
 	Dim a1 As MiniHtml = MH.Anchor.up(navitem1)
 	a1.cls("nav-link float-end")
 	a1.attr("href", "https://paypal.me/aeric80/")
@@ -122,17 +124,11 @@ Private Sub PageBody As MiniHtml
 	img2.sty("width: 174px")
 	Dim content1 As MiniHtml = MH.Div.up(body1).cls("content m-3")
 	Dim padding2 As MiniHtml = MH.Div.up(content1).cls("p-2")
-	Dim row1 As MiniHtml = MH.Div.up(padding2)
-	row1.cls("row text-center align-items-center justify-content-center")
-	Dim div1 As MiniHtml = MH.Div.up(row1)
-	Dim h31 As MiniHtml = MH.H3.up(div1)
-	h31.cls("mb-0")
-	h31.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")
-	h31.text("$HOME_TITLE$")
-	MH.Span.up(div1).cls("small").text("Version: $VERSION$")
-	If mContent.IsInitialized Then mContent.up(padding2)
-	If mSubContent.IsInitialized Then mSubContent.up(padding2)
-	If mModal.IsInitialized Then mModal.up(body1)
+	'BodyHeading.up(padding2)
+	
+	If Initialized(mContent) Then mContent.up(padding2)
+	If Initialized(mSubContent) Then mSubContent.up(padding2)
+	If Initialized(mModal) Then mModal.up(body1)
 	MH.Div.up(body1).cls("bottom")
 	Return body1
 End Sub
@@ -152,4 +148,15 @@ Private Sub BodyFooter As MiniHtml
 	MH.Icon.up(span1).cls("bi bi-heart")
 	caption1.text(" in B4X")
 	Return footer1
+End Sub
+
+Private Sub BodyHeading As MiniHtml 'ignore
+	Dim row1 As MiniHtml = MH.Div
+	row1.cls("row text-center align-items-center justify-content-center")
+	Dim div1 As MiniHtml = MH.Div.up(row1)
+	Dim h31 As MiniHtml = MH.H3.up(div1)
+	h31.cls("mb-0")
+	h31.sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")
+	h31.text("$HOME_TITLE$")
+	MH.Span.up(div1).cls("small").text("Version: $VERSION$")
 End Sub
