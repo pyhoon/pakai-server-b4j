@@ -187,12 +187,12 @@ Private Sub HandleCategories
 End Sub
 
 Private Sub ShowAlert (Message As String, Status As String)
-	Dim info As AlertInfo = Main.CreateAlertInfo(Message, Status)
+	Dim info As AlertInfo = MH.CreateAlertInfo(Message, Status)
 	App.WriteHtml(Response, View.Alert(info))
 End Sub
 '
 Private Sub ShowToast (Entity As String, Action As String, Message As String, Status As String)
 	Dim data As List = Model.Read
-	Dim info As ToastInfo = Main.CreateToastInfo(Entity, Action, Message, Status)
+	Dim info As ToastInfo = MH.CreateToastInfo(Entity, Action, Message, Status)
 	App.WriteHtml(Response, View.Toast(data, info))
 End Sub
