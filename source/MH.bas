@@ -194,7 +194,6 @@ Public Sub Toast (id As String, table1 As MiniHtml, info As ToastInfo) As String
 	Dim div1 As MiniHtml = Div
 	div1.attr("id", id)
 	div1.attr("hx-swap-oob", "true")
-	'CategoriesTableFilled(data).up(div1)
 	table1.up(div1)
 	Dim script1 As MiniJs
 	script1.Initialize
@@ -271,14 +270,46 @@ Public Sub ButtonCancel (text As String, cls As String) As MiniHtml
 	Return button1
 End Sub
 
+Public Sub ButtonSearch (text As String, cls As String, hx_post As String, hx_target As String) As MiniHtml
+	Dim searchBtn As MiniHtml = Button
+	searchBtn.cls("btn btn-danger btn-md pl-3 pr-3 ml-3 mt-2")
+	searchBtn.text("Submit")
+	searchBtn.attr("hx-post", "/hx/products/table")
+	searchBtn.attr("hx-target", "#products-container")
+	searchBtn.attr("hx-swap", "innerHTML")
+	Return searchBtn
+End Sub
+
+Public Sub InputSearch (cls As String, id As String, name As String) As MiniHtml
+	Dim input1 As MiniHtml = Input
+	input1.attr("type", "text")
+	input1.cls(cls)
+	input1.attr("id", id)
+	input1.attr("name", name)
+	Return input1
+End Sub
+
+Public Sub TextLabel (text As String, cls As String, forId As String) As MiniHtml
+	Dim label1 As MiniHtml = Label
+	label1.attr("for", forId)
+	label1.cls(cls)
+	label1.text(text)
+	Return label1
+End Sub
+
 Public Sub FormGroup As MiniHtml
 	Return Div.cls("form-group")
 End Sub
 
-Public Sub HiddenInput (name As String, value As String) As MiniHtml
+Public Sub InputGroup As MiniHtml
+	Return Div.cls("input-group mb-3")
+End Sub
+
+Public Sub HiddenInput (id As String, name As String, value As String) As MiniHtml
 	Dim input1 As MiniHtml = Input
 	input1.attr("type", "hidden")
-	input1.attr("name", name)
+	If id <> "" Then input1.attr("id", id)
+	If name <> "" Then input1.attr("name", name)
 	If value <> "" Then input1.attr("value", value)
 	Return input1
 End Sub
@@ -295,9 +326,45 @@ Public Sub RequiredTextInput (id As String, name As String, value As String) As 
 	Dim input1 As MiniHtml = Input
 	input1.attr("type", "text")
 	input1.cls("form-control")
-	input1.attr("id", id)
-	input1.attr("name", name)
+	If id <> "" Then input1.attr("id", id)
+	If name <> "" Then input1.attr("name", name)
 	If value <> "" Then input1.attr("value", value)
 	input1.required
 	Return input1
+End Sub
+
+Public Sub RequiredDropdown (id As String, name As String) As MiniHtml
+	Dim select1 As MiniHtml = SelectTag
+	select1.cls("form-select")
+	select1.attr("id", id)
+	select1.attr("name", name)
+	select1.required
+	Return select1
+End Sub
+
+Public Sub GitHubLink As MiniHtml
+	Dim div1 As MiniHtml = Div.cls("text-center mb-3")
+	Dim a1 As MiniHtml = Anchor.up(div1)
+	a1.attr("href", "https://github.com/pyhoon/pakai-server-b4j")
+	a1.cls("text-primary mr-1")
+	a1.attr("aria-label", "github")
+	a1.attr("title", "GitHub")
+	a1.attr("target", "_blank")
+	Dim svg1 As MiniHtml = Svg.up(a1)
+	svg1.attr("aria-hidden", "true")
+	svg1.attr("width", "24")
+	svg1.attr("height", "24")
+	svg1.attr("version", "1.1")
+	svg1.attr("viewBox", "0 0 16 16")
+	Dim path1 As MiniHtml = Path.up(svg1)
+	path1.attr("fill-rule", "evenodd")
+	path1.attr("d", "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z")
+	Dim a2 As MiniHtml = Anchor.up(div1)
+	a2.attr("href", "https://github.com/pyhoon/pakai-server-b4j")
+	a2.sty("text-decoration: none")
+	a2.attr("target","_blank")
+	Dim span1 As MiniHtml = Span.up(a2)
+	span1.sty("vertical-align: middle")
+	span1.text("GitHub")
+	Return div1
 End Sub
