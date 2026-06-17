@@ -211,11 +211,11 @@ End Sub
 
 Private Sub ShowAlert (Message As String, Status As String)
 	Dim info As AlertInfo = Main.CreateAlertInfo(Message, Status)
-	App.WriteHtml(Response, View.Alert(info))
+	App.WriteHtml(Response, MH.Alert(info))
 End Sub
 
 Private Sub ShowToast (Entity As String, Action As String, Message As String, Status As String)
 	Dim data As List = Model.Read
 	Dim info As ToastInfo = Main.CreateToastInfo(Entity, Action, Message, Status)
-	App.WriteHtml(Response, View.Toast(info, data))
+	App.WriteHtml(Response, MH.Toast("products-container", View.ProductsTableFilled(data), info))
 End Sub
