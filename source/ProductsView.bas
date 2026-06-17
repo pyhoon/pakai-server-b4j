@@ -92,6 +92,14 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 	End Select
 End Sub
 
+Public Sub Alert (info As AlertInfo) As String
+	Return MH.Alert(info)
+End Sub
+
+Public Sub Toast (data As List, info As ToastInfo) As String
+	Return MH.Toast("products-container", ProductsTableFilled(data), info)
+End Sub
+
 Public Sub RenderedTable (data As List) As String
 	Return ProductsTableFilled(data).build
 End Sub
