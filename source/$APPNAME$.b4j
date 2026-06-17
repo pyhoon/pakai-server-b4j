@@ -39,7 +39,7 @@ Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
 'Product:   Pakai Server
-'Version:   6.90
+'Version:   6.93
 'License:   MIT License
 'Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
