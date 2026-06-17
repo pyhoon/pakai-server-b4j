@@ -179,3 +179,125 @@ End Sub
 Public Sub Textarea As MiniHtml
 	Return CreateTag("textarea")
 End Sub
+
+' ====================
+'  Custom Components
+' ====================
+Public Sub Alert (info As AlertInfo) As String
+	Dim div1 As MiniHtml = Div
+	div1.cls("alert alert-" & info.Status)
+	div1.text(info.Message)
+	Return div1.build
+End Sub
+
+Public Sub Toast (id As String, table1 As MiniHtml, info As ToastInfo) As String
+	Dim div1 As MiniHtml = Div
+	div1.attr("id", id)
+	div1.attr("hx-swap-oob", "true")
+	'CategoriesTableFilled(data).up(div1)
+	table1.up(div1)
+	Dim script1 As MiniJs
+	script1.Initialize
+	script1.AddCustomEventDispatch("entity:changed", _
+	CreateMap( _
+	"entity": info.Entity, _
+	"action": info.Action, _
+	"message": info.Message, _
+	"status": info.Status))
+	Return div1.build & CRLF & script1.Generate
+End Sub
+
+Public Sub NavLinkItem (text As String, href As String, icon_cls As String, icon_title As String) As MiniHtml
+	Dim li1 As MiniHtml = Li
+	li1.cls("nav-item d-block d-lg-block")
+	Dim a1 As MiniHtml = Anchor.up(li1)
+	a1.attr("href", href)
+	a1.cls("nav-link float-end")
+	a1.text(text)
+	Dim i1 As MiniHtml = Icon.up(a1)
+	i1.cls(icon_cls)
+	i1.attr("title", icon_title)
+	Return li1
+End Sub
+
+Public Sub AnchorIcon (cls As String, hx_get As String, title_text As String, icon_class As String) As MiniHtml
+	Dim a1 As MiniHtml = Anchor
+	a1.cls(cls)
+	a1.attr("hx-get", hx_get)
+	a1.attr("hx-target", "#modal-content")
+	a1.attr("hx-trigger", "click")
+	a1.attr("data-bs-target", "#modal-container")
+	a1.attr("data-bs-toggle", "modal")
+	Icon.up(a1).cls(icon_class)
+	a1.attr("title", title_text)
+	Return a1
+End Sub
+
+Public Sub ButtonClose As MiniHtml
+	Dim button1 As MiniHtml = Button
+	button1.attr("type", "button")
+	button1.cls("btn-close")
+	button1.attr("data-bs-dismiss", "modal")
+	Return button1
+End Sub
+
+Public Sub ButtonAdd (text As String, cls As String, hx_get As String, hx_target As String, hx_trigger As String, data_bs_target As String, data_bs_toggle As String) As MiniHtml
+	Dim button1 As MiniHtml = Button
+	button1.cls(cls)
+	button1.attr("hx-get", hx_get)
+	button1.attr("hx-target", hx_target)
+	button1.attr("hx-trigger", hx_trigger)
+	button1.attr("data-bs-target", data_bs_target)
+	button1.attr("data-bs-toggle", data_bs_toggle)
+	Icon.up(button1).cls("bi bi-plus-lg me-2")
+	button1.text(text)
+	Return button1
+End Sub
+
+Public Sub ButtonSubmit (text As String, cls As String) As MiniHtml
+	Dim button1 As MiniHtml = Button
+	button1.attr("type", "submit")
+	button1.cls(cls)
+	button1.text(text)
+	Return button1
+End Sub
+
+Public Sub ButtonCancel (text As String, cls As String) As MiniHtml
+	Dim button1 As MiniHtml = Button
+	button1.attr("type", "button")
+	button1.cls(cls)
+	button1.attr("data-bs-dismiss", "modal")
+	button1.text(text)
+	Return button1
+End Sub
+
+Public Sub FormGroup As MiniHtml
+	Return Div.cls("form-group")
+End Sub
+
+Public Sub HiddenInput (name As String, value As String) As MiniHtml
+	Dim input1 As MiniHtml = Input
+	input1.attr("type", "hidden")
+	input1.attr("name", name)
+	If value <> "" Then input1.attr("value", value)
+	Return input1
+End Sub
+
+Public Sub RequiredLabel (text As String, forId As String) As MiniHtml
+	Dim label1 As MiniHtml = Label
+	If forId <> "" Then label1.attr("for", forId)
+	label1.text(text)
+	Span.up(label1).cls("text-danger").text("*")
+	Return label1
+End Sub
+
+Public Sub RequiredTextInput (id As String, name As String, value As String) As MiniHtml
+	Dim input1 As MiniHtml = Input
+	input1.attr("type", "text")
+	input1.cls("form-control")
+	input1.attr("id", id)
+	input1.attr("name", name)
+	If value <> "" Then input1.attr("value", value)
+	input1.required
+	Return input1
+End Sub
