@@ -55,7 +55,7 @@ End Sub
 
 ' Add modal
 Private Sub HandleModalAdd
-	App.WriteHtml(Response, View.Modal("Add"))
+	App.WriteHtml(Response, View.Modal("Add", Null))
 End Sub
 
 ' Edit modal
@@ -73,7 +73,7 @@ Private Sub HandleModalEdit
 		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 		Return
 	End If	
-	App.WriteHtml2(Response, View.Modal("Edit"), Category)
+	App.WriteHtml2(Response, View.Modal("Edit", Category), Category)
 End Sub
 
 ' Delete modal
@@ -90,7 +90,7 @@ Private Sub HandleModalDelete
 		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 		Return
 	End If	
-	App.WriteHtml2(Response, View.Modal("Delete"), Category)
+	App.WriteHtml2(Response, View.Modal("Delete", Category), Category)
 End Sub
 
 ' Handle CRUD operations
