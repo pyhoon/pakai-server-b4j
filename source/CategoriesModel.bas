@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Categories Model
-' Version 6.90
+' Version 6.93
 Sub Class_Globals
 	Private DB As MiniORM
 End Sub

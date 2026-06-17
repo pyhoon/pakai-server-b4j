@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Products View
-' Version 6.90
+' Version 6.93
 Sub Class_Globals
 	Private App As EndsMeet
 End Sub
@@ -14,31 +14,12 @@ Public Sub Initialize
 	App = Main.App
 End Sub
 
-Private Sub ExistInCache (Key As String) As Boolean
-	Return App.ctx.ContainsKey(Key)
-End Sub
-
-Private Sub ReadFromCache (Key As String) As Object
-	Dim Value As Object = App.ctx.Get(Key)
-	If Value Is MiniHtml Then
-		Return Value.As(MiniHtml)
-	Else If GetType(Value) = "[B" Then
-		Return MH.ConvertFromBytes(Value)
-	Else
-		Return Value
-	End If
-End Sub
-
-Private Sub WriteToCache (Key As String, Value As Object)
-	App.ctx.Put(Key, Value)
-End Sub
-
 Public Sub Show As String
 	Dim CacheName As String = "Products Page"
-	If ExistInCache(CacheName) = False Then
-		WriteToCache(CacheName, ProductsPage)
+	If App.ExistInCache(CacheName) = False Then
+		App.WriteToCache(CacheName, ProductsPage)
 	End If
-	Dim page1 As MiniHtml = ReadFromCache(CacheName)
+	Dim page1 As MiniHtml = App.ReadFromCache(CacheName)
 	Dim doc As MiniHtml
 	doc.Initialize("doctype")
 	doc.Append(page1.build)
@@ -49,10 +30,10 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 	Select Action
 		Case "Add"
 			Dim CacheName As String = "Products Add Modal"
-			If ExistInCache(CacheName) = False Then
-				WriteToCache(CacheName, ModalAdd)
+			If App.ExistInCache(CacheName) = False Then
+				App.WriteToCache(CacheName, ModalAdd)
 			End If
-			Dim modal1 As MiniHtml = ReadFromCache(CacheName)
+			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
 			Dim select1 As MiniHtml = modal1.ChildById("category1")
 			select1.Children.Clear
 			Dim option1 As MiniHtml = MH.Option.up(select1)
@@ -68,10 +49,10 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 			Return modal1.build
 		Case "Edit"
 			Dim CacheName As String = "Products Edit Modal"
-			If ExistInCache(CacheName) = False Then
-				WriteToCache(CacheName, ModalEdit)
+			If App.ExistInCache(CacheName) = False Then
+				App.WriteToCache(CacheName, ModalEdit)
 			End If
-			Dim modal1 As MiniHtml = ReadFromCache(CacheName)
+			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
 			Dim id1 As MiniHtml = modal1.ChildById("id")
 			id1.attr("value", Data.Get("id"))
 			Dim select1 As MiniHtml = modal1.ChildById("category2")
@@ -96,10 +77,10 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 			Return modal1.build
 		Case "Delete"
 			Dim CacheName As String = "Products Delete Modal"
-			If ExistInCache(CacheName) = False Then
-				WriteToCache(CacheName, ModalDelete)
+			If App.ExistInCache(CacheName) = False Then
+				App.WriteToCache(CacheName, ModalDelete)
 			End If
-			Dim modal1 As MiniHtml = ReadFromCache(CacheName)
+			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
 			Dim id1 As MiniHtml = modal1.ChildById("id")
 			id1.attr("value", Data.Get("id"))
 			Dim p1 As MiniHtml = modal1.ChildById("p1")
@@ -196,20 +177,20 @@ End Sub
 
 Private Sub ProductsTableFilled (data As List) As MiniHtml
 	Dim CacheName As String = "Products Table"
-	If ExistInCache(CacheName) = False Then
-		WriteToCache(CacheName, ProductsTable)
+	If App.ExistInCache(CacheName) = False Then
+		App.WriteToCache(CacheName, ProductsTable)
 	End If
 	
 	Dim CacheName As String = "Products Table Row"
-	If ExistInCache(CacheName) = False Then
-		WriteToCache(CacheName, ProductsTableRow.ConvertToBytes) ' bytes()
+	If App.ExistInCache(CacheName) = False Then
+		App.WriteToCache(CacheName, ProductsTableRow.ConvertToBytes) ' bytes()
 	End If
 
-	Dim table1 As MiniHtml = ReadFromCache("Products Table")
+	Dim table1 As MiniHtml = App.ReadFromCache("Products Table")
 	Dim tbody1 As MiniHtml = table1.ChildByName("tbody")
 	tbody1.Children.Clear
 	For Each row As Map In data
-		Dim tr1 As MiniHtml = ReadFromCache("Products Table Row") ' bytes()
+		Dim tr1 As MiniHtml = App.ReadFromCache("Products Table Row") ' bytes()
 		tr1.ChildByIndex(0).text2(row.Get("id"))
 		tr1.ChildByIndex(1).text2(row.Get("product_code"))
 		tr1.ChildByIndex(2).text2(row.Get("product_name"))

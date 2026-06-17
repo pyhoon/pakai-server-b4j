@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.5
 @EndOfDesignText@
 ' MiniHtml Helper
-' Version 6.90
+' Version 6.93
 Sub Process_Globals
 
 End Sub
@@ -14,20 +14,6 @@ Public Sub CreateTag (Name As String) As MiniHtml
 	Dim tag1 As MiniHtml
 	tag1.Initialize(Name)
 	Return tag1
-End Sub
-
-Public Sub ConvertFromBytes (Buffer() As Byte) As MiniHtml
-	Dim tag1 As MiniHtml
-	tag1.Initialize("")
-	Dim s As String = BytesToString(Buffer, 0, Buffer.Length, "UTF-8")
-	Return tag1.Parse(s)
-End Sub
-
-Public Sub ConvertToBytes As Byte()
-	Dim tag1 As MiniHtml
-	tag1.Initialize("")
-	Dim s As String = tag1.build
-	Return s.GetBytes("UTF8")
 End Sub
 
 Public Sub Anchor As MiniHtml

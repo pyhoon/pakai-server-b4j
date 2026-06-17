@@ -39,7 +39,7 @@ Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
 'Product:   Pakai Server
-'Version:   6.90
+'Version:   6.93
 'License:   MIT License
 'Developer: Poon Yip Hoon (Aeric)
 #CommandLineArgs:
@@ -56,14 +56,14 @@ Version=10.5
 '1 - Create $APPNAME$.b4j
 '2 - Open $APPNAME$.b4j
 '    -> Remove all macros for Step 1 to 5
-'3 - Create Pakai Server (6.90).b4xtemplate
+'3 - Create Pakai Server (6.93).b4xtemplate
 '4 - Copy to B4J Additional Libraries folder
 '5 - Check Release folder
-#Macro: Title, Step 1, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\Pakai-Server.b4j&Args=%PROJECT%\$APPNAME$.b4j
-#Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
-#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+(6.90).b4xtemplate&Args=Files&Args=$APPNAME$.*&Args=CategoriesHandler.bas&Args=ProductsHandler.bas&Args=HelpHandler.bas&Args=*Model.bas&Args=*View.bas&Args=MH.bas&Args=ORM.bas&Args=HttpsFilter.bas&Args=*ApiHandler.bas&Args=libs.json&Args=res.json&Args=..\LICENSE&Args=Objects\www\assets\img&Args=Objects\www\assets\css\main.css&Args=Objects\www\assets\js\app.js
-#Macro: Title, Step 4, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\..\release\Pakai+Server+(6.90).b4xtemplate&Args=%ADDITIONAL%
-#Macro: Title, Step 5, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
+'#Macro: Title, Step 1, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\Pakai-Server.b4j&Args=%PROJECT%\$APPNAME$.b4j
+'#Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
+'#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+(6.93).b4xtemplate&Args=Files&Args=$APPNAME$.*&Args=CategoriesHandler.bas&Args=ProductsHandler.bas&Args=HelpHandler.bas&Args=*Model.bas&Args=*View.bas&Args=MH.bas&Args=ORM.bas&Args=HttpsFilter.bas&Args=*ApiHandler.bas&Args=libs.json&Args=res.json&Args=..\LICENSE&Args=Objects\www\assets\img&Args=Objects\www\assets\css\main.css&Args=Objects\www\assets\js\app.js
+'#Macro: Title, Step 4, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\..\release\Pakai+Server+(6.93).b4xtemplate&Args=%ADDITIONAL%
+'#Macro: Title, Step 5, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
 'For release
 '#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
 #Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
