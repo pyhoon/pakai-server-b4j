@@ -43,6 +43,7 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 End Sub
 
 Private Sub ShowHelpPage
+	If Request.Method.EqualsIgnoreCase("GET") = False Then Return
 	#If Debug
 	'ReadHandlers ' Read from source (optional) - comment hashtags are required
 	BuildMethods ' Build page programatically
