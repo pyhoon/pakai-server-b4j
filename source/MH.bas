@@ -7,7 +7,8 @@ Version=10.5
 ' MiniHtml Helper
 ' Version 6.93
 Sub Process_Globals
-
+	Type AlertInfo (Message As String, Status As String)
+	Type ToastInfo (Entity As String, Action As String, Message As String, Status As String)
 End Sub
 
 Public Sub CreateTag (Name As String) As MiniHtml
@@ -183,6 +184,24 @@ End Sub
 ' ====================
 '  Custom Components
 ' ====================
+Public Sub CreateAlertInfo (Message As String, Status As String) As AlertInfo
+	Dim t1 As AlertInfo
+	t1.Initialize
+	t1.Message = Message
+	t1.Status = Status
+	Return t1
+End Sub
+
+Public Sub CreateToastInfo (Entity As String, Action As String, Message As String, Status As String) As ToastInfo
+	Dim t1 As ToastInfo
+	t1.Initialize
+	t1.Entity = Entity
+	t1.Action = Action
+	t1.Message = Message
+	t1.Status = Status
+	Return t1
+End Sub
+
 Public Sub Alert (info As AlertInfo) As String
 	Dim div1 As MiniHtml = Div
 	div1.cls("alert alert-" & info.Status)
