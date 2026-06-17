@@ -71,8 +71,8 @@ Private Sub CategoriesPage As MiniHtml
 	Dim main1 As MainView
 	main1.Initialize
 	main1.LoadContent(ContainerContent)
-	main1.LoadModal(ContainerModal)
-	main1.LoadToast(ContainerToast)
+	main1.LoadModal(MH.ContainerModal)
+	main1.LoadToast(MH.ContainerToast)
 	Dim page1 As MiniHtml = main1.Render
 	Dim navitem1 As MiniHtml = page1.ChildById("nav-item")
 	If App.api.EnableHelp Then
@@ -224,36 +224,4 @@ Private Sub ModalDelete As MiniHtml
 	MH.ButtonSubmit("Delete", "btn btn-danger px-3").up(modalFooter)
 	MH.ButtonCancel("Cancel", "btn btn-secondary px-3").up(modalFooter)
 	Return form1
-End Sub
-
-Private Sub ContainerModal As MiniHtml
-	Dim container1 As MiniHtml = MH.Div
-	container1.attr("id", "modal-container")
-	container1.cls("modal fade")
-	container1.attr("tabindex", "-1")
-	container1.attr("aria-hidden", "true")
-	Dim dialog1 As MiniHtml = MH.Div.up(container1)
-	dialog1.cls("modal-dialog modal-dialog-centered")
-	Dim content1 As MiniHtml = MH.Div.up(dialog1)
-	content1.cls("modal-content")
-	content1.attr("id", "modal-content")
-	Return container1
-End Sub
-
-Private Sub ContainerToast As MiniHtml
-	Dim div1 As MiniHtml = MH.Div.cls("position-fixed end-0 p-3")
-	div1.sty("z-index: 2000")
-	div1.sty("bottom: 0%")
-	Dim toast1 As MiniHtml = MH.Div.up(div1)
-	toast1.attr("id", "toast-container")
-	toast1.cls("toast align-items-center text-bg-success border-0")
-	toast1.attr("role", "alert")
-	Dim div2 As MiniHtml = MH.Div.up(toast1)
-	div2.cls("d-flex")
-	Dim div3 As MiniHtml = MH.Div.up(div2)
-	div3.cls("toast-body")
-	div3.attr("id", "toast-body")
-	div3.text("Operation successful!")
-	MH.ButtonClose.up(div2).cls("btn-close-white me-2 m-auto").attr("data-bs-dismiss", "toast")
-	Return div1
 End Sub
