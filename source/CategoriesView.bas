@@ -27,26 +27,40 @@ Public Sub Show As String
 	Return doc.ToString
 End Sub
 
-Public Sub Modal (Action As String) As String
+Public Sub Modal (Action As String, Data As Map) As String
 	Select Action
 		Case "Add"
 			Dim CacheName As String = "Categories Add Modal"
 			If App.ExistInCache(CacheName) = False Then
 				App.WriteToCache(CacheName, ModalAdd)
 			End If
+			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
+			Return modal1.build			
 		Case "Edit"
 			Dim CacheName As String = "Categories Edit Modal"
 			If App.ExistInCache(CacheName) = False Then
 				App.WriteToCache(CacheName, ModalEdit)
 			End If
+			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
+			Dim id1 As MiniHtml = modal1.ChildById("id")
+			id1.attr("value", Data.Get("id"))
+			Dim input1 As MiniHtml = modal1.ChildById("name")
+			input1.attr("value", Data.Get("category_name"))
+			Return modal1.build			
 		Case "Delete"
 			Dim CacheName As String = "Categories Delete Modal"
 			If App.ExistInCache(CacheName) = False Then
 				App.WriteToCache(CacheName, ModalDelete)
 			End If
+			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
+			Dim id1 As MiniHtml = modal1.ChildById("id")
+			id1.attr("value", Data.Get("id"))
+			Dim p1 As MiniHtml = modal1.ChildById("p1")
+			p1.text2($"Delete ${Data.Get("category_name")}?"$)
+			Return modal1.build
+		Case Else
+			Return ""			
 	End Select
-	Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
-	Return modal1.build
 End Sub
 
 Public Sub RenderedTable (data As List) As String
@@ -151,13 +165,13 @@ Private Sub ModalAdd As MiniHtml
 	form1.attr("hx-post", "/hx/categories")
 	form1.attr("hx-target", "#modal-messages")
 	form1.attr("hx-swap", "innerHTML")
+	
 	Dim modalHeader As MiniHtml = MH.Div.up(form1).cls("modal-header")
 	MH.H5.up(modalHeader).cls("modal-title").text("Add Category")
 	MH.ButtonClose.up(modalHeader)
 	
 	Dim modalBody As MiniHtml = MH.Div.up(form1).cls("modal-body")
 	MH.Div.up(modalBody).attr("id", "modal-messages")
-	
 	Dim group1 As MiniHtml = MH.FormGroup.up(modalBody)
 	MH.RequiredLabel("Name ", "name").up(group1)
 	MH.RequiredTextInput("name", "name", "").up(group1)
@@ -180,11 +194,10 @@ Private Sub ModalEdit As MiniHtml
 	
 	Dim modalBody As MiniHtml = MH.Div.up(form1).cls("modal-body")
 	MH.Div.up(modalBody).attr("id", "modal-messages")
-	MH.HiddenInput("id", "$id$").up(modalBody)
-	
+	MH.HiddenInput("id", "id", "").up(modalBody)
 	Dim group1 As MiniHtml = MH.FormGroup.up(modalBody)
 	MH.RequiredLabel("Name ", "name").up(group1)
-	MH.RequiredTextInput("name", "name", "$category_name$").up(group1)
+	MH.RequiredTextInput("name", "name", "").up(group1)
 	
 	Dim modalFooter As MiniHtml = MH.Div.up(form1).cls("modal-footer")
 	MH.ButtonSubmit("Update", "btn btn-primary px-3").up(modalFooter)
@@ -204,9 +217,8 @@ Private Sub ModalDelete As MiniHtml
 	
 	Dim modalBody As MiniHtml = MH.Div.up(form1).cls("modal-body")
 	MH.Div.up(modalBody).attr("id", "modal-messages")
-	MH.HiddenInput("id", "$id$").up(modalBody)
-	
-	MH.P.up(modalBody).text($"Delete $category_name$?"$)
+	MH.HiddenInput("id", "id", "").up(modalBody)
+	MH.P.up(modalBody).Id = "p1"
 	
 	Dim modalFooter As MiniHtml = MH.Div.up(form1).cls("modal-footer")
 	MH.ButtonSubmit("Delete", "btn btn-danger px-3").up(modalFooter)
@@ -242,9 +254,6 @@ Private Sub ContainerToast As MiniHtml
 	div3.cls("toast-body")
 	div3.attr("id", "toast-body")
 	div3.text("Operation successful!")
-	Dim button1 As MiniHtml = MH.Button.up(div2)
-	button1.attr("type", "button")
-	button1.cls("btn-close btn-close-white me-2 m-auto")
-	button1.attr("data-bs-dismiss", "toast")
+	MH.ButtonClose.up(div2).cls("btn-close-white me-2 m-auto").attr("data-bs-dismiss", "toast")
 	Return div1
 End Sub
