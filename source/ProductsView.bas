@@ -91,29 +91,6 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 	End Select
 End Sub
 
-Public Sub Alert (info As AlertInfo) As String
-	Dim div1 As MiniHtml = MH.Div
-	div1.cls("alert alert-" & info.Status)
-	div1.text(info.Message)
-	Return div1.build
-End Sub
-
-Public Sub Toast (info As ToastInfo, data As List) As String
-	Dim div1 As MiniHtml = MH.Div
-	div1.attr("id", "products-container")
-	div1.attr("hx-swap-oob", "true")
-	ProductsTableFilled(data).up(div1)
-	Dim script1 As MiniJs
-	script1.Initialize
-	script1.AddCustomEventDispatch("entity:changed", _
-	CreateMap( _
-	"entity": info.Entity, _
-	"action": info.Action, _
-	"message": info.Message, _
-	"status": info.Status))
-	Return div1.build & CRLF & script1.Generate
-End Sub
-
 Public Sub RenderedTable (data As List) As String
 	Return ProductsTableFilled(data).build
 End Sub
@@ -175,7 +152,7 @@ Private Sub ContainerContent As MiniHtml
 	Return content1
 End Sub
 
-Private Sub ProductsTableFilled (data As List) As MiniHtml
+Public Sub ProductsTableFilled (data As List) As MiniHtml
 	Dim CacheName As String = "Products Table"
 	If App.ExistInCache(CacheName) = False Then
 		App.WriteToCache(CacheName, ProductsTable)
