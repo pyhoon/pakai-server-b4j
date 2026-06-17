@@ -368,3 +368,36 @@ Public Sub GitHubLink As MiniHtml
 	span1.text("GitHub")
 	Return div1
 End Sub
+
+Public Sub ContainerModal As MiniHtml
+	Dim modal1 As MiniHtml = Div
+	modal1.attr("id", "modal-container")
+	modal1.cls("modal fade")
+	modal1.attr("tabindex", "-1")
+	modal1.attr("aria-hidden", "true")
+	Dim dialog1 As MiniHtml = Div.up(modal1)
+	dialog1.cls("modal-dialog modal-dialog-centered")
+	Dim content1 As MiniHtml = Div.up(dialog1)
+	content1.cls("modal-content")
+	content1.attr("id", "modal-content")
+	Return modal1
+End Sub
+
+Public Sub ContainerToast As MiniHtml
+	Dim div1 As MiniHtml = Div
+	div1.cls("position-fixed end-0 p-3")
+	div1.sty("z-index: 2000")
+	div1.sty("bottom: 0%")
+	Dim toast1 As MiniHtml = Div.up(div1)
+	toast1.attr("id", "toast-container")
+	toast1.cls("toast align-items-center text-bg-success border-0")
+	toast1.attr("role", "alert")
+	Dim div2 As MiniHtml = Div.up(toast1)
+	div2.cls("d-flex")
+	Dim div3 As MiniHtml = Div.up(div2)
+	div3.cls("toast-body")
+	div3.attr("id", "toast-body")
+	div3.text("Operation successful!")
+	ButtonClose.up(div2).cls("btn-close-white me-2 m-auto").attr("data-bs-dismiss", "toast")
+	Return div1
+End Sub
