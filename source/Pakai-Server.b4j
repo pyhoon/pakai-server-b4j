@@ -78,8 +78,6 @@ Sub Process_Globals
 	Public App 	As EndsMeet
 	Public Api	As ApiSettings
 	Public Const APP_VERSION As String = "1.00"
-	Type AlertInfo (Message As String, Status As String)
-	Type ToastInfo (Entity As String, Action As String, Message As String, Status As String)
 End Sub
 
 ' <link>Open in browser|http://127.0.0.1:8080</link>
@@ -136,22 +134,4 @@ Public Sub CurrentDateTime As String
 	Dim Now As String = DateTime.Date(DateTime.Now)
 	DateTime.DateFormat = CurrentDateFormat
 	Return Now
-End Sub
-
-Public Sub CreateAlertInfo (Message As String, Status As String) As AlertInfo
-	Dim t1 As AlertInfo
-	t1.Initialize
-	t1.Message = Message
-	t1.Status = Status
-	Return t1
-End Sub
-
-Public Sub CreateToastInfo (Entity As String, Action As String, Message As String, Status As String) As ToastInfo
-	Dim t1 As ToastInfo
-	t1.Initialize
-	t1.Entity = Entity
-	t1.Action = Action
-	t1.Message = Message
-	t1.Status = Status
-	Return t1
 End Sub
