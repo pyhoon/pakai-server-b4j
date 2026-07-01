@@ -16,14 +16,14 @@ End Sub
 
 Public Sub Show As String
 	Dim CacheName As String = "Categories Page"
-	If App.ExistInCache(CacheName) = False Then
-		App.WriteToCache(CacheName, CategoriesPage)		
+	If MC.ExistInCache(App.ctx, CacheName) = False Then
+		MC.WriteToCache(App.ctx, CacheName, CategoriesPage)
 	End If
-	Dim page1 As MiniHtml = App.ReadFromCache(CacheName)
+	Dim page1 As MiniHtml = MC.ReadFromCache(App.ctx, CacheName)
 	Dim doc As MiniHtml
 	doc.Initialize("")
 	doc.Initialize("doctype")
-	doc.Write(page1.build)
+	doc.Append(page1.build)
 	Return doc.ToString
 End Sub
 
@@ -31,17 +31,17 @@ Public Sub Modal (Action As String, Data As Map) As String
 	Select Action
 		Case "Add"
 			Dim CacheName As String = "Categories Add Modal"
-			If App.ExistInCache(CacheName) = False Then
-				App.WriteToCache(CacheName, ModalAdd)
+			If MC.ExistInCache(App.ctx, CacheName) = False Then
+				MC.WriteToCache(App.ctx, CacheName, ModalAdd)
 			End If
-			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
-			Return modal1.build			
+			Dim modal1 As MiniHtml = MC.ReadFromCache(App.ctx, CacheName)
+			Return modal1.build
 		Case "Edit"
 			Dim CacheName As String = "Categories Edit Modal"
-			If App.ExistInCache(CacheName) = False Then
-				App.WriteToCache(CacheName, ModalEdit)
+			If MC.ExistInCache(App.ctx, CacheName) = False Then
+				MC.WriteToCache(App.ctx, CacheName, ModalEdit)
 			End If
-			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
+			Dim modal1 As MiniHtml = MC.ReadFromCache(App.ctx, CacheName)
 			Dim id1 As MiniHtml = modal1.ChildById("id")
 			id1.attr("value", Data.Get("id"))
 			Dim input1 As MiniHtml = modal1.ChildById("name")
@@ -49,10 +49,10 @@ Public Sub Modal (Action As String, Data As Map) As String
 			Return modal1.build			
 		Case "Delete"
 			Dim CacheName As String = "Categories Delete Modal"
-			If App.ExistInCache(CacheName) = False Then
-				App.WriteToCache(CacheName, ModalDelete)
+			If MC.ExistInCache(App.ctx, CacheName) = False Then
+				MC.WriteToCache(App.ctx, CacheName, ModalDelete)
 			End If
-			Dim modal1 As MiniHtml = App.ReadFromCache(CacheName)
+			Dim modal1 As MiniHtml = MC.ReadFromCache(App.ctx, CacheName)
 			Dim id1 As MiniHtml = modal1.ChildById("id")
 			id1.attr("value", Data.Get("id"))
 			Dim p1 As MiniHtml = modal1.ChildById("p1")
@@ -121,20 +121,20 @@ End Sub
 
 Public Sub CategoriesTableFilled (data As List) As MiniHtml
 	Dim CacheName As String = "Categories Table"
-	If App.ExistInCache(CacheName) = False Then
-		App.WriteToCache(CacheName, CategoriesTable)
+	If MC.ExistInCache(App.ctx, CacheName) = False Then
+		MC.WriteToCache(App.ctx, CacheName, CategoriesTable)
 	End If
 	
 	Dim CacheName As String = "Categories Table Row"
-	If App.ExistInCache(CacheName) = False Then
-		App.WriteToCache(CacheName, CategoriesTableRow.ConvertToBytes) ' bytes()
+	If MC.ExistInCache(App.ctx, CacheName) = False Then
+		MC.WriteToCache(App.ctx, CacheName, CategoriesTableRow.ConvertToBytes) ' bytes()
 	End If
 	
-	Dim table1 As MiniHtml = App.ReadFromCache("Categories Table")
+	Dim table1 As MiniHtml = MC.ReadFromCache(App.ctx, "Categories Table")
 	Dim tbody1 As MiniHtml = table1.ChildByName("tbody")
 	tbody1.Children.Clear
 	For Each row As Map In data
-		Dim tr1 As MiniHtml = App.ReadFromCache("Categories Table Row") ' bytes()
+		Dim tr1 As MiniHtml = MC.ReadFromCache(App.ctx, "Categories Table Row") ' bytes()
 		tr1.ChildByIndex(0).text2(row.Get("id"))
 		tr1.ChildByIndex(1).text2(row.Get("category_name"))
 		tr1.ChildByIndex(2).ChildByIndex(0).attr("hx-get", "/hx/categories/edit/" & row.Get("id"))
