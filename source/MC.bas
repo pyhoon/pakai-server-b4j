@@ -1,0 +1,45 @@
+﻿B4J=true
+Group=App
+ModulesStructureVersion=1
+Type=StaticCode
+Version=10.5
+@EndOfDesignText@
+'Version 3.00
+Sub Process_Globals
+	
+End Sub
+	
+Private Sub EmptyTag As MiniHtml
+	Dim tag1 As MiniHtml
+	tag1.Initialize("")
+	Return tag1
+End Sub
+	
+Public Sub ExistInCache (ctx As Map, Key As String) As Boolean
+	Return ctx.ContainsKey(Key)
+End Sub
+	
+Public Sub WriteToCache (ctx As Map, Key As String, Value As Object)
+	ctx.Put(Key, Value)
+End Sub
+	
+Public Sub ReadFromCache (ctx As Map, Key As String) As Object
+	Dim Value As Object = ctx.Get(Key)
+	If Value Is MiniHtml Then
+		Return Value.As(MiniHtml)
+	Else If GetType(Value) = "[B" Then
+		Return ConvertFromBytes(Value)
+	Else
+		Return Value
+	End If
+End Sub
+	
+Public Sub ConvertFromBytes (Buffer() As Byte) As MiniHtml
+	Dim s As String = BytesToString(Buffer, 0, Buffer.Length, "UTF-8")
+	Return EmptyTag.Parse(s)
+End Sub
+	
+Public Sub ConvertToBytes As Byte()
+	Dim s As String = EmptyTag.build
+	Return s.GetBytes("UTF8")
+End Sub
