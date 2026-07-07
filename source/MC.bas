@@ -4,11 +4,12 @@ ModulesStructureVersion=1
 Type=StaticCode
 Version=10.5
 @EndOfDesignText@
-'Version 3.00
+' MiniHtml Cache
+' Version 3.00
 Sub Process_Globals
-	
+
 End Sub
-	
+
 Private Sub EmptyTag As MiniHtml
 	Dim tag1 As MiniHtml
 	tag1.Initialize("")
