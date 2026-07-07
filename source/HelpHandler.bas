@@ -260,7 +260,7 @@ Private Sub GenerateHelpPage As String 'ignore
 	caption1.text("Made with")
 	Dim span3 As MiniHtml = MH.Span.up(caption1)
 	span3.sty("color: red")
-	span3.text("?")
+	MH.Icon.up(span3).cls("bi bi-heart")
 	caption1.text(" using Pakai")
 	'Local assets
 	'body1.cdn("script", "/assets/js/bootstrap.min.js")
