@@ -2,10 +2,10 @@
 Group=Handlers
 ModulesStructureVersion=1
 Type=Class
-Version=10.3
+Version=10.5
 @EndOfDesignText@
 ' Find Api Handler class
-' Version 6.93
+' Version 6.99
 Sub Class_Globals
 	Private Path As String
 	Private Method As String
