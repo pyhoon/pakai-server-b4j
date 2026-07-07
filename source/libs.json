@@ -1,12 +1,11 @@
 {
-    "Version": "6.90",
+    "Version": "6.99",
     "Libraries": [
         {
             "Name": "EndsMeet.b4xlib",
             "Platform": "B4J",
-            "Version": 2.00,
-            "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v2.00/EndsMeet.b4xlib",
-            "Update": "https://github.com/pyhoon/EndsMeet/releases/download/v2.00/update.json"
+            "Version": 2.20,
+            "Link": "https://github.com/pyhoon/EndsMeet/releases/download/v2.20/EndsMeet.b4xlib"
         },
         {
             "Name": "MiniCSS.b4xlib",
@@ -18,9 +17,9 @@
         {
             "Name": "MiniHtml.b4xlib",
             "Platform": "B4X",
-            "Version": 2.40,
-            "Link": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v2.40/MiniHtml.b4xlib",
-            "Update": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v2.40/update.json"
+            "Version": 3.00,
+            "Link": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v3.00/MiniHtml.b4xlib",
+            "Update": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v3.00/update.json"
         },
         {
             "Name": "MiniJS.b4xlib",
@@ -39,9 +38,8 @@
         {
             "Name": "WebApiUtils.b4xlib",
             "Platform": "B4J",
-            "Version": 6.80,
-            "Link": "https://github.com/pyhoon/WebApiUtils-B4J/releases/download/v6.80/WebApiUtils.b4xlib",
-            "Update": "https://github.com/pyhoon/WebApiUtils-B4J/releases/download/v6.80/update.json"
+            "Version": 6.99,
+            "Link": "https://github.com/pyhoon/WebApiUtils-B4J/releases/download/v6.99/WebApiUtils.b4xlib"
         },
         {
             "Name": "mysql-connector-j-9.3.0.jar",
