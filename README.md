@@ -482,12 +482,16 @@ pakai-server-b4j/
     ├── FindApiHandler.bas       # Search/filter API
     ├── HelpHandler.bas          # API documentation
     ├── HttpsFilter.bas          # SSL redirect
+    └── Files/
+    │   ├── config.example       # Server configuration example
+    │   ├── sqlite.example       # SQLite settings example
+    │   ├── mariadb.example      # MariaDB settings example
+    │   └── mysql.example        # MySQL settings example
     └── Objects/
-        ├── config.ini           # Server configuration
-        ├── sqlite.ini           # SQLite settings
-        ├── mariadb.ini          # MariaDB settings
-        ├── keystore.jks         # SSL keystore
-        ├── pakai.db             # SQLite database
+        ├── config.ini           # Server configuration (auto-generated)
+        ├── sqlite.ini           # SQLite settings (auto-generated)
+        ├── pakai.db             # SQLite database (auto-generated)
+        ├── keystore.jks         # SSL keystore (generated using JDK keytool)
         └── www/                 # Static assets
             ├── assets/css/      # Bootstrap, main.css
             ├── assets/js/       # Bootstrap, HTMX, AlpineJS, app.js
