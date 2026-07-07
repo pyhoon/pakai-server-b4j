@@ -338,7 +338,6 @@ Private Sub BuildMethods 'ignore
 	Method.Put("Format", FormatMap.As(JSON).ToString)
 	Method.Put("Body", BodyMap.As(JSON).ToString)
 	Method.Put("Desc", "Filter Products (with Category name)")
-	'Method.Put("Expected", GetExpectedResponse(Method.Get("Verb"))) ' POST
 	Method.Put("Expected", GetExpectedResponse(""))
 	ReplaceMethod(Method)
 		
@@ -357,7 +356,6 @@ Private Sub BuildMethods 'ignore
 	Dim BodyMap As Map = CreateMap("category_id": 1, "product_code": "", "product_name": "", "product_price": 0)
 	Method.Put("Format", FormatMap.As(JSON).ToString)
 	Method.Put("Body", BodyMap.As(JSON).ToString)
-	Method.Put("Authenticate", "token") '<-- Tells Pakai this route is protected (test)
 	ReplaceMethod(Method)
 	
 	Dim Method As Map = RetrieveMethod("Products", "PutProductById (id As Int)")
@@ -485,7 +483,7 @@ Private Sub ParseHashtags (lineContent As String, methodList As List)
 	For Each HashTag As String In HashTags2
 		If lineContent.ToLowerCase.IndexOf("#" & HashTag.ToLowerCase) > -1 Then
 			Dim str() As String = Regex.Split("=", lineContent)
-			If str.Length > 1 Then ' bug Desc contains equal sign
+			If str.Length > 1 Then
 				Dim lastMethod As Map = methodList.Get(methodList.Size - 1)
 				lastMethod.Put(HashTag, lineContent.SubString(lineContent.IndexOf("=") + 1).Trim)
 			End If
@@ -814,7 +812,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	textarea2.attr(":id", "'response-' + apiId")
 	textarea2.cls("form-control response-area")
 	textarea2.sty("background-color: #363636")
-	textarea2.sty("color: #68d391; font-size: small") ' text-green-400
+	textarea2.sty("color: #68d391; font-size: small")
 	textarea2.FormatAttributes = True
 
 	Dim div8 As MiniHtml = MH.Div.up(div7)
@@ -1215,7 +1213,7 @@ Private Sub SaveToken As String
 	Return script1.Generate2
 End Sub
 
-Private Sub ServeOpenApiJson '(resp As ServletResponse)
+Private Sub ServeOpenApiJson
 	' 1. Define OpenAPI Metadata
 	Dim InfoMap As Map = CreateMap( _
         "title": "Pakai Server v6 API", _
@@ -1231,7 +1229,7 @@ Private Sub ServeOpenApiJson '(resp As ServletResponse)
 	Dim PathsMap As Map
 	PathsMap.Initialize
     
-	' 2. Parse Pakai v6 Endpoints (Modify 'APIList' to match your internal routes variable)
+	' 2. Parse Pakai v6 Endpoints
 	BuildMethods
 	For Each Method As Map In AllMethods
 		Dim section As VerbSection = GenerateVerbSection(Method)
