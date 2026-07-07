@@ -148,9 +148,9 @@ The application follows a **Model-View-Handler** pattern:
 | Module | Type | Purpose |
 |--------|------|---------|
 | `ORM.bas` | Static Code | Database init, table creation, seed data |
+| `MC.bas` | Static Code | MiniHtml caching utility |
+| `MH.bas` | Static Code | MiniHtml helper methods |
 | `MainView.bas` | Class | Main HTML layout (Bootstrap navbar, footer, containers) |
-| `MC.bas` | Class | MiniHtml caching utility |
-| `MH.bas` | Class | MiniHtml helper methods |
 | `CategoriesModel.bas` | Class | tbl_categories CRUD operations |
 | `CategoriesView.bas` | Class | Categories HTML rendering (table, modals) |
 | `CategoriesHandler.bas` | Class | Web handler for `/categories`, `/hx/categories/*` |
