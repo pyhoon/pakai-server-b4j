@@ -139,7 +139,7 @@ The application follows a **Model-View-Handler** pattern:
        v                      v
 ┌──────────────┐     ┌──────────────┐
 │    View      │     │  Json/XML    │
-│  (MiniHtml)  │     │  (WebApiUtils)│
+│  (MiniHtml)  │     │ (WebApiUtils)│
 └──────────────┘     └──────────────┘
 ```
 
