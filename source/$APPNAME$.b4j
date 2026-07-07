@@ -19,11 +19,12 @@ Library5=minijs
 Library6=miniormutils
 Library7=webapiutils
 Module1=CategoriesApiHandler
-Module10=ORM
-Module11=ProductsApiHandler
-Module12=ProductsHandler
-Module13=ProductsModel
-Module14=ProductsView
+Module10=MH
+Module11=ORM
+Module12=ProductsApiHandler
+Module13=ProductsHandler
+Module14=ProductsModel
+Module15=ProductsView
 Module2=CategoriesHandler
 Module3=CategoriesModel
 Module4=CategoriesView
@@ -31,17 +32,25 @@ Module5=FindApiHandler
 Module6=HelpHandler
 Module7=HttpsFilter
 Module8=MainView
-Module9=MH
+Module9=MC
 NumberOfFiles=4
 NumberOfLibraries=7
-NumberOfModules=14
+NumberOfModules=15
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
-'Product:   Pakai Server
-'Version:   6.93
+'================================================
+'Template:  Pakai Server
+'Version:   6.99
 'License:   MIT License
 'Developer: Poon Yip Hoon (Aeric)
+'================================================
+'================================================
+'Product:   Your Web Server
+'Version:   1.00
+'License:   Your License
+'Copyright: Your Company 2026
+'================================================
 #CommandLineArgs:
 #MergeLibraries: True
 #End Region
