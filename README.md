@@ -459,7 +459,8 @@ pakai-server-b4j/
 ├── release/                     # Compiled b4xtemplate files
 │   ├── Pakai Server (6.99).b4xtemplate
 │   ├── Pakai Server Api (6.99).b4xtemplate
-│   └── Pakai Server Web (6.99).b4xtemplate
+│   ├── Pakai Server Web (6.99).b4xtemplate
+│   └── swagger.zip              # Minimal Swagger UI asset files
 └── source/
     ├── Pakai-Server.b4j         # Full stack project file
     ├── Pakai-Server-Api.b4j     # API-only project file
