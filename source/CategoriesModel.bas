@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Categories Model
-' Version 6.93
+' Version 6.99
 Sub Class_Globals
 	Private DB As MiniORM
 End Sub
@@ -17,7 +17,6 @@ End Sub
 Public Sub GetRowById (Id As Int) As Map
 	DB.Open
 	DB.Table = "tbl_categories"
-	'DB.Columns = Array("id", "category_name")
 	DB.Condition = "id = ?"
 	DB.Parameter = Id
 	DB.Query
@@ -86,7 +85,6 @@ Public Sub Read As List
 	DB.Open
 	DB.Table = "tbl_categories"
 	DB.Columns = Array("id", "category_name")
-	DB.OrderBy = CreateMap("id": "DESC")
 	DB.Query
 	Return DB.Results
 End Sub
