@@ -2,10 +2,10 @@
 Group=Views
 ModulesStructureVersion=1
 Type=Class
-Version=10.3
+Version=10.5
 @EndOfDesignText@
 ' Main View
-' Version 6.93
+' Version 6.99
 Sub Class_Globals
 	Private mModal As MiniHtml
 	Private mToast As MiniHtml
