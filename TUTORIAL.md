@@ -26,7 +26,7 @@ Pakai Framework is a full-stack B4J web application framework built on top of th
 ### Three Flavors
 
 | Variant | Modules | Use Case |
-|---------|---------|----------|
+|---------|:---:|----------|
 | **Pakai Server** (Full Stack) | 15 | Web UI + REST API + Docs |
 | **Pakai Server Api** | 9 | REST API only |
 | **Pakai Server Web** | 11 | Web UI only (no REST) |
