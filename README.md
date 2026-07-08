@@ -6,6 +6,8 @@ Pakai Server is a full-stack B4J project template for building modern web applic
 
 > **Forum thread:** [https://www.b4x.com/android/forum/threads/web-project-template-pakai-server-v6.169224/](https://www.b4x.com/android/forum/threads/web-project-template-pakai-server-v6.169224/)  
 > **GitHub:** [https://github.com/pyhoon/pakai-server-b4j](https://github.com/pyhoon/pakai-server-b4j)
+> **Tutorial:** [Pakai Framework v6.99 Tutorial](TUTORIAL.md)  
+> **Libraries Guide:** [Dependency Libraries Guide](LIBRARIES-TUTORIAL.md)
 
 ![Index](pakai-index.png)
 
@@ -117,6 +119,21 @@ SSL_KEYSTORE_FILE=keystore.jks
 SSL_KEYSTORE_PASSWORD=password
 SSL_ENABLED=False
 ```
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `APP_TITLE` | Pakai | Browser tab title |
+| `APP_TRADEMARK` | PAKAI | Navbar brand text |
+| `HOME_TITLE` | PAKAI FRAMEWORK | Page heading |
+| `APP_COPYRIGHT` | *(see file)* | Footer copyright text |
+| `ROOT_URL` | http://127.0.0.1 | Public server URL (use domain in production) |
+| `ROOT_PATH` | *(empty)* | URL sub-path prefix |
+| `PORT` | 8080 | HTTP listen port |
+| `REDIRECT_TO_HTTPS` | False | Auto-redirect HTTP to HTTPS |
+| `SSL_PORT` | 8888 | HTTPS listen port |
+| `SSL_KEYSTORE_FILE` | keystore.jks | JKS keystore filename |
+| `SSL_KEYSTORE_PASSWORD` | password | Keystore password |
+| `SSL_ENABLED` | False | Enable HTTPS |
 
 SMTP email settings are also available for notification features.
 
@@ -428,7 +445,10 @@ GET /api/find/products-by-category_id/1
 
 ### Optional Tools
 
-- [B4X libraries downloader](https://github.com/pyhoon/libget-b4j) java app `libget.jar` for auto update dependencies via B4J IDE #Macro
+- [libget.jar](https://github.com/pyhoon/libget-b4j) — Auto-download all library dependencies via B4J IDE macro
+- [resget.jar](https://github.com/pyhoon/resget-b4j) — Auto-download all static file resources via B4J IDE macro
+- [modgen.jar](https://github.com/pyhoon/modgen-b4j) — Generate and inject MiniORM code snippets to scaffold models from User-defined Types
+- [closedb.jar](https://github.com/pyhoon/closedb-b4j) — SQLite Management Utility for closing active connections
 
 ### JDBC Drivers
 
@@ -453,7 +473,9 @@ GET /api/find/products-by-category_id/1
 
 ```
 pakai-server-b4j/
-├── README.md
+├── README.md                    # This file
+├── TUTORIAL.md                  # Step-by-step Pakai Framework tutorial
+├── TUTORIAL-LIBRARIES.md        # Dependency libraries guide
 ├── LICENSE                      # MIT License
 ├── pakai-index.png              # Preview image
 ├── release/                     # Compiled b4xtemplate files
@@ -483,7 +505,7 @@ pakai-server-b4j/
     ├── FindApiHandler.bas       # Search/filter API
     ├── HelpHandler.bas          # API documentation
     ├── HttpsFilter.bas          # SSL redirect
-    └── Files/
+    ├── Files/
     │   ├── config.example       # Server configuration example
     │   ├── sqlite.example       # SQLite settings example
     │   ├── mariadb.example      # MariaDB settings example
@@ -491,39 +513,31 @@ pakai-server-b4j/
     └── Objects/
         ├── config.ini           # Server configuration (auto-generated)
         ├── sqlite.ini           # SQLite settings (auto-generated)
+        ├── mariadb.ini          # MariaDB settings (auto-generated via Conditional Compile)
         ├── pakai.db             # SQLite database (auto-generated)
-        ├── keystore.jks         # SSL keystore (generated using JDK keytool)
+        ├── help.html            # Generated API documentation page
+        ├── keystore.jks         # SSL keystore (generated via JDK keytool)
         └── www/                 # Static assets
-            ├── assets/css/      # Bootstrap, main.css
-            ├── assets/js/       # Bootstrap, HTMX, AlpineJS, app.js
+            ├── assets/css/      # Bootstrap 5.3.8, main.css
+            ├── assets/js/       # Bootstrap, HTMX 2.0.8, AlpineJS 3.15.8, app.js
             ├── assets/img/      # favicon, sponsor images
             └── swagger/         # Swagger UI files
+
+**Note:** Config example files (`config.example`, `sqlite.example`, `mariadb.example`, `mysql.example`) are auto-copied to `Objects/` on first run if the `.ini` file doesn't exist.
 ```
 
 ---
 
 ## Creating a New Project from Template
 
-1. Copy the desired `.b4xtemplate` from the `release/` folder to your B4J additional libraries folder
-2. In B4J IDE: **File → New → Pakai Server template**
-3. Set the project name and start coding
+1. Copy the desired `.b4xtemplate` from the `release/` folder to your B4J **Additional Libraries** folder
+2. In B4J IDE: **File → New → Pakai Server (6.99)**
+3. Set the project name and click OK
+4. Use the **IDE macros** (clickable links in the project code header) to:
+   - **GetLibraries** — auto-download all B4X library dependencies via `libget.jar`
+   - **ModelGenerator** — scaffold new models from your database schema via `modgen.jar`
 
-> Use `libget.jar` to auto-download all library dependencies.  
-> Use `modgen.jar` (Model Generator) to scaffold new models from your database schema.
-
----
-
-## Improvement over v5.x
-
-- Better UI/UX/DX compared to version 5.x
-- More flexible model generation pipeline
-- HTML generated entirely in B4X (no external templates)
-- No JavaScript module required for CRUD (HTMX handles it)
-- No jQuery AJAX parsing needed
-- JSON/XML API with unified response format
-- WebApiUtils with HelpHandler for auto-documentation
-- OpenAPI 3.0 spec (Swagger UI) integration
-- B4X code snippets for client-side API consumption
+> See the [Pakai Framework v6.99 Tutorial](TUTORIAL.md) for a complete step-by-step guide.
 
 ---
 
