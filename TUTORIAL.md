@@ -94,7 +94,7 @@ Copy the `release/Pakai Server (6.99).b4xtemplate` file to your B4J **Additional
 
 | Screenshot | Description |
 |------------|-------------|
-| *(screenshot: File → New → Other → Pakai Server)* | In B4J IDE, go to **File → New → Other** and select **Pakai Server (6.99)** from the template list |
+| *(screenshot: File → New → Pakai Server)* | In B4J IDE, go to **File → New** and select **Pakai Server (6.99)** from the template list |
 | *(screenshot: New Project dialog)* | Enter your **Project Name** (e.g., "MyApp"), confirm the project folder, and click **OK** |
 | *(screenshot: IDE with project loaded)* | The project is created and all modules are loaded in the IDE. You should see 15 `.bas` files in the Modules tab |
 
