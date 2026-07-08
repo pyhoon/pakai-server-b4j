@@ -116,7 +116,7 @@ Database is created successfully!
 |------------|-------------|
 | *(screenshot: Logs showing database creation)* | The database is auto-created with `tbl_categories` and `tbl_products` tables, seeded with sample data (Hardwares, Toys categories; Teddy Bear, Hammer, Optimus Prime products) |
 
-3. Hover over the macro link in the IDE (the blue underlined URL in the code) or open your browser to:
+3. Hover over the comment link in the IDE (the blue underlined URL in the code) or open your browser to:
 
 ```
 http://127.0.0.1:8080
