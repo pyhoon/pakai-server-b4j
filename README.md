@@ -35,7 +35,7 @@ Pakai Server is a full-stack B4J project template for building modern web applic
 ## Project Variants (Templates)
 
 | Template | Modules | Description |
-|----------|---------|-------------|
+|----------|:---:|-------------|
 | `Pakai Server (6.99).b4xtemplate` | 15 | Full stack: Web UI + REST API + Documentation |
 | `Pakai Server Api (6.99).b4xtemplate` | 9 | API only: REST endpoints + HelpHandler as landing page |
 | `Pakai Server Web (6.99).b4xtemplate` | 11 | Web only: HTMX frontend without REST API |
@@ -459,7 +459,8 @@ pakai-server-b4j/
 ├── release/                     # Compiled b4xtemplate files
 │   ├── Pakai Server (6.99).b4xtemplate
 │   ├── Pakai Server Api (6.99).b4xtemplate
-│   └── Pakai Server Web (6.99).b4xtemplate
+│   ├── Pakai Server Web (6.99).b4xtemplate
+│   └── swagger.zip              # Minimal Swagger UI asset files
 └── source/
     ├── Pakai-Server.b4j         # Full stack project file
     ├── Pakai-Server-Api.b4j     # API-only project file
