@@ -161,13 +161,13 @@ Navigate to `http://127.0.0.1:8080/help`
 | Feature | Screenshot |
 |---------|------------|
 | Interactive API docs with all endpoints listed | *(screenshot: API docs page)* |
-| Each endpoint shows method, path, parameters, and "Try It" button | *(screenshot: endpoint detail)* |
+| Each endpoint shows method, path, parameters, and "Submit" button | *(screenshot: endpoint detail)* |
 | AlpineJS-powered interactive console | *(screenshot: API console)* |
 
 You can also access:
 - **OpenAPI 3.0 spec:** `http://127.0.0.1:8080/help?format=openapi` (JSON)
 - **B4X code snippets:** `http://127.0.0.1:8080/help?format=snippets` (text)
-
+- **Swagger UI** `http://127.0.0.1:8080/swagger`
 ---
 
 ## Chapter 4 — Server Configuration
