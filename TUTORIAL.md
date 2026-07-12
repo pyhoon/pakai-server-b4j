@@ -141,7 +141,7 @@ http://127.0.0.1:8080
 | Toast notification after CRUD | *(screenshot: Toast message)* |
 | Required field validation via Bootstrap | *(screenshot: validation popup)* |
 
-The table loads dynamically via HTMX — notice `hx-get="/hx/products/table"` with `hx-trigger="load"` in the view. The search box sends a GET request to the same endpoint with a `keyword` parameter.
+The table loads dynamically via HTMX — notice `hx-get="/hx/products/table"` with `hx-trigger="load"` in the view. The search box sends a POST request to the same endpoint with a `keyword` parameter.
 
 ### Categories Page
 
