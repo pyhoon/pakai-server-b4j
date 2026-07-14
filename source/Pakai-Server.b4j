@@ -40,8 +40,8 @@ Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
 '================================================
-'Template:  Pakai Server
-'Version:   6.99
+'Template:  Pakai Server (Full-Stack)
+'Version:   6.99 rev1
 'License:   MIT License
 'Developer: Poon Yip Hoon (Aeric)
 '================================================
@@ -55,33 +55,36 @@ Version=10.5
 #MergeLibraries: True
 #End Region
 #If MariaDB
-#AdditionalJar: mariadb-java-client-3.5.6
+#AdditionalJar: mariadb-java-client-3.5.9
 #Else If MySQL
-#AdditionalJar: mysql-connector-j-9.3.0
+#AdditionalJar: mysql-connector-j-9.7.0
 #Else
-#AdditionalJar: sqlite-jdbc-3.7.2
+#AdditionalJar: sqlite-jdbc-3.53.2.0
 #End If
 #Region  Macros
 '1 - Create $APPNAME$.b4j
 '2 - Open $APPNAME$.b4j
 '    -> Remove all macros for Step 1 to 5
-'3 - Create Pakai Server (6.99).b4xtemplate
+'3 - Create Pakai Server (6.99 rev1).b4xtemplate
 '4 - Copy to B4J Additional Libraries folder
 '5 - Check Release folder
 #Macro: Title, Step 1, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\Pakai-Server.b4j&Args=%PROJECT%\$APPNAME$.b4j
 #Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
-#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+(6.99).b4xtemplate&Args=Files&Args=$APPNAME$.*&Args=CategoriesHandler.bas&Args=ProductsHandler.bas&Args=HelpHandler.bas&Args=*Model.bas&Args=*View.bas&Args=MC.bas&Args=MH.bas&Args=ORM.bas&Args=HttpsFilter.bas&Args=*ApiHandler.bas&Args=libs.json&Args=res.json&Args=..\LICENSE&Args=Objects\www\assets\img&Args=Objects\www\assets\css\main.css&Args=Objects\www\assets\js\app.js
-#Macro: Title, Step 4, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\..\release\Pakai+Server+(6.99).b4xtemplate&Args=%ADDITIONAL%
+#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+(6.99+rev1).b4xtemplate&Args=Files&Args=$APPNAME$.*&Args=CategoriesHandler.bas&Args=ProductsHandler.bas&Args=HelpHandler.bas&Args=*Model.bas&Args=*View.bas&Args=MC.bas&Args=MH.bas&Args=ORM.bas&Args=HttpsFilter.bas&Args=*ApiHandler.bas&Args=libs.json&Args=res.json&Args=..\LICENSE&Args=Objects\www\assets\img&Args=Objects\www\assets\css\main.css&Args=Objects\www\assets\js\app.js
+#Macro: Title, Step 4, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\..\release\Pakai+Server+(6.99+rev1).b4xtemplate&Args=%ADDITIONAL%
 #Macro: Title, Step 5, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
 'For release
-'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
-#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
-'#Macro: Title, Backup, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&Args=Files&Args=Objects\www&Args=Objects\config.ini&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
+#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
+'#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
+'#Macro: Title, GetResources, ide://run?File=%ADDITIONAL%\resget.jar&args=%PROJECT%&args=true
 '#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
+'#Macro: Title, Backup, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&Args=Files&Args=Objects\www&Args=Objects\config.ini&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
 '#Macro: Title, Distribute, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&Args=-cMf&Args=Dist.zip&Args=www&Args=*.jar&Args=*.ini
 #End Region
 'Download tools:
-'<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link> | <link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
+'<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link>
+'<link>resget.jar|https://github.com/pyhoon/resget-b4j/releases/download/v1.10/resget.jar</link>
+'<link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 Sub Process_Globals
 	Public DB 	As MiniORM
 	Public App 	As EndsMeet
