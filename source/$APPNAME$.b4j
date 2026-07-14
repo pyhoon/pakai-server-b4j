@@ -40,8 +40,8 @@ Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
 '================================================
-'Template:  Pakai Server
-'Version:   6.99
+'Template:  Pakai Server (Full-Stack)
+'Version:   6.99 rev1
 'License:   MIT License
 'Developer: Poon Yip Hoon (Aeric)
 '================================================
@@ -55,21 +55,24 @@ Version=10.5
 #MergeLibraries: True
 #End Region
 #If MariaDB
-#AdditionalJar: mariadb-java-client-3.5.6
+#AdditionalJar: mariadb-java-client-3.5.9
 #Else If MySQL
-#AdditionalJar: mysql-connector-j-9.3.0
+#AdditionalJar: mysql-connector-j-9.7.0
 #Else
-#AdditionalJar: sqlite-jdbc-3.7.2
+#AdditionalJar: sqlite-jdbc-3.53.2.0
 #End If
 #Region  Macros
-'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
-#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
-'#Macro: Title, Backup, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&Args=Files&Args=Objects\www&Args=Objects\config.ini&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
+#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
+'#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
+'#Macro: Title, GetResources, ide://run?File=%ADDITIONAL%\resget.jar&args=%PROJECT%&args=true
 '#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
+'#Macro: Title, Backup, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&Args=Files&Args=Objects\www&Args=Objects\config.ini&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
 '#Macro: Title, Distribute, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&Args=-cMf&Args=Dist.zip&Args=www&Args=*.jar&Args=*.ini
 #End Region
 'Download tools:
-'<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link> | <link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
+'<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link>
+'<link>resget.jar|https://github.com/pyhoon/resget-b4j/releases/download/v1.10/resget.jar</link>
+'<link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 Sub Process_Globals
 	Public DB 	As MiniORM
 	Public App 	As EndsMeet
