@@ -1,5 +1,5 @@
 /*!
- * Pakai Server Framework B4J Project Template v6.90 by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
+ * Pakai Server Framework B4J Project Template v6.99 by @pyhoon (https://github.com/pyhoon/pakai-server-b4j)
  * Copyright (c) 2022-2026 Poon Yip Hoon (Aeric)
  * Licensed under MIT (https://github.com/pyhoon/pakai-server-b4j/blob/main/LICENSE)
  */
@@ -25,7 +25,7 @@ document.addEventListener('entity:changed', (e) => {
     console.info(`[HTMX] ${entity} ${action} completed`);
 });
 
-// Global error handler
+// Global error handler ** 4.0 htmx:response:error **
 document.addEventListener('htmx:responseError', function (event) {
     // Show toast
     document.getElementById('toast-body').textContent = 'Network error occurred. Please try again.';
