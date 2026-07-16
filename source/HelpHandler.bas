@@ -369,6 +369,15 @@ Private Sub BuildMethods 'ignore
 	Method.Put("Elements", $"["{id}"]"$)
 	ReplaceMethod(Method)
 	
+	Dim Method As Map = RetrieveMethod("Products", "PatchProductById (id As Int)")
+	Method.Put("Desc", "Update Product by id (Partially)")
+	Dim FormatMap As Map = CreateMap("category_id": 1, "product_code": "CODE", "product_name": "ProductName", "product_price": 10)
+	Dim BodyMap As Map = CreateMap("category_id": 1, "product_code": "", "product_name": "", "product_price": 0)
+	Method.Put("Format", FormatMap.As(JSON).ToString)
+	Method.Put("Body", BodyMap.As(JSON).ToString)
+	Method.Put("Elements", $"["{id}"]"$)
+	ReplaceMethod(Method)
+	
 	Dim Method As Map = RetrieveMethod("Products", "DeleteProductById (id As Int)")
 	Method.Put("Desc", "Delete Product by id")
 	Method.Put("Elements", $"["{id}"]"$)
@@ -406,7 +415,7 @@ Private Sub BuildMethods 'ignore
 End Sub
 
 Private Sub ReadHandlers 'ignore
-	Dim Verbs() As String = Array As String("GET", "POST", "PUT", "DELETE")
+	Dim Verbs() As String = Array As String("GET", "POST", "PUT", "PATCH", "DELETE")
 	For Each Handler As String In Handlers
 		Dim Methods As List
 		Methods.Initialize
@@ -546,6 +555,8 @@ Private Sub ExtractVerb (methodLine As String) As String
 		MethodVerb = "POST"
 	Else If methodLine.ToUpperCase.StartsWith("PUT") Then
 		MethodVerb = "PUT"
+	Else If methodLine.ToUpperCase.StartsWith("PATCH") Then
+		MethodVerb = "PATCH"
 	Else If methodLine.ToUpperCase.StartsWith("DELETE") Then
 		MethodVerb = "DELETE"
 	End If
@@ -557,6 +568,8 @@ Private Sub ExtractVerb (methodLine As String) As String
 			MethodVerb = "POST"
 		Case methodLine.ToUpperCase.Contains("#PUT")
 			MethodVerb = "PUT"
+		Case methodLine.ToUpperCase.Contains("#PATCH")
+			MethodVerb = "PATCH"
 		Case methodLine.ToUpperCase.Contains("#DELETE")
 			MethodVerb = "DELETE"
 	End Select
@@ -714,7 +727,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	span1.sty("background-color: #636363; color: white; height: fit-content; vertical-align: text-top; font-size: small")
 	span1.text(section.Params)
 
-	If section.Verb = "POST" Or section.Verb = "PUT" Then
+	If section.Verb = "POST" Or section.Verb = "PUT" Or section.Verb = "PATCH" Then
 		Dim p2 As MiniHtml = MH.P.up(div4)
 		p2.multiline
 		Dim strong2 As MiniHtml = MH.Strong.up(p2)
@@ -753,7 +766,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	input1.FormatAttributes = True
 	input1.multiline
 	
-	If section.Verb = "POST" Or section.Verb = "PUT" Then
+	If section.Verb = "POST" Or section.Verb = "PUT" Or section.Verb = "PATCH" Then
 		Dim p4 As MiniHtml = MH.P.up(div6)
 		p4.multiline
 		Dim strong5 As MiniHtml = MH.Strong.up(p4)
@@ -789,7 +802,7 @@ Private Sub GenerateAccordionBody (section As VerbSection) As MiniHtml
 	button1.sty("cursor: pointer; padding-bottom: 60px")
 	button1.attr(":data-api-id", "apiId")
 	button1.attr("hx-" & section.Verb.ToLowerCase, "dynamic")
-	If section.Verb = "POST" Or section.Verb = "PUT" Then button1.attr("hx-ext", "raw-body")
+	If section.Verb = "POST" Or section.Verb = "PUT" Or section.Verb = "PATCH" Then button1.attr("hx-ext", "raw-body")
 	button1.attr("hx-target", "this")
 	button1.attr("hx-swap", "none")
 	button1.attr("@click", "resetUI(apiId)")
@@ -852,6 +865,8 @@ Private Sub GetColorForVerb (verb As String) As String
 			Return "purple"
 		Case "PUT"
 			Return "blue"
+		Case "PATCH"
+			Return "yellow"
 		Case "DELETE"
 			Return "red"
 		Case Else
@@ -923,6 +938,18 @@ Private Sub GetStyles As String
 	cb1.ParseRawWithRules(".accordion-button-blue:not(.collapsed)", _
 	"color: #fff;background: #2563eb;")
 	
+	cb1.Rule(".accordion-button-yellow")
+	cb1.ParseRaw("color: #fff;background: #ffca2c;box-shadow: none;")
+	
+	cb1.ParseRawWithRules(".accordion-button-yellow:not(.collapsed)", _
+	"color: #fff;background: #ffca2c;")
+	
+	'cb1.Rule(".accordion-button-orange")
+	'cb1.ParseRaw("color: #fff;background: #e8a317;box-shadow: none;")
+	
+	'cb1.ParseRawWithRules(".accordion-button-orange:not(.collapsed)", _
+	'"color: #fff;background: #e8a317;")
+	
 	cb1.Rule(".accordion-button-red")
 	cb1.ParseRaw("color: #fff;background: #dc2626;box-shadow: none;")
 	
@@ -965,6 +992,14 @@ Private Sub GetStyles As String
 	cb1.Rule(".submit-button-blue:hover")
 	cb1.Property("background-color", "#1e40af")
 	'cb1.Property("border-color", "#1e40af")
+	
+	cb1.Rule(".submit-button-yellow")
+	cb1.Property("background-color", "#ffca2c")
+	cb1.Property("border-color", "#ffc107")
+
+	cb1.Rule(".submit-button-yellow:hover")
+	cb1.Property("background-color", "#e2c01a")
+	'cb1.Property("border-color", "#ffc720")
 
 	cb1.Rule(".submit-button-red")
 	cb1.Property("background-color", "#dc2626")
@@ -982,6 +1017,9 @@ Private Sub GetStyles As String
 
 	cb1.Rule(".badge-blue")
 	cb1.Property("background-color", "#bfdbfe")
+
+	cb1.Rule(".badge-yellow")
+	cb1.Property("background-color", "#fff3cd")
 
 	cb1.Rule(".badge-red")
 	cb1.Property("background-color", "#fecaca")
@@ -1345,7 +1383,7 @@ Private Sub ServeOpenApiJson
 		' -------------------------------------
 
 		' Handle payload structure for data-modifying requests
-		If verb = "post" Or verb = "put" Then
+		If verb = "post" Or verb = "put" Or verb = "patch" Then
 			' 1. Define the properties (fields) for the JSON body
 			Dim PropertiesMap As Map
 			PropertiesMap.Initialize
@@ -1476,7 +1514,7 @@ Private Sub GenerateAppSnippet (MethodMap As Map) As String
 	
 	' Output exact B4X client code based on the Request type
 	Select Verb
-		Case "POST", "PUT"
+		Case "POST", "PUT", "PATCH"
 			' If there are existing path or auth parameters, add a trailing comma before JsonBody
 			Dim FormattedParams As String = ""
 			If ParamSignature <> "" Then FormattedParams = ParamSignature & ", "
@@ -1486,6 +1524,8 @@ Private Sub GenerateAppSnippet (MethodMap As Map) As String
 			Sb.Append($"    j.Initialize("", Me)"$).Append(CRLF)
 			If Verb = "PUT" Then
 				Sb.Append($"    j.PutString(${UrlBuilder}, JsonBody)"$).Append(CRLF)
+			Else If Verb = "PATCH" Then
+				Sb.Append($"    j.PatchString(${UrlBuilder}, JsonBody)"$).Append(CRLF)
 			Else
 				Sb.Append($"    j.PostString(${UrlBuilder}, JsonBody)"$).Append(CRLF)
 			End If
