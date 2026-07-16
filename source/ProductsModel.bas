@@ -118,6 +118,37 @@ Public Sub Update (Id As Int, Category As Int, Code As String, Name As String, P
 	DB.Save
 End Sub
 
+Public Sub Patch (Id As Int, Fields As Map, Modified_Date As String)
+	DB.Open
+	DB.Table = "tbl_products"
+	'DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "modified_date")
+	'DB.Parameters = Array(Category, Code, Name, Price, Modified_Date)
+	
+	Dim Parameters As List
+	Parameters.Initialize
+	Select True
+		Case Fields.ContainsKey("category_id")
+			DB.Columns.Add("category_id")
+			Parameters.Add(Fields.Get("category_id"))
+		Case Fields.ContainsKey("product_code")
+			DB.Columns.Add("product_code")
+			Parameters.Add(Fields.Get("product_code"))
+		Case Fields.ContainsKey("product_name")
+			DB.Columns.Add("product_name")
+			Parameters.Add(Fields.Get("product_name"))
+		Case Fields.ContainsKey("product_price")
+			DB.Columns.Add("product_price")
+			Parameters.Add(Fields.Get("product_price"))
+	End Select
+	Parameters.Add(Modified_Date)
+	DB.Columns.Add("modified_date")
+	DB.Parameters = Parameters.As(JavaObject).RunMethod("toArray", Null)
+	DB.Condition = "id = ?"
+	DB.Parameter = Id
+	DB.ReturnRow = True
+	DB.Save
+End Sub
+
 Public Sub Delete (Id As Int)
 	DB.Open
 	DB.Table = "tbl_products"
