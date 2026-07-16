@@ -33,6 +33,8 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 		GetProductById
 	Else If Path.StartsWith("/api/products/") And Method = "PUT" Then
 		PutProductById
+	Else If Path.StartsWith("/api/products/") And Method = "PATCH" Then
+		PatchProductById
 	Else If Path.StartsWith("/api/products/") And Method = "DELETE" Then
 		DeleteProductById
 	Else
@@ -214,6 +216,98 @@ Private Sub PutProductById
 	
 	' Update row by id
 	Model.Update(id, category_id, product_code, product_name, product_price, Main.CurrentDateTime)
+	If Model.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = Model.Error.Message
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+
+	' Return updated row
+	HRM.ResponseCode = 200
+	HRM.ResponseMessage = "Product updated successfully"
+	HRM.ResponseObject = Model.First
+
+	WebApiUtils.ReturnHttpResponse(HRM, Response)
+End Sub
+
+Private Sub PatchProductById
+	Log($"${Method}: ${Path}"$)
+	Try
+		Dim id As Int = Path.SubString("/api/products/".Length)
+	Catch
+		HRM.ResponseCode = 400
+		HRM.ResponseError = "Invalid id value"
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End Try
+	
+	Dim str As String = WebApiUtils.RequestDataText(Request)
+	If WebApiUtils.ValidateContent(str, HRM.PayloadType) = False Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = $"Invalid ${HRM.PayloadType} payload"$
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+	If HRM.PayloadType = WebApiUtils.MIME_TYPE_XML Then
+		Dim data As Map = WebApiUtils.ParseXML(str)		' XML payload
+	Else
+		Dim data As Map = WebApiUtils.ParseJSON(str)	' JSON payload
+	End If
+	
+	' Check whether required keys are provided at least one key
+	Dim KeyCount As Int
+	Dim KeyList As List = Array As String("category_id", "product_code", "product_name", "product_price")
+	For Each key As String In KeyList
+		If data.ContainsKey(key) Then
+			KeyCount = KeyCount + 1
+		End If
+	Next
+	If KeyCount = 0 Then
+		HRM.ResponseCode = 400
+		HRM.ResponseError = $"At least one Key is required"$
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+		
+	' Find row by id
+	Dim Found As Boolean = Model.FindRowById(id)
+	If Model.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = Model.Error.Message
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+	If Not(Found) Then
+		HRM.ResponseCode = 404
+		HRM.ResponseError = "Product not found"
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+	
+	'Dim category_id As Int = data.Get("category_id")
+	Dim product_code As String = data.Get("product_code")
+	'Dim product_name As String = data.Get("product_name")
+	'Dim product_price As Double = data.Get("product_price")
+	
+	' Check conflict product code
+	Dim Found As Boolean = Model.FindRowByProductCodeNotEqualId(product_code, id)
+	If Model.Error.IsInitialized Then
+		HRM.ResponseCode = 422
+		HRM.ResponseError = Model.Error.Message
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+	If Found Then
+		HRM.ResponseCode = 409
+		HRM.ResponseError = "Product Code already exist"
+		WebApiUtils.ReturnHttpResponse(HRM, Response)
+		Return
+	End If
+	
+	' Update row by id
+	'Model.Update(id, category_id, product_code, product_name, product_price, Main.CurrentDateTime)
+	Model.Patch(id, data, Main.CurrentDateTime)
 	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = Model.Error.Message
