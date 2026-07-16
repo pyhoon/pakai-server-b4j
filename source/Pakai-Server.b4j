@@ -98,6 +98,7 @@ Sub AppStart (Args() As String)
 	App.Initialize
 	App.LoadConfig
 	App.LogEnabled = True
+	App.staticfiles.Folder = File.Combine(File.DirApp, "www")
 	#If Release
 	'App.ssl.Enabled = True
 	'App.RedirectToHttps = True
