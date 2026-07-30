@@ -1,0 +1,77 @@
+﻿AppType=StandardJava
+Build1=Default,b4j.pakai.server.ultimate
+File1=config.example
+File2=sqlite.example
+FileGroup1=config
+FileGroup2=config
+Group=App
+Library1=endsmeet
+Library2=jcore
+Library3=minicss
+Library4=minihtml
+Library5=minijs
+Library6=miniormutils
+Module1=CategoriesHandler
+Module10=ProductsView
+Module2=CategoriesModel
+Module3=CategoriesView
+Module4=MainView
+Module5=MC
+Module6=MH
+Module7=ORM
+Module8=ProductsHandler
+Module9=ProductsModel
+NumberOfFiles=2
+NumberOfLibraries=6
+NumberOfModules=10
+Version=10.5
+@EndOfDesignText@
+#Region  Project Attributes
+#CommandLineArgs:
+#MergeLibraries: True
+#AdditionalJar: sqlite-jdbc-3.53.2.0
+#End Region
+#Region  Macros
+'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
+'#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\..\B4X\libget.jar&Args=%PROJECT%&librariesrefresh=True
+'#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
+#End Region
+'Download tools:
+'<link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
+'<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link>
+Sub Process_Globals
+	Public DB	As MiniORM
+	Public App	As EndsMeet
+	Public Const APP_VERSION As String = "1.00"
+End Sub
+
+' <link>Open in browser|http://127.0.0.1:8080</link>
+' <link>Donate|https://paypal.me/aeric80/</link> | <link>Forum|https://www.b4x.com/android/forum/threads/web-project-template-pakai-server-v6.169224/</link> | <link>GitHub|https://github.com/pyhoon/pakai-server-b4j</link>
+Sub AppStart (Args() As String)
+	App.Initialize
+	App.LoadConfig
+	App.LogEnabled = True
+	App.staticfiles.Folder = File.Combine(File.DirApp, "www") 'EndsMeet v3.00
+	' Frontend using HTMX and AlpineJS
+	App.Get("", "ProductsHandler")
+	App.Get("/categories", "CategoriesHandler")
+	App.Rest("/hx/products/*", "ProductsHandler")
+	App.Rest("/hx/categories/*", "CategoriesHandler")
+	App.Start
+	App.LogStartupMessage
+	App.ctx.Put("VERSION", APP_VERSION)
+	Log($"App version: ${APP_VERSION}"$)
+	Log($"Open the following URL from your web browser"$)
+	Log(App.ServerUrl)
+	ORM.InitDatabase
+	StartMessageLoop
+End Sub
+
+Public Sub CurrentDateTime As String
+	Dim CurrentDateFormat As String = DateTime.DateFormat
+	DateTime.DateFormat = "yyyy-MM-dd HH:mm:ss"
+	DateTime.SetTimeZone(0)
+	Dim Now As String = DateTime.Date(DateTime.Now)
+	DateTime.DateFormat = CurrentDateFormat
+	Return Now
+End Sub
