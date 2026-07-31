@@ -16,7 +16,7 @@ End Sub
 
 Public Sub Show As String
 	Dim page1 As MiniHtml = CreateOrReadFromCache("Products Page")
-	Return page1.build	
+	Return page1.build
 End Sub
 
 Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
