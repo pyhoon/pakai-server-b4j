@@ -93,9 +93,9 @@ Private Sub CreateDatabase
 
 	DB.Table = "tbl_products"
 	DB.Columns.Add(CreateMap("N": "category_id", "T": DB.INTEGER, "AN": False))
-	DB.Columns.Add(CreateMap("N": "product_code", "L": "12", "AN": False))
+	DB.Columns.Add(CreateMap("N": "product_code", "S": "12", "AN": False))
 	DB.Columns.Add(CreateMap("N": "product_name", "AN": False))
-	DB.Columns.Add(CreateMap("N": "product_price", "T": DB.DECIMAL, "L": "10,2", "AN": False, "D": "0.00"))
+	DB.Columns.Add(CreateMap("N": "product_price", "T": DB.DECIMAL, "S": "10,2", "AN": False, "D": "0.00"))
 	DB.Columns.Add(CreateMap("N": "product_image", "T": DB.BLOB))
 	DB.Foreign = "category_id"
 	DB.References("tbl_categories", "id")
