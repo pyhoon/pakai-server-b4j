@@ -220,55 +220,6 @@ Public Sub Col (cols As String) As MiniHtml
 	Return Div.cls("col-" & cols)
 End Sub
 
-Public Sub InputText (id As String, name As String, value As String, placeholder As String) As MiniHtml
-	Return Input.attr("type", "text").cls("form-control").attrsIfValues(CreateMap("id": id, "name": name, "value": value, "placeholder": placeholder))
-End Sub
-
-Public Sub InputEmail (id As String, name As String, value As String, placeholder As String) As MiniHtml
-	Return Input.attr("type", "email").cls("form-control").attrsIfValues(CreateMap("id": id, "name": name, "value": value, "placeholder": placeholder))
-End Sub
-
-Public Sub InputPassword (id As String, name As String, placeholder As String) As MiniHtml
-	Return Input.attr("type", "password").cls("form-control").attrsIfValues(CreateMap("id": id, "name": name, "placeholder": placeholder))
-End Sub
-
-Public Sub InputNumber (id As String, name As String, value As String, MinValue As String, MaxValue As String, StepValue As String) As MiniHtml
-	Return Input.attr("type", "number").cls("form-control").attrsIfValues(CreateMap("id": id, "name": name, "value": value, "min": MinValue, "max": MaxValue, "step": StepValue))
-End Sub
-
-Public Sub InputDate (id As String, name As String, value As String) As MiniHtml
-	Return Input.attr("type", "date").cls("form-control").attrsIfValues(CreateMap("id": id, "name": name, "value": value))
-End Sub
-
-Public Sub InputFile (id As String, name As String, accept As String, multiple As Boolean) As MiniHtml
-	Return Input.attr("type", "file").cls("form-control").attrsIfValues(CreateMap("id": id, "name": name, "accept": accept)).boolIf(multiple, "multiple")
-End Sub
-
-Public Sub TextareaInput (id As String, name As String, value As String, rows As Int, placeholder As String) As MiniHtml
-	Return Textarea.cls("form-control").attrsIfValues(CreateMap("id": id, "name": name, "placeholder": placeholder)).attrIf(rows > 0, "rows", rows).textIfValue(value)
-End Sub
-
-Public Sub CheckboxInput (id As String, name As String, value As String, text As String, checked As Boolean) As MiniHtml
-	Dim input1 As MiniHtml = Input.attr("type", "checkbox").cls("form-check-input").attrsIfValues(CreateMap("id": id, "name": name, "value": value)).boolIf(checked, "checked")
-	Dim label1 As MiniHtml = Label.cls("form-check-label").attrIfValue("for", id).textIfValue(text)
-	Return Div.cls("form-check").down(input1).Parent.down(label1).Parent
-End Sub
-
-Public Sub RadioInput (name As String, id As String, value As String, text As String, checked As Boolean) As MiniHtml
-	Dim input1 As MiniHtml = Input.attr("type", "radio").cls("form-check-input").attrsIfValues(CreateMap("id": id, "name": name, "value": value)).boolIf(checked, "checked")
-	Dim label1 As MiniHtml = Label.cls("form-check-label").attrIfValue("for", id).textIfValue(text)
-	Return Div.cls("form-check").down(input1).Parent.down(label1).Parent
-End Sub
-
-Public Sub SelectInput (id As String, name As String, options As List, selectedValue As String, prompt As String, required As Boolean) As MiniHtml
-	Dim select1 As MiniHtml = SelectTag.cls("form-select").attrsIfValues(CreateMap("id": id, "name": name)).boolIf(required, "required")
-	If prompt <> "" Then OptionDisabled(prompt).up(select1)
-	For Each opt As Map In options
-		OptionSelected(opt.Get("text"), opt.Get("value"), selectedValue <> "" And opt.Get("value") = selectedValue).up(select1)
-	Next
-	Return select1
-End Sub
-
 Public Sub HiddenInput (id As String, name As String, value As String) As MiniHtml
 	Return Input.attr("type", "hidden").attrsIfValues(CreateMap("id": id, "name": name, "value": value))
 End Sub
@@ -286,78 +237,8 @@ Public Sub RequiredDropdown (id As String, name As String) As MiniHtml
 End Sub
 
 ' ============================
-'  Bootstrap UI Components
-' ============================
-
-Public Sub Card As MiniHtml
-	Return Div.cls("card")
-End Sub
-
-Public Sub CardHeader As MiniHtml
-	Return Div.cls("card-header")
-End Sub
-
-Public Sub CardBody As MiniHtml
-	Return Div.cls("card-body")
-End Sub
-
-Public Sub CardFooter As MiniHtml
-	Return Div.cls("card-footer")
-End Sub
-
-Public Sub CardTitle As MiniHtml
-	Return CreateTag("h5").cls("card-title")
-End Sub
-
-Public Sub CardText As MiniHtml
-	Return CreateTag("p").cls("card-text")
-End Sub
-
-Public Sub Badge (text As String, cls As String) As MiniHtml
-	Return Span.cls("badge " & cls).text(text)
-End Sub
-
-Public Sub ListGroup As MiniHtml
-	Return CreateTag("ul").cls("list-group")
-End Sub
-
-Public Sub ListGroupItem (text As String, cls As String) As MiniHtml
-	Return Li.cls("list-group-item " & cls).textIfValue(text)
-End Sub
-
-Public Sub ListGroupButton (text As String, cls As String, active As Boolean) As MiniHtml
-	Return Button.cls("list-group-item list-group-item-action").clsIf(cls <> "", cls).clsIf(active, "active").text(text)
-End Sub
-
-Public Sub ProgressBar (NowPercent As Int, MinValue As Int, MaxValue As Int, cls As String, showLabel As Boolean) As MiniHtml
-	Return Div.cls("progress").down(Div).cls("progress-bar").clsIf(cls <> "", cls).sty("width: " & NowPercent & "%").attr("role", "progressbar").attr("aria-valuenow", NowPercent).attr("aria-valuemin", MinValue).attr("aria-valuemax", MaxValue).textIf(showLabel, NowPercent & "%").Parent
-End Sub
-
-Public Sub Spinner (cls As String, text As String) As MiniHtml
-	Dim span1 As MiniHtml = Span.cls("visually-hidden").text(text)
-	Return Div.cls("spinner-border").clsIf(cls <> "", cls).attr("role", "status").down(span1).Parent
-End Sub
-
-Public Sub SpinnerGrow (cls As String, text As String) As MiniHtml
-	Dim span1 As MiniHtml = Span.cls("visually-hidden").text(text)
-	Return Div.cls("spinner-grow").clsIf(cls <> "", cls).attr("role", "status").down(span1).Parent
-End Sub
-
-Public Sub AlertDismissible (message As String, status As String) As MiniHtml
-	Return Div.cls("alert alert-" & status & " alert-dismissible fade show").attr("role", "alert").text(message).down(Button).cls("btn-close").attr("type", "button").attr("data-bs-dismiss", "alert").Parent
-End Sub
-
-' ============================
 '  HTMX Helpers
 ' ============================
-
-Public Sub HxGet (href As String, target As String, swap As String, trigger As String) As MiniHtml
-	Return Anchor.attr("hx-get", href).attrsIfValues(CreateMap("hx-target": target, "hx-swap": swap, "hx-trigger": trigger))
-End Sub
-
-Public Sub HxPost (href As String, target As String, swap As String) As MiniHtml
-	Return Button.attr("type", "button").attr("hx-post", href).attrsIfValues(CreateMap("hx-target": target, "hx-swap": swap))
-End Sub
 
 Public Sub ContainerHxGet (id As String, href As String, trigger As String, text As String) As MiniHtml
 	Return Div.attr("id", id).attr("hx-get", href).attr("hx-trigger", trigger).text(text)
@@ -413,30 +294,6 @@ End Sub
 '  Utility Helpers
 ' ============================
 
-Public Sub CssLink (href As String) As MiniHtml
-	Return Link.attr("rel", "stylesheet").attr("href", href)
-End Sub
-
-Public Sub JsScript (src As String) As MiniHtml
-	Return Script.attr("src", src)
-End Sub
-
-Public Sub ImgResponsive (src As String, alt As String, cls As String) As MiniHtml
-	Return Img.attr("src", src).attr("alt", alt).cls("img-fluid " & cls)
-End Sub
-
-Public Sub PageHeading (text As String, tag As String) As MiniHtml
-	Return CreateTag(tag).text(text)
-End Sub
-
-Public Sub ButtonIcon (text As String, iconCls As String, btnCls As String) As MiniHtml
-	Return Button.cls(btnCls).down(Icon).cls(iconCls).Parent.text(" " & text).Parent
-End Sub
-
-Public Sub AnchorButton (text As String, href As String, cls As String) As MiniHtml
-	Return Anchor.attr("href", href).cls("btn " & cls).textIfValue(text)
-End Sub
-
 Public Sub NavLinkItem (text As String, href As String, icon_cls As String, icon_title As String) As MiniHtml
 	Return Li.cls("nav-item d-block d-lg-block") _
 	.down(Anchor).attr("href", href).cls("nav-link float-end") _
@@ -454,14 +311,6 @@ End Sub
 '(deprecated)
 Public Sub AnchorIcon (cls As String, hx_get As String, title_text As String, icon_class As String) As MiniHtml
 	Return Anchor.cls(cls).attr("hx-get", hx_get).attr("hx-target", "#modal-content").attr("hx-trigger", "click").attr("data-bs-target", "#modal-container").attr("data-bs-toggle", "modal").down(Icon).cls(icon_class).attr("title", title_text).Parent
-End Sub
-
-Public Sub IconAnchor (cls As String, href As String, icon_class As String, icon_title As String) As MiniHtml
-	Return Anchor.cls(cls).attrIf(href <> "", "href", href).down(Icon).cls(icon_class).attrIf(icon_title <> "", "title", icon_title).Parent
-End Sub
-
-Public Sub ImageAnchor (href As String, img_src As String, img_class As String, img_title As String) As MiniHtml
-	Return Anchor.attrIf(href <> "", "href", href).down(Img).attr("src", img_src).cls(img_class).attrIf(img_title <> "", "title", img_title).Parent
 End Sub
 
 Public Sub FavoriteIcon (icon_type As String, href As String) As MiniHtml
@@ -516,17 +365,6 @@ Public Sub ContainerToast As MiniHtml
 	.down(Div.cls("d-flex")) _
 	.down(Div.cls("toast-body").attr("id", "toast-body").text("Operation successful!")).Parent _
 	.down(ButtonClose.cls("btn-close-white me-2 m-auto").attr("data-bs-dismiss", "toast")).Parent.Parent.Parent
-End Sub
-
-Public Sub ContainerModalWithButton (TitleText As String, ParagraphText As String, ButtonText As String) As MiniHtml
-    Return Div.cls("modal-dialog modal-lg modal-dialog-centered") _
-	.down(Div).cls("modal-content") _
-	.down(Div).cls("modal-header") _
-	.down(H5).cls("modal-title").text(TitleText).Parent.Parent _
-	.down(Div).cls("modal-body") _
-	.down(P).text(ParagraphText).Parent.Parent _
-	.down(Div).cls("modal-footer") _
-	.down(Button).attr("type", "button").cls("btn btn-secondary text-uppercase").attr("data-bs-dismiss", "modal").text(ButtonText).Parent.Parent.Parent
 End Sub
 
 Public Sub ModalHeader (text As String) As MiniHtml
