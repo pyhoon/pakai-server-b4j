@@ -41,7 +41,7 @@ Version=10.5
 #Region  Project Attributes
 '================================================
 'Template:  Pakai Server (Full-Stack)
-'Version:   6.99 rev1
+'Version:   6.99 rev2
 'License:   MIT License
 'Developer: Poon Yip Hoon (Aeric)
 '================================================
@@ -62,7 +62,7 @@ Version=10.5
 #AdditionalJar: sqlite-jdbc-3.53.2.0
 #End If
 #Region  Macros
-#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
+'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=%STATE1%&codesync=True
 '#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\libget.jar&Args=%PROJECT%&librariesrefresh=True
 '#Macro: Title, GetResources, ide://run?File=%ADDITIONAL%\resget.jar&args=%PROJECT%&args=true
 '#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
@@ -121,17 +121,7 @@ Public Sub HRM As HttpResponseMessage
 	Dim HRM1 As HttpResponseMessage
 	HRM1.Initialize
 	HRM1.VerboseMode = Api.VerboseMode
-	HRM1.OrderedKeys = Api.OrderedKeys
 	HRM1.ContentType = Api.ContentType
 	HRM1.PayloadType = Api.PayloadType
 	Return HRM1
-End Sub
-
-Public Sub CurrentDateTime As String
-	Dim CurrentDateFormat As String = DateTime.DateFormat
-	DateTime.DateFormat = "yyyy-MM-dd HH:mm:ss"
-	DateTime.SetTimeZone(0)
-	Dim Now As String = DateTime.Date(DateTime.Now)
-	DateTime.DateFormat = CurrentDateFormat
-	Return Now
 End Sub
