@@ -116,3 +116,12 @@ Private Sub CreateDatabase
 	DB.QueryExecute = True
 	Main.DB = DB
 End Sub
+
+Public Sub CurrentDateTime As String
+	Dim CurrentDateFormat As String = DateTime.DateFormat
+	DateTime.DateFormat = "yyyy-MM-dd HH:mm:ss"
+	DateTime.SetTimeZone(0)
+	Dim Now As String = DateTime.Date(DateTime.Now)
+	DateTime.DateFormat = CurrentDateFormat
+	Return Now
+End Sub
