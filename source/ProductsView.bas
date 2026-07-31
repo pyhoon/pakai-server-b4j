@@ -98,6 +98,7 @@ Private Sub ProductsPage As MiniHtml
 	Dim main1 As MainView
 	main1.Initialize
 	main1.LoadContent(ContainerContent)
+	main1.LoadSubContent(MH.GitHubLink)
 	main1.LoadModal(MH.ContainerModal)
 	main1.LoadToast(MH.ContainerToast)
 	Dim page1 As MiniHtml = main1.Render
