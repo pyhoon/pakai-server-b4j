@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Products Model
-' Version 6.99 rev1
+' Version 6.99 rev2
 Sub Class_Globals
 	Private DB As MiniORM
 End Sub
@@ -27,7 +27,7 @@ Public Sub GetRowById (Id As Int) As Map
 	Return CreateMap()
 End Sub
 
-Public Sub GetRowsByCategoryId (Category_Id As Int) As List	
+Public Sub GetRowsByCategoryId (Category_Id As Int) As List
 	DB.Open
 	DB.Table = "tbl_products p"
 	DB.Columns = Array("p.id", "p.category_id", "c.category_name", "p.product_code", "p.product_name", "p.product_price")
@@ -121,9 +121,6 @@ End Sub
 Public Sub Patch (Id As Int, Fields As Map, Modified_Date As String)
 	DB.Open
 	DB.Table = "tbl_products"
-	'DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "modified_date")
-	'DB.Parameters = Array(Category, Code, Name, Price, Modified_Date)
-	
 	Dim Parameters As List
 	Parameters.Initialize
 	Select True
