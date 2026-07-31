@@ -135,7 +135,7 @@ Private Sub HandleProducts
 			End If
 
 			' Insert new row
-			Model.Create(category, code, name, price, Main.CurrentDateTime)
+			Model.Create(category, code, name, price, ORM.CurrentDateTime)
 			If Model.Error.IsInitialized Then
 				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
@@ -179,7 +179,7 @@ Private Sub HandleProducts
 			End If
 			
 			' Update row
-			Model.Update(id, category, code, name, price, Main.CurrentDateTime)
+			Model.Update(id, category, code, name, price, ORM.CurrentDateTime)
 			If Model.Error.IsInitialized Then
 				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
