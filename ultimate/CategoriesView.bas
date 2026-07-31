@@ -28,14 +28,14 @@ Public Sub Modal (Action As String, Data As Map) As String
 			Dim modal1 As MiniHtml = CreateOrReadFromCache("Categories Edit Modal")
 			modal1.ChildById("id").attr("value", Data.Get("id"))
 			modal1.ChildById("name").attr("value", Data.Get("category_name"))
-			Return modal1.build			
+			Return modal1.build
 		Case "Delete"
 			Dim modal1 As MiniHtml = CreateOrReadFromCache("Categories Delete Modal")
 			modal1.ChildById("id").attr("value", Data.Get("id"))
 			modal1.ChildById("p1").text2($"Delete ${Data.Get("category_name")}?"$)
 			Return modal1.build
 		Case Else
-			Return ""			
+			Return ""
 	End Select
 End Sub
 
@@ -87,9 +87,7 @@ Private Sub CategoriesPage As MiniHtml
 	main1.LoadToast(MH.ContainerToast)
 	Dim page1 As MiniHtml = main1.Render
 	Dim nav1 As MiniHtml = page1.ChildByClass("navbar-nav") 'ul
-	If App.api.EnableHelp Then
-		MH.NavLinkItem("API", "/help", "bi bi-gear me-2", "API").up(nav1)
-	End If
+	If App.api.EnableHelp Then MH.NavLinkItem("API", "/help", "bi bi-gear me-2", "API").up(nav1)
 	MH.NavLinkItem("Home", "/", "bi bi-house me-2", "Home").up(nav1)
 	Return page1
 End Sub
