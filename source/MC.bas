@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.5
 @EndOfDesignText@
 ' MiniHtml Cache
-' Version 3.00
+' Version: 3.31
 Sub Process_Globals
 
 End Sub
@@ -15,15 +15,15 @@ Private Sub EmptyTag As MiniHtml
 	tag1.Initialize("")
 	Return tag1
 End Sub
-	
+
 Public Sub ExistInCache (ctx As Map, Key As String) As Boolean
 	Return ctx.ContainsKey(Key)
 End Sub
-	
+
 Public Sub WriteToCache (ctx As Map, Key As String, Value As Object)
 	ctx.Put(Key, Value)
 End Sub
-	
+
 Public Sub ReadFromCache (ctx As Map, Key As String) As Object
 	Dim Value As Object = ctx.Get(Key)
 	If Value Is MiniHtml Then
@@ -34,13 +34,30 @@ Public Sub ReadFromCache (ctx As Map, Key As String) As Object
 		Return Value
 	End If
 End Sub
-	
+
+'Remove key
+Public Sub ClearFromCache (ctx As Map, Key As String)
+	If ctx.ContainsKey(Key) Then ctx.Remove(Key)
+End Sub
+
+'Remove all matched *key*
+Public Sub ClearAllFromCache (ctx As Map, MatchKey As String)
+    Dim keys As List
+    keys.Initialize
+    For Each k As String In ctx.Keys
+        If k.Contains(MatchKey) Then keys.Add(k)
+    Next
+    For Each k As String In keys
+        ctx.Remove(k)
+    Next
+End Sub
+
 Public Sub ConvertFromBytes (Buffer() As Byte) As MiniHtml
 	Dim s As String = BytesToString(Buffer, 0, Buffer.Length, "UTF-8")
 	Return EmptyTag.Parse(s)
 End Sub
-	
-Public Sub ConvertToBytes As Byte()
-	Dim s As String = EmptyTag.build
+
+Public Sub ConvertToBytes (tag As MiniHtml) As Byte()
+	Dim s As String = tag.build
 	Return s.GetBytes("UTF8")
 End Sub
