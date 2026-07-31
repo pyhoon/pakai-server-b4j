@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Products Handler class
-' Version 6.99 rev1
+' Version 6.99 rev2
 Sub Class_Globals
 	Private App As EndsMeet
 	Private Path As String
@@ -135,7 +135,7 @@ Private Sub HandleProducts
 			End If
 
 			' Insert new row
-			Model.Create(category, code, name, price, Main.CurrentDateTime)
+			Model.Create(category, code, name, price, ORM.CurrentDateTime)
 			If Model.Error.IsInitialized Then
 				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
@@ -179,7 +179,7 @@ Private Sub HandleProducts
 			End If
 			
 			' Update row
-			Model.Update(id, category, code, name, price, Main.CurrentDateTime)
+			Model.Update(id, category, code, name, price, ORM.CurrentDateTime)
 			If Model.Error.IsInitialized Then
 				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
