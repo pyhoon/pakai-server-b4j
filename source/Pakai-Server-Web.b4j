@@ -36,7 +36,7 @@ Version=10.5
 #Region  Project Attributes
 '================================================
 'Template:  Pakai Server Web
-'Version:   6.99 rev1
+'Version:   6.99 rev2
 'License:   MIT License
 'Developer: Poon Yip Hoon (Aeric)
 '================================================
@@ -69,9 +69,9 @@ Version=10.5
 #Macro: Title, Step 4, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\..\release\Pakai+Server+Web+(6.99+rev1).b4xtemplate&Args=%ADDITIONAL%
 #Macro: Title, Step 5, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
 'For release
-#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
 '#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\..\B4X\libget.jar&Args=%PROJECT%&librariesrefresh=True
 '#Macro: Title, GetResources, ide://run?File=%ADDITIONAL%\resget.jar&args=%PROJECT%&args=true
+'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
 '#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
 '#Macro: Title, Backup, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT_NAME%.zip&Args=Files&Args=Objects\www&Args=Objects\config.ini&Args=Objects\LICENSE&Args=*.bas&Args=*.b4j&Args=*.b4j.meta&Args=libs.json
 '#Macro: Title, Distribute, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=../Objects&Args=-cMf&Args=Dist.zip&Args=www&Args=*.jar&Args=*.ini
@@ -96,29 +96,17 @@ Sub AppStart (Args() As String)
 	'App.ssl.Enabled = True
 	'App.RedirectToHttps = True
 	#End If
-	
 	' Frontend using HTMX and AlpineJS
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
 	App.Rest("/hx/categories/*", "CategoriesHandler")
-	
 	App.Start
 	App.LogStartupMessage
 	App.ctx.Put("VERSION", APP_VERSION)
 	Log($"App version: ${APP_VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
 	Log(App.ServerUrl)
-	
 	ORM.InitDatabase
 	StartMessageLoop
-End Sub
-
-Public Sub CurrentDateTime As String
-	Dim CurrentDateFormat As String = DateTime.DateFormat
-	DateTime.DateFormat = "yyyy-MM-dd HH:mm:ss"
-	DateTime.SetTimeZone(0)
-	Dim Now As String = DateTime.Date(DateTime.Now)
-	DateTime.DateFormat = CurrentDateFormat
-	Return Now
 End Sub
