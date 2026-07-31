@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Products Api Handler class
-' Version 6.99 rev1
+' Version 6.99 rev2
 Sub Class_Globals
 	Private Path As String
 	Private Method As String
@@ -285,10 +285,7 @@ Private Sub PatchProductById
 		Return
 	End If
 	
-	'Dim category_id As Int = data.Get("category_id")
 	Dim product_code As String = data.Get("product_code")
-	'Dim product_name As String = data.Get("product_name")
-	'Dim product_price As Double = data.Get("product_price")
 	
 	' Check conflict product code
 	Dim Found As Boolean = Model.FindRowByProductCodeNotEqualId(product_code, id)
@@ -306,7 +303,6 @@ Private Sub PatchProductById
 	End If
 	
 	' Update row by id
-	'Model.Update(id, category_id, product_code, product_name, product_price, Main.CurrentDateTime)
 	Model.Patch(id, data, Main.CurrentDateTime)
 	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
