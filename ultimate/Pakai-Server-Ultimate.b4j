@@ -78,7 +78,6 @@ Sub AppStart (Args() As String)
 	App.Initialize
 	App.LoadConfig
 	App.LogEnabled = True
-	App.staticfiles.Folder = File.Combine(File.DirApp, "www") 'EndsMeet v3.00
 	' Frontend using HTMX and AlpineJS
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
@@ -92,13 +91,4 @@ Sub AppStart (Args() As String)
 	Log(App.ServerUrl)
 	ORM.InitDatabase
 	StartMessageLoop
-End Sub
-
-Public Sub CurrentDateTime As String
-	Dim CurrentDateFormat As String = DateTime.DateFormat
-	DateTime.DateFormat = "yyyy-MM-dd HH:mm:ss"
-	DateTime.SetTimeZone(0)
-	Dim Now As String = DateTime.Date(DateTime.Now)
-	DateTime.DateFormat = CurrentDateFormat
-	Return Now
 End Sub
