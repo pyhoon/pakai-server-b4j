@@ -5,7 +5,7 @@ Type=StaticCode
 Version=10.5
 @EndOfDesignText@
 ' ORM Module
-' Version 6.99 rev1
+' Version 6.99 rev2
 Sub Process_Globals
 	Private MDB As MiniORM
 	Private DBS As MiniORMSettings
