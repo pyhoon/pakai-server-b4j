@@ -129,7 +129,7 @@ Private Sub PostProduct
 	End If
 	
 	' Insert new row
-	Model.Create(category_id, product_code, product_name, product_price, Main.CurrentDateTime)
+	Model.Create(category_id, product_code, product_name, product_price, ORM.CurrentDateTime)
 	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = Model.Error.Message
@@ -215,7 +215,7 @@ Private Sub PutProductById
 	End If
 	
 	' Update row by id
-	Model.Update(id, category_id, product_code, product_name, product_price, Main.CurrentDateTime)
+	Model.Update(id, category_id, product_code, product_name, product_price, ORM.CurrentDateTime)
 	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = Model.Error.Message
@@ -303,7 +303,7 @@ Private Sub PatchProductById
 	End If
 	
 	' Update row by id
-	Model.Patch(id, data, Main.CurrentDateTime)
+	Model.Patch(id, data, ORM.CurrentDateTime)
 	If Model.Error.IsInitialized Then
 		HRM.ResponseCode = 422
 		HRM.ResponseError = Model.Error.Message
