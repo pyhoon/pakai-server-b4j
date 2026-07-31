@@ -46,7 +46,6 @@ End Sub
 
 Private Sub PageHeader As MiniHtml
 	Dim head1 As MiniHtml = MH.ResponsiveHeader
-	'head1.Indentation = False
 	MH.Meta.up(head1).attr("name", "description").attr("content", "Created using Pakai framework")
 	MH.Meta.up(head1).attr("name", "author").attr("content", "Aeric Poon")
 	MH.Title.up(head1).text("$APP_TITLE$")
@@ -60,7 +59,6 @@ End Sub
 
 Private Sub PageBody As MiniHtml
 	Dim body1 As MiniHtml = MH.Body.cls("bg-white")
-	'body1.Indentation = False
 	If mToast.IsInitialized Then mToast.up(body1)
 	Dim nav1 As MiniHtml = MH.NavbarExpand("navbar-light sticky-top bg-info py-1", "lg", "bi bi-infinity h3", "$APP_TRADEMARK$").up(body1)
 	Dim div1 As MiniHtml = nav1.ChildByClass("container-fluid")
