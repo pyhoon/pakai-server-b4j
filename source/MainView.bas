@@ -69,7 +69,6 @@ Private Sub PageBody As MiniHtml
 	Dim nav1 As MiniHtml = MH.NavbarExpand("navbar-light sticky-top bg-info py-1", "lg", "bi bi-infinity h3", "$APP_TRADEMARK$").up(body1)
 	Dim div1 As MiniHtml = nav1.ChildByClass("container-fluid")
 	MH.NavbarToggler.up(div1)
-	MH.NavbarCollapse.up(div1)
 	Dim collapse1 As MiniHtml = MH.NavbarCollapse.up(div1)
 	Dim navbar1 As MiniHtml = collapse1.child(0)
 	MH.NavLinkItemImage("https://paypal.me/aeric80/", "/assets/img/coffee.png", "").up(navbar1)
