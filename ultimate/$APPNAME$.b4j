@@ -32,13 +32,13 @@ Version=10.5
 #AdditionalJar: sqlite-jdbc-3.53.2.0
 #End Region
 #Region  Macros
-'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
 '#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\..\B4X\libget.jar&Args=%PROJECT%&librariesrefresh=True
+'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
 '#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
 #End Region
 'Download tools:
-'<link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 '<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link>
+'<link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 Sub Process_Globals
 	Public DB	As MiniORM
 	Public App	As EndsMeet
@@ -51,7 +51,6 @@ Sub AppStart (Args() As String)
 	App.Initialize
 	App.LoadConfig
 	App.LogEnabled = True
-	App.staticfiles.Folder = File.Combine(File.DirApp, "www") 'EndsMeet v3.00
 	' Frontend using HTMX and AlpineJS
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
@@ -65,13 +64,4 @@ Sub AppStart (Args() As String)
 	Log(App.ServerUrl)
 	ORM.InitDatabase
 	StartMessageLoop
-End Sub
-
-Public Sub CurrentDateTime As String
-	Dim CurrentDateFormat As String = DateTime.DateFormat
-	DateTime.DateFormat = "yyyy-MM-dd HH:mm:ss"
-	DateTime.SetTimeZone(0)
-	Dim Now As String = DateTime.Date(DateTime.Now)
-	DateTime.DateFormat = CurrentDateFormat
-	Return Now
 End Sub
