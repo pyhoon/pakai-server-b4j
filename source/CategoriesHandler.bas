@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Categories Handler class
-' Version 6.99 rev1
+' Version 6.99 rev2
 Sub Class_Globals
 	Private App As EndsMeet
 	Private Path As String
@@ -115,7 +115,7 @@ Private Sub HandleCategories
 			End If
 			
 			' Insert new row
-			Model.Create(name, Main.CurrentDateTime)
+			Model.Create(name, ORM.CurrentDateTime)
 			If Model.Error.IsInitialized Then
 				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
@@ -147,7 +147,7 @@ Private Sub HandleCategories
 			End If
 			
 			' Update row
-			Model.Update(id, name, Main.CurrentDateTime)
+			Model.Update(id, name, ORM.CurrentDateTime)
 			If Model.Error.IsInitialized Then
 				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
 				Return
