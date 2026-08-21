@@ -15,11 +15,11 @@
             "Update": "https://github.com/pyhoon/MiniCSS-B4X/releases/download/v0.30/update.json"
         },
         {
-            "Name": "MiniHtml.b4xlib",
+            "Name": "MiniHTML.b4xlib",
             "Platform": "B4X",
             "Version": 3.00,
-            "Link": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v3.00/MiniHtml.b4xlib",
-            "Update": "https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v3.00/update.json"
+            "Link": "https://github.com/pyhoon/MiniHTML3/releases/download/v3.00/MiniHtml.b4xlib",
+            "Update": "https://github.com/pyhoon/MiniHTML3/releases/download/v3.00/update.json"
         },
         {
             "Name": "MiniJS.b4xlib",
