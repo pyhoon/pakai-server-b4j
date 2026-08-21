@@ -27,6 +27,19 @@ NumberOfModules=10
 Version=10.5
 @EndOfDesignText@
 #Region  Project Attributes
+'================================================
+'Template  : Pakai Server Ultimate
+'Version   : 6.99
+'License   : MIT License
+'Developer : Poon Yip Hoon (Aeric)
+'================================================
+'================================================
+'Product   : Your Web Server
+'Version   : 1.00
+'Developer : Your Name
+'License   : Your License
+'Copyright : Your Company 2026
+'================================================
 #CommandLineArgs:
 #MergeLibraries: True
 #AdditionalJar: sqlite-jdbc-3.53.2.0
