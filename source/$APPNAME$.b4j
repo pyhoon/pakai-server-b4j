@@ -36,12 +36,12 @@ Module9=MC
 NumberOfFiles=4
 NumberOfLibraries=7
 NumberOfModules=15
-Version=10.5
+Version=10.7
 @EndOfDesignText@
 #Region  Project Attributes
 '================================================
 'Template:  Pakai Server (Full-Stack)
-'Version:   6.99 rev2
+'Version:   6.99 rev3
 'License:   MIT License
 'Developer: Poon Yip Hoon (Aeric)
 '================================================
@@ -77,6 +77,7 @@ Sub Process_Globals
 	Public DB 	As MiniORM
 	Public App 	As EndsMeet
 	Public Api	As ApiSettings
+	Public HRM	As HttpResponseMessage
 	Public Const APP_VERSION As String = "1.00"
 End Sub
 
@@ -87,8 +88,8 @@ Sub AppStart (Args() As String)
 	App.LoadConfig
 	App.LogEnabled = True
 	#If Release
-	'App.ssl.Enabled = True
-	'App.RedirectToHttps = True
+	App.ssl.Enabled = True
+	App.RedirectToHttps = True
 	#End If
 	
 	' Frontend using HTMX and AlpineJS
@@ -114,14 +115,9 @@ Sub AppStart (Args() As String)
 	Api = App.api
 	Api.EnableHelp = True
 	ORM.InitDatabase
+	HRM.Initialize
+	HRM.VerboseMode = Api.VerboseMode
+	HRM.ContentType = Api.ContentType
+	HRM.PayloadType = Api.PayloadType
 	StartMessageLoop
-End Sub
-
-Public Sub HRM As HttpResponseMessage
-	Dim HRM1 As HttpResponseMessage
-	HRM1.Initialize
-	HRM1.VerboseMode = Api.VerboseMode
-	HRM1.ContentType = Api.ContentType
-	HRM1.PayloadType = Api.PayloadType
-	Return HRM1
 End Sub
