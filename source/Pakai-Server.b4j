@@ -65,7 +65,7 @@ Version=10.7
 '1 - Create $APPNAME$.b4j
 '2 - Open $APPNAME$.b4j
 '    -> Remove all macros for Step 1 to 5
-'3 - Create Pakai Server (6.99 rev2).b4xtemplate
+'3 - Create Pakai Server (6.99 rev3).b4xtemplate
 '4 - Copy to B4J Additional Libraries folder
 '5 - Check Release folder
 #Macro: Title, Step 1, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\Pakai-Server.b4j&Args=%PROJECT%\$APPNAME$.b4j

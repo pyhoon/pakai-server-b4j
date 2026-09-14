@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 'Https Filter class
-'Version: 6.99 rev2
+'Version: 6.99 rev3
 Sub Class_Globals
 
 End Sub

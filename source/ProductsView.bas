@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Products View
-' Version 6.99 rev2
+' Version 6.99 rev3
 Sub Class_Globals
 	Private App As EndsMeet
 End Sub
@@ -223,7 +223,7 @@ Private Sub ModalDelete As MiniHtml
 	Dim ModalBody As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(ModalBody)
 	MH.HiddenInput("id", "id", "").up(ModalBody)
-	MH.P.up(ModalBody).Id = "p1"
+	MH.P.up(ModalBody).attr("id", "p1")
 	MH.ModalFooter("Delete", "Cancel", "danger", "secondary").up(form1)
 	Return form1
 End Sub

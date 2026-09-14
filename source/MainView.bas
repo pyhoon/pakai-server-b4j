@@ -5,14 +5,13 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Main View
-' Version 6.99 rev2
+' Version 6.99 rev3
 Sub Class_Globals
 	Private mModal As MiniHtml
 	Private mToast As MiniHtml
 	Private mContent As MiniHtml
 	Private mSubContent As MiniHtml
 	Private mAddCsrfToken As Boolean
-	Private mScript As String
 End Sub
 
 Public Sub Initialize
@@ -37,10 +36,6 @@ End Sub
 
 Public Sub LoadToast (Tag1 As MiniHtml)
 	mToast = Tag1
-End Sub
-
-Public Sub LoadScript (Script1 As String)
-	mScript = Script1
 End Sub
 
 Public Sub Render As MiniHtml
