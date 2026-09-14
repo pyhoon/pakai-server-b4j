@@ -47,7 +47,7 @@ Public Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 		Case "Delete"
 			Dim modal1 As MiniHtml = CreateOrReadFromCache("Products Delete Modal")
 			modal1.ChildById("id").attr("value", Data.Get("id"))
-			modal1.ChildById("p1").text2($"Delete ${Data.Get("product_name")} (${Data.Get("product_code")})?"$)
+			modal1.ChildById("p1").replace($"Delete ${Data.Get("product_name")} (${Data.Get("product_code")})?"$)
 			Return modal1.build
 		Case Else
 			Return ""
@@ -133,11 +133,11 @@ Public Sub ProductsTableFilled (data As List) As MiniHtml
 	tbody1.Children.Clear
 	For Each row As Map In data
 		Dim tr1 As MiniHtml = CreateOrReadFromCache("Products Table Row")
-		tr1.child(0).text2(row.Get("id"))
-		tr1.child(1).text2(row.Get("product_code"))
-		tr1.child(2).text2(row.Get("product_name"))
-		tr1.child(3).text2(row.Get("category_name"))
-		tr1.child(4).text2(NumberFormat2(row.Get("product_price"), 1, 2, 2, True))
+		tr1.child(0).replace(row.Get("id"))
+		tr1.child(1).replace(row.Get("product_code"))
+		tr1.child(2).replace(row.Get("product_name"))
+		tr1.child(3).replace(row.Get("category_name"))
+		tr1.child(4).replace(NumberFormat2(row.Get("product_price"), 1, 2, 2, True))
 		tr1.child(5).child(0).attr("hx-get", "/hx/products/edit/" & row.Get("id"))
 		tr1.child(5).child(1).attr("hx-get", "/hx/products/delete/" & row.Get("id"))
 		tr1.up(tbody1)
