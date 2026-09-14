@@ -12,19 +12,20 @@ Library4=minihtml
 Library5=minijs
 Library6=miniormutils
 Module1=CategoriesHandler
-Module10=ProductsView
+Module10=ProductsModel
+Module11=ProductsView
 Module2=CategoriesModel
 Module3=CategoriesView
 Module4=MainView
 Module5=MC
 Module6=MH
-Module7=ORM
-Module8=ProductsHandler
-Module9=ProductsModel
+Module7=|absolute|C:\Projects\MiniHTML4\source\MiniHtml
+Module8=ORM
+Module9=ProductsHandler
 NumberOfFiles=2
 NumberOfLibraries=6
-NumberOfModules=10
-Version=10.5
+NumberOfModules=11
+Version=10.7
 @EndOfDesignText@
 #Region  Project Attributes
 '================================================

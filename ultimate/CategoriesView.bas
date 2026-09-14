@@ -32,7 +32,7 @@ Public Sub Modal (Action As String, Data As Map) As String
 		Case "Delete"
 			Dim modal1 As MiniHtml = CreateOrReadFromCache("Categories Delete Modal")
 			modal1.ChildById("id").attr("value", Data.Get("id"))
-			modal1.ChildById("p1").text2($"Delete ${Data.Get("category_name")}?"$)
+			modal1.ChildById("p1").replace($"Delete ${Data.Get("category_name")}?"$)
 			Return modal1.build
 		Case Else
 			Return ""
@@ -51,7 +51,7 @@ Public Sub RenderedTable (data As List) As String
 	Return CategoriesTableFilled(data).build
 End Sub
 
-Private Sub CreateOrReadFromCache (CacheName As String) As MiniHtml
+Sub CreateOrReadFromCache (CacheName As String) As MiniHtml
 	Select CacheName
 		Case "Categories Page", "Categories Table"
 			If MC.ExistInCache(App.ctx, CacheName) Then
@@ -79,7 +79,7 @@ Private Sub CreateOrReadFromCache (CacheName As String) As MiniHtml
 	Return Segment
 End Sub
 
-Private Sub CategoriesPage As MiniHtml
+Sub CategoriesPage As MiniHtml
 	Dim main1 As MainView
 	main1.Initialize
 	main1.LoadContent(ContainerContent)
@@ -92,7 +92,7 @@ Private Sub CategoriesPage As MiniHtml
 	Return page1
 End Sub
 
-Private Sub ContainerContent As MiniHtml
+Sub ContainerContent As MiniHtml
 	Dim row1 As MiniHtml = MH.Div.cls("row mt-3 text-center align-items-center justify-content-center")
 	Dim col1 As MiniHtml = MH.Div.up(row1).cls("col-md-12 col-lg-6")
 	Dim form1 As MiniHtml = MH.Form.up(col1).cls("form mb-3").attr("action", "")
@@ -102,7 +102,7 @@ Private Sub ContainerContent As MiniHtml
 	Dim div1 As MiniHtml = MH.Div.up(row2).cls("col-md-6 col-lg-6")
 	Dim div2 As MiniHtml = MH.Div.up(div1).cls("text-end mt-2")
 	MH.ButtonAdd("Add Category", "btn btn-success ml-2", "/hx/categories/add", "#modal-content", "click", "#modal-container", "modal").up(div2)
-	MH.ContainerHxGet("categories-container", "/hx/categories/table", "load", "Loading...").up(col1)
+	MH.ContainerHxGet("categories-container", "/hx/categories/table", "load", "Loading...").up(col1).uniline
 	Return row1
 End Sub
 
@@ -112,8 +112,8 @@ Public Sub CategoriesTableFilled (data As List) As MiniHtml
 	tbody1.Children.Clear
 	For Each row As Map In data
 		Dim tr1 As MiniHtml = CreateOrReadFromCache("Categories Table Row")
-		tr1.child(0).text2(row.Get("id"))
-		tr1.child(1).text2(row.Get("category_name"))
+		tr1.child(0).replace(row.Get("id"))
+		tr1.child(1).replace(row.Get("category_name"))
 		tr1.child(2).child(0).attr("hx-get", "/hx/categories/edit/" & row.Get("id"))
 		tr1.child(2).child(1).attr("hx-get", "/hx/categories/delete/" & row.Get("id"))
 		tr1.up(tbody1)
@@ -142,38 +142,34 @@ Public Sub CategoriesTableRow As MiniHtml
 	Return tr1
 End Sub
 
-Private Sub ModalAdd As MiniHtml	
+Sub ModalAdd As MiniHtml	
 	Dim form1 As MiniHtml = MH.FormHxPost("/hx/categories", "#modal-messages")
 	MH.ModalHeader("Add Category").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
-	Dim fg1 As MiniHtml = MH.FormGroup.up(mb1)
-	MH.RequiredLabel("Name ", "name").up(fg1)
-	MH.RequiredTextInput("name", "name", "").up(fg1)
+	MH.TextInputGroup("name", "name", "", "Name ").up(mb1)
 	MH.ModalFooter("Create", "Cancel", "success", "secondary").up(form1)
 	Return form1
 End Sub
 
-Private Sub ModalEdit As MiniHtml	
+Sub ModalEdit As MiniHtml	
 	Dim form1 As MiniHtml = MH.FormHxPut("/hx/categories", "#modal-messages")
 	MH.ModalHeader("Edit Category").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
 	MH.HiddenInput("id", "id", "").up(mb1)
-	Dim fg1 As MiniHtml = MH.FormGroup.up(mb1)
-	MH.RequiredLabel("Name ", "name").up(fg1)
-	MH.RequiredTextInput("name", "name", "").up(fg1)
+	MH.TextInputGroup("name", "name", "", "Name ").up(mb1)
 	MH.ModalFooter("Update", "Cancel", "primary", "secondary").up(form1)
 	Return form1
 End Sub
 
-Private Sub ModalDelete As MiniHtml	
+Sub ModalDelete As MiniHtml	
 	Dim form1 As MiniHtml = MH.FormHxDelete("/hx/categories", "#modal-messages")
 	MH.ModalHeader("Delete Category").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
 	MH.HiddenInput("id", "id", "").up(mb1)
-	MH.P.up(mb1).Id = "p1"
+	MH.P.up(mb1).attr("id", "p1")
 	MH.ModalFooter("Delete", "Cancel", "danger", "secondary").up(form1)
 	Return form1
 End Sub

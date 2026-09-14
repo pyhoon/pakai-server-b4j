@@ -43,7 +43,7 @@ Public Sub InitDatabase
 	End Try
 End Sub
 
-Private Sub CheckDatabase
+Sub CheckDatabase
 	Try
 		LogColor("Checking database...", COLOR_BLUE)
 		Select DB.DbType
@@ -70,7 +70,7 @@ Private Sub CheckDatabase
 End Sub
 
 ' Create Database Tables and Populate Data
-Private Sub CreateDatabase
+Sub CreateDatabase
 	LogColor("Creating database...", COLOR_BLUE)
 	Dim Success As Boolean = DB.CreateSQLite
 	If Not(Success) Then

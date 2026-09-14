@@ -12,6 +12,7 @@ Sub Class_Globals
 	Private Method As String
 	Private View As ProductsView
 	Private Model As ProductsModel
+	Private Model2 As CategoriesModel
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 End Sub
@@ -20,6 +21,7 @@ Public Sub Initialize
 	App = Main.App
 	View.Initialize
 	Model.Initialize
+	Model2.Initialize
 End Sub
 
 Sub Handle (req As ServletRequest, resp As ServletResponse)
@@ -43,31 +45,26 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 	End If
 End Sub
 
-Private Sub HandlePage
+Sub HandlePage
 	App.WriteHtml2(Response, View.Show, App.ctx)
 End Sub
 
 ' Return default or search results table
-Private Sub HandleTable
+Sub HandleTable
 	Dim keyword As String = Request.GetParameter("keyword")
 	Dim Rows As List = Model.Search(keyword)
 	App.WriteHtml(Response, View.RenderedTable(Rows))
 End Sub
 
 ' Add modal
-Private Sub HandleModalAdd
-	Dim CM As CategoriesModel
-	CM.Initialize
-	Dim Categories As List = CM.Read
-	If CM.Error.IsInitialized Then
-		ShowAlert($"Database error: ${CM.Error.Message}"$, "danger")
-		Return
-	End If
+Sub HandleModalAdd
+	Dim Categories As List = Model2.Read
+	If Model2Error Then Return
 	App.WriteHtml(Response, View.Modal("Add", Categories, Null))
 End Sub
 
 ' Edit modal
-Private Sub HandleModalEdit
+Sub HandleModalEdit
 	Try
 		Dim id As Int = Path.SubString("/hx/products/edit/".Length)
 	Catch
@@ -75,23 +72,15 @@ Private Sub HandleModalEdit
 		ShowAlert($"Error: ${LastException.Message}"$, "danger")
 		Return
 	End Try
-	Dim CM As CategoriesModel
-	CM.Initialize
-	Dim Categories As List = CM.Read
-	If CM.Error.IsInitialized Then
-		ShowAlert($"Database error: ${CM.Error.Message}"$, "danger")
-		Return
-	End If
+	Dim Categories As List = Model2.Read
+	If Model2Error Then Return
 	Dim Product As Map = Model.GetRowById(id)
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-		Return
-	End If
+	If ModelError Then Return
 	App.WriteHtml(Response, View.Modal("Edit", Categories, Product))
 End Sub
 
 ' Delete modal
-Private Sub HandleModalDelete
+Sub HandleModalDelete
 	Try
 		Dim id As Int = Path.SubString("/hx/products/delete/".Length)
 	Catch
@@ -100,15 +89,12 @@ Private Sub HandleModalDelete
 		Return
 	End Try
 	Dim Product As Map = Model.GetRowById(id)
-	If Model.Error.IsInitialized Then
-		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-		Return
-	End If
+	If ModelError Then Return
 	App.WriteHtml(Response, View.Modal("Delete", Null, Product))
 End Sub
 
 ' Handle CRUD operations
-Private Sub HandleProducts
+Sub HandleProducts
 	Select Method
 		Case "POST"
 			' Create
@@ -117,29 +103,20 @@ Private Sub HandleProducts
 			Dim tempprice As String = Request.GetParameter("price")
 			Dim price As Double = IIf(tempprice.Trim = "", 0, tempprice)
 			Dim category As Int = Request.GetParameter("category")
-
 			If code = "" Or code.Trim.Length < 2 Then
 				ShowAlert("Product Code must be at least 2 characters long.", "warning")
 				Return
 			End If
-			
 			' Check conflict
 			Dim Found As Boolean = Model.FindRowByProductCode(code)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-				Return
-			End If
+			If ModelError Then Return
 			If Found Then
 				ShowAlert("Product Code already exists!", "warning")
 				Return
 			End If
-
 			' Insert new row
 			Model.Create(category, code, name, price, ORM.CurrentDateTime)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-				Return
-			End If			
+			If ModelError Then Return
 			ShowToast("Product", "created", "Product created successfully!", "success")
 		Case "PUT"
 			' Update
@@ -148,7 +125,6 @@ Private Sub HandleProducts
 			Dim name As String = Request.GetParameter("name")
 			Dim price As Double = Request.GetParameter("price")
 			Dim category As Int = Request.GetParameter("category")
-			
 			If code = "" Or code.Trim.Length < 2 Then
 				ShowAlert("Product Code must be at least 2 characters long.", "warning")
 				Return
@@ -157,65 +133,59 @@ Private Sub HandleProducts
 				ShowAlert("Product Name must be at least 2 characters long.", "warning")
 				Return
 			End If
-			
 			Dim Found As Boolean = Model.FindRowById(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-				Return
-			End If
+			If ModelError Then Return
 			If Not(Found) Then
 				ShowAlert("Product not found!", "warning")
 				Return
 			End If
-			
 			Dim Found As Boolean = Model.FindRowByProductCodeNotEqualId(code, id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-				Return
-			End If
+			If ModelError Then Return
 			If Found Then
 				ShowAlert("Product Code already exists!", "warning")
 				Return
 			End If
-			
 			' Update row
 			Model.Update(id, category, code, name, price, ORM.CurrentDateTime)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-				Return
-			End If
+			If ModelError Then Return
 			ShowToast("Product", "updated", "Product updated successfully!", "info")
 		Case "DELETE"
 			' Delete
 			Dim id As Int = Request.GetParameter("id")
-			
 			Dim Found As Boolean = Model.FindRowById(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-				Return
-			End If
+			If ModelError Then Return
 			If Not(Found) Then
 				ShowAlert("Product not found!", "warning")
 				Return
 			End If
-
 			' Delete row
 			Model.Delete(id)
-			If Model.Error.IsInitialized Then
-				ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
-				Return
-			End If
+			If ModelError Then Return
 			ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
 	End Select
 End Sub
 
-Private Sub ShowAlert (Message As String, Status As String)
-	Dim info As AlertInfo = MH.CreateAlertInfo(Message, Status)
-	App.WriteHtml(Response, View.Alert(info))
+Sub ModelError As Boolean
+	If Model.Error.IsInitialized Then
+		ShowAlert($"Database error: ${Model.Error.Message}"$, "danger")
+		Return True
+	End If
+	Return False
 End Sub
-'
-Private Sub ShowToast (Entity As String, Action As String, Message As String, Status As String)
+
+Sub Model2Error As Boolean
+	If Model2.Error.IsInitialized Then
+		ShowAlert($"Database error: ${Model2.Error.Message}"$, "danger")
+		Return True
+	End If
+	Return False
+End Sub
+
+Sub ShowAlert (Message As String, Status As String)
+	App.WriteHtml(Response, View.Alert(MH.CreateAlertInfo(Message, Status)))
+End Sub
+
+Sub ShowToast (Entity As String, Action As String, Message As String, Status As String)
 	Dim data As List = Model.Read
-	Dim info As ToastInfo = MH.CreateToastInfo(Entity, Action, Message, Status)
-	App.WriteHtml(Response, View.Toast(data, info))
+	App.WriteHtml(Response, View.Toast(data, MH.CreateToastInfo(Entity, Action, Message, Status)))
 End Sub
