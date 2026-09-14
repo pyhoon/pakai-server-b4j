@@ -7,11 +7,20 @@ Version=10.5
 ' Main View
 ' Version 6.99 rev2
 Sub Class_Globals
-	Private mModal, mToast, mContent, mSubContent As MiniHtml
+	Private mModal As MiniHtml
+	Private mToast As MiniHtml
+	Private mContent As MiniHtml
+	Private mSubContent As MiniHtml
+	Private mAddCsrfToken As Boolean
+	Private mScript As String
 End Sub
 
 Public Sub Initialize
 
+End Sub
+
+Public Sub setAddCsrfToken (Enable As Boolean)
+	mAddCsrfToken = Enable
 End Sub
 
 Public Sub LoadContent (Tag1 As MiniHtml)
@@ -28,6 +37,10 @@ End Sub
 
 Public Sub LoadToast (Tag1 As MiniHtml)
 	mToast = Tag1
+End Sub
+
+Public Sub LoadScript (Script1 As String)
+	mScript = Script1
 End Sub
 
 Public Sub Render As MiniHtml
@@ -51,6 +64,9 @@ Private Sub PageHeader As MiniHtml
 	Dim head1 As MiniHtml = MH.ResponsiveHeader
 	MH.Meta.up(head1).attr("name", "description").attr("content", "Created using Pakai framework")
 	MH.Meta.up(head1).attr("name", "author").attr("content", "Aeric Poon")
+	If mAddCsrfToken Then
+		MH.Meta.up(head1).attr("name", "csrf-token").attr("content", "{{ csrf_token() }}")
+	End If
 	MH.Title.up(head1).text("$APP_TITLE$")
 	MH.FavoriteIcon("image/png", "$SERVER_URL$/assets/img/favicon.png").up(head1)
 	'Local assets
