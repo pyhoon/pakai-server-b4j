@@ -32,7 +32,7 @@ Public Sub Modal (Action As String, Data As Map) As String
 		Case "Delete"
 			Dim modal1 As MiniHtml = CreateOrReadFromCache("Categories Delete Modal")
 			modal1.ChildById("id").attr("value", Data.Get("id"))
-			modal1.ChildById("p1").text2($"Delete ${Data.Get("category_name")}?"$)
+			modal1.ChildById("p1").replace($"Delete ${Data.Get("category_name")}?"$)
 			Return modal1.build
 		Case Else
 			Return ""			
@@ -112,8 +112,8 @@ Public Sub CategoriesTableFilled (data As List) As MiniHtml
 	tbody1.Children.Clear
 	For Each row As Map In data
 		Dim tr1 As MiniHtml = CreateOrReadFromCache("Categories Table Row")
-		tr1.child(0).text2(row.Get("id"))
-		tr1.child(1).text2(row.Get("category_name"))
+		tr1.child(0).replace(row.Get("id"))
+		tr1.child(1).replace(row.Get("category_name"))
 		tr1.child(2).child(0).attr("hx-get", "/hx/categories/edit/" & row.Get("id"))
 		tr1.child(2).child(1).attr("hx-get", "/hx/categories/delete/" & row.Get("id"))
 		tr1.up(tbody1)
