@@ -4,16 +4,8 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.5
 @EndOfDesignText@
-' Categories Handler class
-' Version 6.99
 Sub Class_Globals
-	Private App As EndsMeet
-	Private Path As String
-	Private Method As String
-	Private View As CategoriesView
-	Private Model As CategoriesModel
-	Private Request As ServletRequest
-	Private Response As ServletResponse
+	Private App As EndsMeet, Path As String, Method As String, View As CategoriesView, Model As CategoriesModel, Request As ServletRequest, Response As ServletResponse
 End Sub
 
 Public Sub Initialize
@@ -47,18 +39,15 @@ Sub HandlePage
 	App.WriteHtml2(Response, View.Show, App.ctx)
 End Sub
 
-' Return table HTML
 Sub HandleTable
 	Dim Rows As List = Model.Read
 	App.WriteHtml(Response, View.RenderedTable(Rows))
 End Sub
 
-' Add modal
 Sub HandleModalAdd
 	App.WriteHtml(Response, View.Modal("Add", Null))
 End Sub
 
-' Edit modal
 Sub HandleModalEdit
 	Try
 		Dim id As Int = Path.SubString("/hx/categories/edit/".Length)
@@ -72,7 +61,6 @@ Sub HandleModalEdit
 	App.WriteHtml2(Response, View.Modal("Edit", Category), Category)
 End Sub
 
-' Delete modal
 Sub HandleModalDelete
 	Try
 		Dim id As Int = Path.SubString("/hx/categories/delete/".Length)
@@ -86,7 +74,6 @@ Sub HandleModalDelete
 	App.WriteHtml2(Response, View.Modal("Delete", Category), Category)
 End Sub
 
-' Handle CRUD operations
 Sub HandleCategories
 	Select Method
 		Case "POST"
@@ -102,12 +89,10 @@ Sub HandleCategories
 				ShowAlert("Category already exists!", "warning")
 				Return
 			End If
-			' Insert new row
-			Model.Create(name, ORM.CurrentDateTime)
+			Model.Create(name)
 			If ModelError Then Return
 			ShowToast("Category", "created", "Category created successfully!", "success")
 		Case "PUT"
-			' Update
 			Dim id As Int = Request.GetParameter("id")
 			Dim name As String = Request.GetParameter("name")
 			Dim Found As Boolean = Model.FindRowById(id)
@@ -125,12 +110,10 @@ Sub HandleCategories
 				ShowAlert("Category already exists!", "warning")
 				Return
 			End If
-			' Update row
-			Model.Update(id, name, ORM.CurrentDateTime)
+			Model.Update(id, name)
 			If ModelError Then Return
 			ShowToast("Category", "updated", "Category updated successfully!", "info")
 		Case "DELETE"
-			' Delete
 			Dim id As Int = Request.GetParameter("id")
 			Dim Found As Boolean = Model.FindRowById(id)
 			If ModelError Then Return
@@ -144,7 +127,6 @@ Sub HandleCategories
 				ShowAlert("Cannot delete category with associated products!", "warning")
 				Return
 			End If
-			' Delete row
 			Model.Delete(id)
 			If ModelError Then Return
 			ShowToast("Category", "deleted", "Category deleted successfully!", "danger")
@@ -160,10 +142,9 @@ Sub ModelError As Boolean
 End Sub
 
 Sub ShowAlert (Message As String, Status As String)
-	App.WriteHtml(Response, View.Alert(MH.CreateAlertInfo(Message, Status)))
+	App.WriteHtml(Response, MH.Alert(Message, Status))
 End Sub
 
 Sub ShowToast (Entity As String, Action As String, Message As String, Status As String)
-	Dim data As List = Model.Read
-	App.WriteHtml(Response, View.Toast(data, MH.CreateToastInfo(Entity, Action, Message, Status)))
+	App.WriteHtml(Response, View.Toast(Model.Read, CreateMap("entity": Entity, "action": Action, "message": Message, "status": Status)))
 End Sub
