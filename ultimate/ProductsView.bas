@@ -4,8 +4,6 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.5
 @EndOfDesignText@
-' Products View
-' Version 6.99
 Sub Class_Globals
 	Private App As EndsMeet
 End Sub
@@ -24,7 +22,6 @@ Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 		Case "Add"
 			Dim modal1 As MiniHtml = CreateOrReadFromCache("Products Add Modal")
 			Dim dd1 As MiniHtml = modal1.ChildById("category") 'dropdown
-			dd1.Children.Clear
 			MH.OptionDisabled("Select Category").up(dd1).selected
 			For Each row As Map In CategoryList
 				MH.OptionSelected(row.Get("category_name"), row.Get("id"), False).up(dd1)
@@ -33,8 +30,7 @@ Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 		Case "Edit"
 			Dim modal1 As MiniHtml = CreateOrReadFromCache("Products Edit Modal")
 			modal1.ChildById("id").attr("value", Data.Get("id"))
-			Dim dd1 As MiniHtml = modal1.ChildById("category") 'dropdown
-			dd1.Children.Clear
+			Dim dd1 As MiniHtml = modal1.ChildById("category")
 			MH.OptionDisabled("Select Category").up(dd1)
 			For Each row As Map In CategoryList
 				MH.OptionSelected(row.Get("category_name"), row.Get("id"), row.Get("id") = Data.Get("category_id")).up(dd1)
@@ -54,11 +50,7 @@ Sub Modal (Action As String, CategoryList As List, Data As Map) As String
 	End Select
 End Sub
 
-Sub Alert (info As AlertInfo) As String
-	Return MH.Alert(info)
-End Sub
-
-Sub Toast (data As List, info As ToastInfo) As String
+Sub Toast (data As List, info As Map) As String
 	Return MH.Toast("products-container", ProductsTableFilled(data), info)
 End Sub
 
@@ -75,20 +67,13 @@ Sub CreateOrReadFromCache (CacheName As String) As MiniHtml
 	End Select
 	Dim Segment As MiniHtml
 	Select CacheName
-		Case "Products Page"
-			Segment = ProductsPage
-		Case "Products Table"
-			Segment = ProductsTable
-		Case "Products Table Row"
-			Segment = ProductsTableRow
-		Case "Products Add Modal"
-			Segment = ModalAdd
-		Case "Products Edit Modal"
-			Segment = ModalEdit
-		Case "Products Delete Modal"
-			Segment = ModalDelete
-		Case Else
-			Segment.Initialize("")
+		Case "Products Page" : Segment = ProductsPage
+		Case "Products Table" :	Segment = ProductsTable
+		Case "Products Table Row" :	Segment = ProductsTableRow
+		Case "Products Add Modal" :	Segment = ModalAdd
+		Case "Products Edit Modal" : Segment = ModalEdit
+		Case "Products Delete Modal" : Segment = ModalDelete
+		Case Else :	Segment.Initialize("")
 	End Select
 	MC.WriteToCache(App.ctx, CacheName, Segment.ConvertToBytes)
 	Return Segment
@@ -101,7 +86,7 @@ Sub ProductsPage As MiniHtml
 	main1.LoadModal(MH.ContainerModal)
 	main1.LoadToast(MH.ContainerToast)
 	Dim page1 As MiniHtml = main1.Render
-	Dim nav1 As MiniHtml = page1.ChildByClass("navbar-nav") 'ul
+	Dim nav1 As MiniHtml = page1.ChildByClass("navbar-nav")
 	If App.api.EnableHelp Then
 		MH.NavLinkItem("API", "/help", "bi bi-gear me-2", "API").up(nav1)
 	End If
@@ -129,7 +114,6 @@ End Sub
 Sub ProductsTableFilled (data As List) As MiniHtml
 	Dim table1 As MiniHtml = CreateOrReadFromCache("Products Table")
 	Dim tbody1 As MiniHtml = table1.ChildByName("tbody")
-	tbody1.Children.Clear
 	For Each row As Map In data
 		Dim tr1 As MiniHtml = CreateOrReadFromCache("Products Table Row")
 		tr1.child(0).replace(row.Get("id"))
@@ -173,7 +157,7 @@ Sub ProductsTableRow As MiniHtml
 End Sub
 
 Sub ModalAdd As MiniHtml
-	Dim form1 As MiniHtml = MH.FormHxPost("/hx/products", "#modal-messages")
+	Dim form1 As MiniHtml = MH.FormHx("post", "/hx/products", "#modal-messages")
 	MH.ModalHeader("Add Product").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
@@ -186,7 +170,7 @@ Sub ModalAdd As MiniHtml
 End Sub
 
 Sub ModalEdit As MiniHtml
-	Dim form1 As MiniHtml = MH.FormHxPut("/hx/products", "#modal-messages")
+	Dim form1 As MiniHtml = MH.FormHx("put", "/hx/products", "#modal-messages")
 	MH.ModalHeader("Edit Product").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
@@ -200,7 +184,7 @@ Sub ModalEdit As MiniHtml
 End Sub
 
 Sub ModalDelete As MiniHtml
-	Dim form1 As MiniHtml = MH.FormHxDelete("/hx/products", "#modal-messages")
+	Dim form1 As MiniHtml = MH.FormHx("delete", "/hx/products", "#modal-messages")
 	MH.ModalHeader("Delete Product").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
