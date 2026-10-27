@@ -123,7 +123,8 @@ App.ssl.ShowLog = True
 App.smtp.Enabled = True
 App.ssl.Port = 8888
 App.cors.Enabled = True
-App.staticfiles.Folder = "/www"
+App.AssetsFolderBrowsable = True
+App.AssetsFolder = File.Combine(File.DirApp, "assets")
 ```
 
 **Key Properties:**
@@ -131,7 +132,8 @@ App.staticfiles.Folder = "/www"
 - `App.ssl` → SslSettings (ShowLog, Enabled, Port, KeystoreDir, KeystoreFile, KeystorePassword)
 - `App.cors` → CorsSettings (Enabled, Path, Settings)
 - `App.smtp` → SMTP settings (Enabled, Port, UseSsl, Server, UserName, Password)
-- `App.staticfiles` → StaticFilesSettings (Folder, Browsable)
+- `App.AssetsFolderBrowsable` → Allow browsing the assets folder
+- `App.AssetsFolder` → Filesystem path to the assets folder
 - `App.ctx` → Map for template variables (used in HTML substitution)
 
 ---
