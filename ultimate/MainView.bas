@@ -4,8 +4,6 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.5
 @EndOfDesignText@
-' Main View
-' Version 6.99
 Sub Class_Globals
 	Private mModal, mToast, mContent, mSubContent As MiniHtml
 End Sub
@@ -49,7 +47,7 @@ Sub PageHeader As MiniHtml
 	MH.Meta.up(head1).attr("name", "description").attr("content", "Created using Pakai framework")
 	MH.Meta.up(head1).attr("name", "author").attr("content", "Aeric Poon")
 	MH.Title.up(head1).text("$APP_TITLE$")
-	'MH.Link.up(head1).attr("rel", "icon").attr("type", "image/png").attr("href", "$SERVER_URL$/assets/img/favicon.png")
+	'MH.Link.up(head1).attr("rel", "icon").attr("type", "image/png").href("$SERVER_URL$/assets/img/favicon.png")
 	MH.Link.up(head1).rel.href("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css") _
 	.integrity("sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB").crossorigin("anonymous").wrapAttributes
 	MH.Link.up(head1).rel.href("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")	
@@ -62,13 +60,13 @@ Sub PageBody As MiniHtml
 	If mToast.IsInitialized Then mToast.up(body1)
 	Dim nav1 As MiniHtml = MH.NavbarExpand("navbar-light sticky-top bg-info py-1", "lg", "bi bi-infinity h3", "$APP_TRADEMARK$").up(body1)
 	Dim div1 As MiniHtml = nav1.ChildByClass("container-fluid")
-	MH.NavbarToggler.up(div1).wrapAttributes
+	MH.NavbarToggler.up(div1)
 	MH.NavbarCollapse.up(div1)
 	Dim content1 As MiniHtml = MH.Div.up(body1).cls("content m-3")
 	Dim padding2 As MiniHtml = MH.Div.up(content1).cls("p-2")
 	If Initialized(mContent) Then mContent.up(padding2)
 	If Initialized(mSubContent) Then mSubContent.up(padding2)
 	If Initialized(mModal) Then mModal.up(body1)
-	MH.Div(False).up(body1).cls("bottom")
+	MH.CMH("div", False).up(body1).cls("bottom")
 	Return body1
 End Sub
