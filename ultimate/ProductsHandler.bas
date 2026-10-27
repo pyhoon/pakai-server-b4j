@@ -4,17 +4,8 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.5
 @EndOfDesignText@
-' Products Handler class
-' Version 6.99
 Sub Class_Globals
-	Private App As EndsMeet
-	Private Path As String
-	Private Method As String
-	Private View As ProductsView
-	Private Model As ProductsModel
-	Private Model2 As CategoriesModel
-	Private Request As ServletRequest
-	Private Response As ServletResponse
+	Private App As EndsMeet, Path As String, Method As String, View As ProductsView, Model As ProductsModel, Model2 As CategoriesModel, Request As ServletRequest, Response As ServletResponse
 End Sub
 
 Public Sub Initialize
@@ -49,21 +40,18 @@ Sub HandlePage
 	App.WriteHtml2(Response, View.Show, App.ctx)
 End Sub
 
-' Return default or search results table
 Sub HandleTable
 	Dim keyword As String = Request.GetParameter("keyword")
 	Dim Rows As List = Model.Search(keyword)
 	App.WriteHtml(Response, View.RenderedTable(Rows))
 End Sub
 
-' Add modal
 Sub HandleModalAdd
 	Dim Categories As List = Model2.Read
 	If Model2Error Then Return
 	App.WriteHtml(Response, View.Modal("Add", Categories, Null))
 End Sub
 
-' Edit modal
 Sub HandleModalEdit
 	Try
 		Dim id As Int = Path.SubString("/hx/products/edit/".Length)
@@ -79,7 +67,6 @@ Sub HandleModalEdit
 	App.WriteHtml(Response, View.Modal("Edit", Categories, Product))
 End Sub
 
-' Delete modal
 Sub HandleModalDelete
 	Try
 		Dim id As Int = Path.SubString("/hx/products/delete/".Length)
@@ -93,11 +80,9 @@ Sub HandleModalDelete
 	App.WriteHtml(Response, View.Modal("Delete", Null, Product))
 End Sub
 
-' Handle CRUD operations
 Sub HandleProducts
 	Select Method
 		Case "POST"
-			' Create
 			Dim code As String = Request.GetParameter("code")
 			Dim name As String = Request.GetParameter("name")
 			Dim tempprice As String = Request.GetParameter("price")
@@ -107,19 +92,16 @@ Sub HandleProducts
 				ShowAlert("Product Code must be at least 2 characters long.", "warning")
 				Return
 			End If
-			' Check conflict
 			Dim Found As Boolean = Model.FindRowByProductCode(code)
 			If ModelError Then Return
 			If Found Then
 				ShowAlert("Product Code already exists!", "warning")
 				Return
 			End If
-			' Insert new row
-			Model.Create(category, code, name, price, ORM.CurrentDateTime)
+			Model.Create(category, code, name, price)
 			If ModelError Then Return
 			ShowToast("Product", "created", "Product created successfully!", "success")
 		Case "PUT"
-			' Update
 			Dim id As Int = Request.GetParameter("id")
 			Dim code As String = Request.GetParameter("code")
 			Dim name As String = Request.GetParameter("name")
@@ -145,12 +127,10 @@ Sub HandleProducts
 				ShowAlert("Product Code already exists!", "warning")
 				Return
 			End If
-			' Update row
-			Model.Update(id, category, code, name, price, ORM.CurrentDateTime)
+			Model.Update(id, category, code, name, price)
 			If ModelError Then Return
 			ShowToast("Product", "updated", "Product updated successfully!", "info")
 		Case "DELETE"
-			' Delete
 			Dim id As Int = Request.GetParameter("id")
 			Dim Found As Boolean = Model.FindRowById(id)
 			If ModelError Then Return
@@ -158,7 +138,6 @@ Sub HandleProducts
 				ShowAlert("Product not found!", "warning")
 				Return
 			End If
-			' Delete row
 			Model.Delete(id)
 			If ModelError Then Return
 			ShowToast("Product", "deleted", "Product deleted successfully!", "danger")
@@ -182,10 +161,9 @@ Sub Model2Error As Boolean
 End Sub
 
 Sub ShowAlert (Message As String, Status As String)
-	App.WriteHtml(Response, View.Alert(MH.CreateAlertInfo(Message, Status)))
+	App.WriteHtml(Response, MH.Alert(Message, Status))
 End Sub
 
 Sub ShowToast (Entity As String, Action As String, Message As String, Status As String)
-	Dim data As List = Model.Read
-	App.WriteHtml(Response, View.Toast(data, MH.CreateToastInfo(Entity, Action, Message, Status)))
+	App.WriteHtml(Response, View.Toast(Model.Read, CreateMap("entity": Entity, "action": Action, "message": Message, "status": Status)))
 End Sub
