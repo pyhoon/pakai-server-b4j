@@ -61,7 +61,7 @@ Pakai Framework is a full-stack B4J web application framework built on top of th
 
 ### Prerequisites
 
-- **B4J IDE** v10.5 or later (https://www.b4x.com/b4j.html)
+- **B4J IDE** v10.7 or later (https://www.b4x.com/b4j.html). All Pakai v6.99 templates target B4J v10.7.
 - **Java JDK** 19+ (bundled with B4J or download separately)
 - **B4X Libraries** (see below)
 
