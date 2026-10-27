@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Help Handler class
-' Version 6.99 rev3
+' Version 6.99 rev4
 Sub Class_Globals
 	Private AllGroups 	As Map
 	Private AllMethods 	As List
@@ -113,11 +113,11 @@ Private Sub GenerateHelpPage As String 'ignore
 	link1.attr("type", "image/png")
 	link1.attr("href", "/assets/img/favicon.png")
 	'Local assets
-	'head1.cdn("style", "/assets/css/bootstrap.min.css")
-	'head1.cdn("style", "/assets/css/bootstrap-icons.min.css")
-	head1.cdn("css", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css") _
+	'MH.Link.up(head1).rel.href("/assets/css/bootstrap.min.css")
+	'MH.Link.up(head1).rel.href("/assets/css/bootstrap-icons.min.css")
+	MH.Link.up(head1).rel.href("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css") _
 	.integrity("sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB").crossorigin("anonymous")
-	head1.cdn("css", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")
+	MH.Link.up(head1).rel.href("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")
 	Dim sty1 As MiniHtml = MH.Style.up(head1)
 	Dim cssFolder As String = File.Combine(File.Combine(Main.App.AssetsFolder, "assets"), "css")
 	If File.Exists(cssFolder, "help.css") Then
@@ -263,14 +263,14 @@ Private Sub GenerateHelpPage As String 'ignore
 	MH.Icon.up(span3).cls("bi bi-heart")
 	caption1.text(" using Pakai")
 	'Local assets
-	'body1.cdn("script", "/assets/js/bootstrap.min.js")
-	'body1.cdn("script", "/assets/js/htmx.min.js")
-	'body1.cdn3("script", "/assets/js/cdn.min.js", CreateMap("defer": ""))
-	body1.cdn("js", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js") _
+	'MH.Script.up(body1).src("/assets/js/bootstrap.min.js")
+	'MH.Script.up(body1).src("/assets/js/htmx.min.js")
+	'MH.Script.up(body1).src("/assets/js/cdn.min.js").defer
+	MH.Script.up(body1).src("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js") _
 	.integrity("sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y").crossorigin("anonymous")
-	body1.cdn("js", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js") _
+	MH.Script.up(body1).src("https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js") _
 	.integrity("sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz").crossorigin("anonymous")
-	body1.cdn("js", "https://cdn.jsdelivr.net/npm/alpinejs@3.15.8/dist/cdn.min.js").defer
+	MH.Script.up(body1).src("https://cdn.jsdelivr.net/npm/alpinejs@3.15.8/dist/cdn.min.js").defer
 
 	Dim script2 As String = AlpineHtmx
 	MH.Script.up(body1).text(script2.SubString2(0, script2.LastIndexOf(CRLF))).multiline
@@ -1254,7 +1254,7 @@ Private Sub ServeOpenApiJson
 	' 1. Define OpenAPI Metadata
 	Dim InfoMap As Map = CreateMap( _
         "title": "Pakai Server v6 API", _
-        "version": "6.99 rev3", _
+        "version": "6.99 rev4", _
         "description": "Auto-compiled specification generated directly by HelpHandler" _
     )
     
