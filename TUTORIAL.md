@@ -14,22 +14,23 @@ Pakai Framework is a full-stack B4J web application framework built on top of th
 ### What's New in v6.99
 
 - HTMX 2.0.8 frontend (no custom JavaScript needed for CRUD)
-- Server-side HTML via MiniHtml 3.00 DSL (no HTML templates)
-- Three project variants: Full Stack, API-only, Web-only
+- Server-side HTML via MiniHTML4 4.02 DSL (no HTML templates)
+- Four project variants: Full Stack, API-only, Web-only, and Ultimate
 - Multi-database: SQLite, MySQL, MariaDB
 - Auto-generated OpenAPI 3.0 + Swagger UI
 - Interactive API console with AlpineJS
 - B4X code snippets for all endpoints
 - HTML caching for performance
-- HTTPS/SSL with auto-redirect
+- HTTPS/SSL settings loaded from a separate `.env` file
 
-### Three Flavors
+### Four Flavors
 
-| Variant | Modules | Use Case |
-|---------|:---:|----------|
-| **Pakai Server** (Full Stack) | 15 | Web UI + REST API + Docs |
-| **Pakai Server Api** | 9 | REST API only |
-| **Pakai Server Web** | 11 | Web UI only (no REST) |
+| Variant | Use Case |
+|---------|----------|
+| **Pakai Server** | Web UI + REST API + Docs |
+| **Pakai Server Api** | REST API and docs |
+| **Pakai Server Web** | Web UI only (no REST API) |
+| **Pakai Server Ultimate** | Lean Web UI starter (no REST API or API docs) |
 
 ### Architecture
 
@@ -71,14 +72,16 @@ Download these `.b4xlib` and `.jar` files and place them in your B4J **Additiona
 
 | Library | Version | Download |
 |---------|---------|----------|
-| EndsMeet | 2.20 | [GitHub](https://github.com/pyhoon/EndsMeet/releases/download/v2.20/EndsMeet.b4xlib) |
-| MiniHtml | 3.00 | [GitHub](https://github.com/pyhoon/MiniHtml2-B4X/releases/download/v3.00/MiniHtml.b4xlib) |
-| MiniORMUtils | 6.00 | [GitHub](https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v6.00/MiniORMUtils.b4xlib) |
-| MiniCSS | 0.30 | [GitHub](https://github.com/pyhoon/MiniCSS-B4X/releases/download/v0.30/MiniCSS.b4xlib) |
+| EndsMeet | 4.03 | [GitHub](https://github.com/pyhoon/EndsMeet/releases/download/v4.03/EndsMeet.b4xlib) |
+| MiniCSS | 0.40 | [GitHub](https://github.com/pyhoon/MiniCSS-B4X/releases/download/v0.40/MiniCSS.b4xlib) |
+| MiniHTML4 | 4.02 | [GitHub](https://github.com/pyhoon/MiniHTML4/releases/download/v4.02/MiniHTML.b4xlib) |
 | MiniJS | 0.60 | [GitHub](https://github.com/pyhoon/MiniJS-B4X/releases/download/v0.60/MiniJS.b4xlib) |
-| WebApiUtils | 6.99 | [GitHub](https://github.com/pyhoon/WebApiUtils-B4J/releases/download/v6.99/WebApiUtils.b4xlib) |
-| sqlite-jdbc | 3.7.2 | (included or download from Maven) |
-| mariadb-java-client | 3.5.6 | (included or download from MariaDB) |
+| MiniORMUtils | 6.04 | [GitHub](https://github.com/pyhoon/MiniORMUtils-B4X/releases/download/v6.04/MiniORMUtils.b4xlib) |
+| WebApiUtils | 7.00 | [GitHub](https://github.com/pyhoon/WebApiUtils-B4J/releases/download/v7.00/WebApiUtils.b4xlib) |
+| MariaDB Java Client | 3.5.9 | [Maven Central](https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/3.5.9/mariadb-java-client-3.5.9.jar) |
+| MySQL Connector/J | 9.7.0 | [Maven Central](https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/9.7.0/mysql-connector-j-9.7.0.jar) |
+
+The SQLite driver is supplied with B4J v10.7 as `sqlite-jdbc.jar` (without a version in the filename); the project uses `#AdditionalJar: sqlite-jdbc`. Use the `libs.json` shipped with each template as the dependency source of truth and run `libget.jar` to retrieve the libraries.
 
 > **Pro tip:** Use `libget.jar` (https://github.com/pyhoon/libget-b4j) to auto-download all libraries. Place it in your Additional folder and click the **GetLibraries** macro in the IDE.
 
@@ -175,34 +178,40 @@ You can also access:
 The server is configured via `Objects/config.ini` (auto-created on first run):
 
 ```ini
-# App Constants
-APP_TITLE=Pakai                 # Browser tab title
-APP_TRADEMARK=PAKAI             # Navbar brand text
-HOME_TITLE=PAKAI FRAMEWORK      # Heading on home page
-APP_COPYRIGHT=Copyright Your Company 2026  # Footer text
-
-# Server
-ROOT_URL=http://127.0.0.1       # Public-facing URL
-ROOT_PATH=                      # Sub-path (e.g., /myapp)
-PORT=8080                       # HTTP port
-REDIRECT_TO_HTTPS=False         # Auto-redirect to HTTPS
-
-# SSL
-SSL_PORT=8888
-SSL_KEYSTORE_DIR=
-SSL_KEYSTORE_FILE=keystore.jks
-SSL_KEYSTORE_PASSWORD=password
-SSL_ENABLED=False
-
-# Email
-SMTP_SERVER=xxxxxxxxx
-SMTP_USERNAME=xxxxxxxxx
-SMTP_PASSWORD=xxxxxxxxx
-SMTP_PORT=465
-SMTP_USESSL=True
+APP_TITLE=Pakai
+APP_TRADEMARK=PAKAI
+HOME_TITLE=PAKAI SERVER
+APP_COPYRIGHT=Copyright MyCompany 2026
+ROOT_URL=http://127.0.0.1
+ROOT_PATH=
+#API_NAME=api
+PORT=8080
 ```
 
 > Lines starting with `#` are comments; lines starting with `;` are disabled.
+
+`config.ini` contains app branding and HTTP URL/port settings. **SSL and SMTP settings are not read from `config.ini`**, and `REDIRECT_TO_HTTPS` is no longer a supported `config.ini` setting. Configure optional SSL and email settings in a `.env` file instead.
+
+### SSL and SMTP settings in `.env`
+
+The standard templates include `Files/.env.example`. Copy or rename it to `Files/.env` in your project and set the values. Select one SMTP port rather than leaving the example `465/587` text as-is. Do not commit the completed `.env` file, keystores, or secrets.
+
+```ini
+SSL_PORT=8888
+SSL_ENABLED=False
+SSL_KEYSTORE_DIR=
+SSL_KEYSTORE_FILE=keystore.p12
+SSL_KEYSTORE_PASSWORD=replace-with-your-keystore-password
+
+SMTP_PORT=465
+SMTP_ENABLED=False
+SMTP_USESSL=True
+SMTP_SERVER=smtp.example.com
+SMTP_USERNAME=your-account@example.com
+SMTP_PASSWORD=replace-with-your-smtp-password
+```
+
+EndsMeet reads the optional values and applies them to its SSL and SMTP settings when `App.LoadDotEnv` is called. It only applies keys present in `.env`.
 
 ### Programmatic Configuration
 
@@ -212,18 +221,25 @@ Some settings can only be set in code:
 Sub AppStart (Args() As String)
     App.Initialize
     App.LoadConfig
-    
+    App.LoadDotEnv
+
     ' Override settings programmatically
     App.api.ContentType = "application/xml"
     App.api.VerboseMode = True
     App.api.EnableHelp = True
-    
-    ' SSL
-    'App.ssl.Enabled = True
-    'App.RedirectToHttps = True
-    ...
+
+    ' Enable SSL only after configuring the keystore in .env
+    App.ssl.ShowLog = True
+    App.ssl.Enabled = True
+
+    ' Register routes here, before starting the server
+    App.Start
+    Log(App.StartupMessage)
+    StartMessageLoop
 End Sub
 ```
+
+In the repository's sample `Main` module, `App.LoadDotEnv` is commented out. Uncomment it to load `.env`. An explicit assignment such as `App.ssl.Enabled = True` takes precedence over the value loaded from `.env`; remove or adjust that assignment if you want `SSL_ENABLED` to control the setting. Register all application routes before calling `App.Start`.
 
 ### Available ApiSettings
 
@@ -235,7 +251,6 @@ End Sub
 | `ContentType` | `"application/json"` | Default response content type |
 | `EnableHelp` | `False` | Enable `/help` endpoint |
 | `VerboseMode` | `True` | Verbose JSON response format |
-| `OrderedKeys` | `True` | Preserve key order in response |
 
 ---
 
@@ -245,11 +260,11 @@ End Sub
 
 The database type is selected via **Build Configurations** in the B4J IDE toolbar:
 
-| Configuration | Symbol | Database | Driver JAR |
-|---------------|--------|----------|------------|
-| Default | `hu2_acceptall` | SQLite | sqlite-jdbc-3.7.2.jar |
-| MariaDB | `MariaDB,hu2_acceptall` | MariaDB | mariadb-java-client-3.5.6.jar |
-| MySQL | `MySQL,hu2_acceptall` | MySQL | mysql-connector-j-9.3.0.jar |
+| Configuration | Symbol | Database | Driver |
+|---------------|--------|----------|--------|
+| Default | `hu2_acceptall` | SQLite | `sqlite-jdbc.jar` (ships with B4J v10.7; filename has no version suffix) |
+| MariaDB | `MariaDB,hu2_acceptall` | MariaDB | `mariadb-java-client-3.5.9.jar` |
+| MySQL | `MySQL,hu2_acceptall` | MySQL | `mysql-connector-j-9.7.0.jar` |
 
 The build symbols are defined at the top of the `.b4j` project file:
 ```b4j
@@ -326,8 +341,16 @@ The application starts in `Pakai-Server.b4j` (or the variant you're using):
 Sub AppStart (Args() As String)
     App.Initialize
     App.LoadConfig
+    App.LoadDotEnv
     App.LogEnabled = True
-    
+
+    ' Configure SSL only when a valid keystore is available.
+    ' The sample project enables SSL in its Release build.
+    #If Release
+    App.ssl.ShowLog = True
+    App.ssl.Enabled = True
+    #End If
+
     ' Register web routes (HTMX frontend)
     App.Get("", "ProductsHandler")
     App.Get("/categories", "CategoriesHandler")
@@ -342,7 +365,7 @@ Sub AppStart (Args() As String)
     App.Get("/help", "HelpHandler")
     
     App.Start
-    App.LogStartupMessage
+    Log(App.StartupMessage)
     
     Api = App.api
     Api.EnableHelp = True
@@ -351,6 +374,8 @@ Sub AppStart (Args() As String)
     StartMessageLoop
 End Sub
 ```
+
+This matches the current `Pakai-Server.b4j` startup pattern: load `config.ini`, optionally load `.env`, register routes, start the server, and log `App.StartupMessage`. SSL is enabled for the Release build in the sample project; configure its keystore values in `.env` before running that build with SSL enabled.
 
 ### Routing Methods
 
@@ -721,28 +746,26 @@ Handlers.Add("SuppliersApiHandler")
 
 ### Build for Release
 
-1. Enable SSL in `config.ini`:
-```ini
-SSL_ENABLED=True
-SSL_PORT=443
-```
+1. Configure SSL in `.env` (copied from `Files/.env.example`) and provide a valid keystore. SSL and email settings are not loaded from `config.ini`.
 
-Or in code:
+2. Enable SSL in code. The sample project does this in the Release build configuration:
 ```b4x
 #If Release
+App.ssl.ShowLog = True
 App.ssl.Enabled = True
-App.RedirectToHttps = True
 #End If
 ```
 
-2. Generate a keystore (or use Let's Encrypt):
+3. Generate a PKCS#12 keystore (or use an existing certificate):
 ```
-keytool -keystore keystore.jks -alias jetty -genkey -keyalg RSA
+keytool -keystore keystore.p12 -storetype PKCS12 -alias jetty -genkey -keyalg RSA
 ```
 
-3. Select **Release** build configuration in the IDE
+4. Select **Release** build configuration in the IDE
 
-4. Compile (Ctrl+F5) to generate the runnable JAR file in `Objects\`
+5. Compile (Ctrl+F5) to generate the runnable JAR file in `Objects\`
+
+The template does not provide `REDIRECT_TO_HTTPS` in `config.ini`; configure an HTTP-to-HTTPS redirect separately if your deployment requires one.
 
 ### Database Migration
 
@@ -755,7 +778,7 @@ For SQLite → MariaDB/MySQL migration:
 
 ### Environment Variables
 
-For sensitive data (passwords), use environment variables or external config files. The config.ini system supports reading from different sources.
+Use `Files/.env.example` as the template for SSL and SMTP settings. Copy it to `.env`, fill in your values, and call `App.LoadDotEnv` during startup. Keep the actual `.env` file and its secrets out of source control.
 
 ---
 
@@ -768,7 +791,7 @@ For sensitive data (passwords), use environment variables or external config fil
 | Libraries not found | Run the **GetLibraries** macro or manually download and place in Additional folder |
 | Browser shows blank page | Check the B4J Logs tab for errors. Verify `ROOT_URL` in config.ini |
 | HTMX requests not working | Check browser console for 404 errors. Verify route paths match handler methods |
-| SSL handshake error | Regenerate keystore or check keystore password in config.ini |
+| SSL handshake error | Check that SSL is enabled, the `.env` keystore path/file/password are correct, and the keystore matches the certificate |
 
 ---
 
