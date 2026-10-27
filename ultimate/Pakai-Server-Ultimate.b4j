@@ -3,9 +3,13 @@ Build1=Default,b4j.pakai
 Build2=MariaDB,b4j.pakai,MariaDB
 Build3=MySQL,b4j.pakai,MySQL
 File1=config.example
-File2=sqlite.example
+File2=mariadb.example
+File3=mysql.example
+File4=sqlite.example
 FileGroup1=config
 FileGroup2=config
+FileGroup3=config
+FileGroup4=config
 Group=App
 Library1=endsmeet
 Library2=jcore
@@ -23,7 +27,7 @@ Module6=MH
 Module7=ORM
 Module8=ProductsHandler
 Module9=ProductsModel
-NumberOfFiles=2
+NumberOfFiles=4
 NumberOfLibraries=6
 NumberOfModules=10
 Version=10.7
@@ -61,11 +65,11 @@ Version=10.7
 '5 - Check Release folder
 #Macro: Title, Step 1, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\Pakai-Server-Ultimate.b4j&Args=%PROJECT%\$APPNAME$.b4j
 #Macro: Title, Step 2, ide://run?File=%WINDIR%\explorer.exe&Args=%PROJECT%\$APPNAME$.b4j
-#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+Ultimate+(6.99).b4xtemplate&Args=Files&Args=$APPNAME$.b4j&Args=ProductsHandler.bas&Args=CategoriesHandler.bas&Args=*Model.bas&Args=*View.bas&Args=MC.bas&Args=MH.bas&Args=ORM.bas&Args=Objects\www\assets\css\main.css&Args=Objects\www\assets\js\app.js
+#Macro: Title, Step 3, ide://run?File=%JAVABIN%\jar.exe&WorkingDirectory=..&Args=-cMf&Args=%PROJECT%\..\release\Pakai+Server+Ultimate+(6.99).b4xtemplate&Args=Files&Args=$APPNAME$.b4j&Args=*Handler.bas&Args=*Model.bas&Args=*View.bas&Args=MC.bas&Args=MH.bas&Args=ORM.bas&Args=Objects\www
 #Macro: Title, Step 4, ide://run?File=%COMSPEC%&Args=/c&Args=copy&Args=%PROJECT%\..\release\Pakai+Server+Ultimate+(6.99).b4xtemplate&Args=%ADDITIONAL%
 #Macro: Title, Step 5, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\..\release
 'For release
-'#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\..\B4X\libget.jar&Args=%PROJECT%&librariesrefresh=True
+#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\..\B4X\libget.jar&Args=%PROJECT%&librariesrefresh=True
 '#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
 '#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
 #End Region
@@ -84,7 +88,6 @@ Sub AppStart (Args() As String)
 	App.Initialize
 	App.LoadConfig
 	'App.LoadDotEnv
-	' Frontend using HTMX and AlpineJS
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
