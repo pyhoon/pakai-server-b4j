@@ -257,7 +257,7 @@ Private Sub GenerateHelpPage As String 'ignore
 	caption1.multiline
 	caption1.text("$APP_COPYRIGHT$")
 	MH.Br.up(caption1)
-	caption1.text("Made with")
+	caption1.text("Made with ")
 	Dim span3 As MiniHtml = MH.Span.up(caption1)
 	span3.sty("color: red")
 	MH.Icon.up(span3).cls("bi bi-heart")
