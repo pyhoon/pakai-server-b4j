@@ -36,11 +36,11 @@ Public Sub Render As MiniHtml
 	PageBody.up(page1)
 	Dim body1 As MiniHtml = page1.ChildByName("body")
 	MH.CopyrightFooter.up(body1)
-	MH.Script.up(body1).attr("src", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js") _
+	MH.Script.up(body1).src("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js") _
 	.integrity("sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y").crossorigin("anonymous").wrapAttributes
-	MH.Script.up(body1).attr("src", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js") _
+	MH.Script.up(body1).src("https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js") _
 	.integrity("sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz").crossorigin("anonymous").wrapAttributes
-	MH.Script.up(body1).attr("src", "$SERVER_URL$/assets/js/app.js")
+	MH.Script.up(body1).src("$SERVER_URL$/assets/js/app.js")
 	Return page1
 End Sub
 
@@ -50,10 +50,10 @@ Sub PageHeader As MiniHtml
 	MH.Meta.up(head1).attr("name", "author").attr("content", "Aeric Poon")
 	MH.Title.up(head1).text("$APP_TITLE$")
 	'MH.Link.up(head1).attr("rel", "icon").attr("type", "image/png").attr("href", "$SERVER_URL$/assets/img/favicon.png")
-	MH.Link.up(head1).attr("rel", "stylesheet").attr("href", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css") _
+	MH.Link.up(head1).rel.href("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css") _
 	.integrity("sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB").crossorigin("anonymous").wrapAttributes
-	MH.Link.up(head1).attr("rel", "stylesheet").attr("href", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")	
-	MH.Link.up(head1).attr("rel", "stylesheet").attr("href", "$SERVER_URL$/assets/css/main.css?v=$VERSION$")
+	MH.Link.up(head1).rel.href("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")	
+	MH.Link.up(head1).rel.href("$SERVER_URL$/assets/css/main.css?v=$VERSION$")
 	Return head1
 End Sub
 
