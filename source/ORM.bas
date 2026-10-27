@@ -16,13 +16,13 @@ End Sub
 Public Sub InitDatabase
 	Try
 		LogColor("Configuring database...", COLOR_BLUE)
-		Dim dbvar As String = "sqlite"
 		#If MariaDB
 		Dim dbvar As String = "mariadb"
-		#End If
-		#If MySQL
+		#Else If MySQL
 		Dim dbvar As String = "mysql"
-		#End If
+		#Else
+		Dim dbvar As String = "sqlite"
+		#End If	
 		If File.Exists(File.DirApp, $"${dbvar}.ini"$) = False Then
 			File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)
 		End If
