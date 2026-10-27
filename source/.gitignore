@@ -1,4 +1,5 @@
 # ignore files
+.env
 Objects/*.ini
 Objects/*.log
 Objects/*.jar
