@@ -6,22 +6,27 @@ This guide covers each library that Pakai Framework depends on, explaining what 
 
 ## Library Overview
 
-| Library | Type | Version | Role in Pakai |
-|---------|------|---------|---------------|
-| EndsMeet | B4J | 2.20 | Web server, routing, sessions, SSL |
-| MiniHtml | B4X | 3.00 | Server-side HTML generation (DSL) |
-| MiniORMUtils | B4X | 6.00 | Database ORM & connection management |
-| WebApiUtils | B4J | 6.99 | REST API response formatting |
-| MiniCSS | B4X | 0.30 | CSS generation from B4X code |
+| Library | Type | Current version | Role in Pakai |
+|---------|------|-----------------|---------------|
+| EndsMeet | B4J | 4.03 | Web server, routing, sessions, SSL, SMTP |
+| MiniHTML4 | B4X | 4.02 | Server-side HTML generation (DSL) |
+| MiniORMUtils | B4X | 6.04 | Database ORM & connection management |
+| WebApiUtils | B4J | 7.00 | REST API response formatting |
+| MiniCSS | B4X | 0.40 | CSS generation from B4X code |
 | MiniJS | B4X | 0.60 | JavaScript generation from B4X code |
-| MC + MH | B4J | 3.00 | Caching & HTML helpers (bundled with Pakai) |
+| MariaDB Java Client | B4J | 3.5.9 | MariaDB JDBC driver |
+| MySQL Connector/J | B4J | 9.7.0 | MySQL JDBC driver |
+| SQLite JDBC | B4J | Bundled with B4J 10.7 | SQLite JDBC driver (`sqlite-jdbc.jar`) |
+| MC + MH | Pakai modules | — | HTML caching & helper methods |
+
+All four templates use these current B4X library and JDBC versions. Each template includes a `libs.json` manifest; use the selected project's manifest as the dependency source of truth. The SQLite driver is supplied with B4J 10.7, and its JAR filename has no numeric version suffix.
 
 ---
 
 ## 1. EndsMeet — Web Server & Routing
 
 **GitHub:** https://github.com/pyhoon/EndsMeet  
-**Version in Pakai:** 2.20
+**Version in Pakai:** 4.03
 
 ### What It Does
 
@@ -42,8 +47,11 @@ EndsMeet is a lightweight B4J web server framework that handles:
 Dim App As EndsMeet
 App.Initialize
 
-' Load config from config.ini
+' Load app branding, URL, and HTTP port from config.ini
 App.LoadConfig
+
+' Optional: Load SSL and SMTP settings from Files/.env
+App.LoadDotEnv
 
 ' --- Routes ---
 ' Match exact path
@@ -83,18 +91,26 @@ Sub Handle (req As ServletRequest, resp As ServletResponse)
 End Sub
 ```
 
-### Configuration (config.ini)
+### Configuration
 
-| Key | Description |
-|-----|-------------|
-| `PORT` | HTTP port |
-| `ROOT_URL` | Public server URL |
-| `ROOT_PATH` | URL sub-path |
-| `REDIRECT_TO_HTTPS` | Auto-redirect to SSL |
-| `SSL_ENABLED` | Enable HTTPS |
-| `SSL_PORT` | HTTPS port |
-| `SSL_KEYSTORE_FILE` | Keystore filename |
-| `SSL_KEYSTORE_PASSWORD` | Keystore password |
+`config.ini` contains app branding, root URL/path, optional API name, and HTTP port. SSL and SMTP settings are not loaded from `config.ini`. Put optional SSL and SMTP settings in `Files/.env` (using `Files/.env.example` as a guide), then call `App.LoadDotEnv` after `App.LoadConfig` and before `App.Start`.
+
+```ini
+SSL_PORT=8888
+SSL_ENABLED=True
+SSL_KEYSTORE_DIR=
+SSL_KEYSTORE_FILE=keystore.p12
+SSL_KEYSTORE_PASSWORD=your-keystore-password
+
+SMTP_PORT=465
+SMTP_ENABLED=True
+SMTP_USESSL=True
+SMTP_SERVER=smtp.example.com
+SMTP_USERNAME=your-account@example.com
+SMTP_PASSWORD=your-smtp-password
+```
+
+The `REDIRECT_TO_HTTPS` setting is not available in `config.ini`. Explicit settings in code (such as `App.ssl.Enabled = True`) override values loaded from `.env`.
 
 ### Programmatic API
 
@@ -103,29 +119,31 @@ End Sub
 App.api.ContentType = "application/json"
 App.api.VerboseMode = True
 App.ssl.Enabled = True
+App.ssl.ShowLog = True
+App.smtp.Enabled = True
 App.ssl.Port = 8888
 App.cors.Enabled = True
 App.staticfiles.Folder = "/www"
 ```
 
 **Key Properties:**
-- `App.api` → ApiSettings (Name, Versioning, PayloadType, ContentType, EnableHelp, VerboseMode, OrderedKeys)
-- `App.ssl` → SslSettings (Enabled, Port, KeystoreDir, KeystoreFile, KeystorePassword)
+- `App.api` → ApiSettings (Name, Versioning, PayloadType, ContentType, EnableHelp, VerboseMode)
+- `App.ssl` → SslSettings (ShowLog, Enabled, Port, KeystoreDir, KeystoreFile, KeystorePassword)
 - `App.cors` → CorsSettings (Enabled, Path, Settings)
-- `App.email` → EmailSettings (SmtpUserName, SmtpPassword, SmtpServer, SmtpPort, SmtpUseSsl)
+- `App.smtp` → SMTP settings (Enabled, Port, UseSsl, Server, UserName, Password)
 - `App.staticfiles` → StaticFilesSettings (Folder, Browsable)
 - `App.ctx` → Map for template variables (used in HTML substitution)
 
 ---
 
-## 2. MiniHtml — HTML Generation
+## 2. MiniHTML4 — HTML Generation
 
-**GitHub:** https://github.com/pyhoon/MiniHtml2-B4X  
-**Version in Pakai:** 3.00
+**GitHub:** https://github.com/pyhoon/MiniHTML4
+**Version in Pakai:** 4.02
 
 ### What It Does
 
-MiniHtml is a B4X library that generates HTML using a **DSL builder pattern** — pure B4X code that constructs HTML elements programmatically with methods chaining.
+MiniHTML4 is a B4X library that generates HTML using a **DSL builder pattern** — pure B4X code that constructs HTML elements programmatically with method chaining.
 
 ### Core Concepts
 
@@ -224,7 +242,7 @@ See the separate **MH.bas Helper Library** section below.
 ## 3. MiniORMUtils — Database ORM
 
 **GitHub:** https://github.com/pyhoon/MiniORMUtils-B4X  
-**Version in Pakai:** 6.00
+**Version in Pakai:** 6.04
 
 ### What It Does
 
@@ -259,8 +277,8 @@ DBS.DBPort = "3306"
 DBS.DBName = "mydb"
 DBS.User = "root"
 DBS.Password = "password"
-DBS.Driver = "org.mariadb.jdbc.Driver"
-DBS.JdbcUrl = "jdbc:mariadb://{DbHost}:{DbPort}/{DbName}?useSSL=false"
+DBS.Driver = "org.mariadb.jdbc.Driver"  ' MySQL: com.mysql.cj.jdbc.Driver
+DBS.JdbcUrl = "jdbc:mariadb://{DbHost}:{DbPort}/{DbName}?characterEncoding=utf8&useSSL=false"
 DBS.MaxPoolSize = 10
 
 MDB.Settings = DBS
@@ -397,7 +415,7 @@ End If
 ## 4. WebApiUtils — REST API Utilities
 
 **GitHub:** https://github.com/pyhoon/WebApiUtils-B4J  
-**Version in Pakai:** 6.99
+**Version in Pakai:** 7.00
 
 ### What It Does
 
@@ -419,7 +437,6 @@ HRM.ResponseData = ListOfMaps    ' For list responses
 HRM.ResponseObject = SingleMap   ' For single object responses
 HRM.ResponseMessage = "Success"
 HRM.VerboseMode = True
-HRM.OrderedKeys = True
 HRM.ContentType = "application/json"
 
 ' Send response
@@ -454,14 +471,14 @@ End If
 Verbose mode (default: True):
 ```json
 {
-    "a": 200,        "code": 200,
-    "m": "Success",  "message": "Success",
-    "s": true,       "status": true,
-    "t": "json",     "type": "json",
-    "r": [...]       "result": [...]
+    "a": 200,
+    "m": "Success",
+    "s": true,
+    "t": "application/json",
+    "r": [...]
 }
 ```
-Short key names in the actual output (`a`, `m`, `s`, `t`, `r`) for bandwidth efficiency.
+Verbose responses use the configured short keys for code, message, status, content type, and result. The actual fields depend on the response values set by the handler.
 
 Non-verbose mode:
 ```json
@@ -493,7 +510,7 @@ WebApiUtils.MIME_TYPE_XML    ' "application/xml"
 ## 5. MiniCSS — CSS Generation
 
 **GitHub:** https://github.com/pyhoon/MiniCSS-B4X  
-**Version in Pakai:** 0.30
+**Version in Pakai:** 0.40
 
 ### What It Does
 
