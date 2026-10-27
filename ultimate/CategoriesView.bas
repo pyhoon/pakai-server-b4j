@@ -4,8 +4,6 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.5
 @EndOfDesignText@
-' Categories View
-' Version 6.99
 Sub Class_Globals
 	Private App As EndsMeet
 End Sub
@@ -39,11 +37,7 @@ Public Sub Modal (Action As String, Data As Map) As String
 	End Select
 End Sub
 
-Public Sub Alert (info As AlertInfo) As String
-	Return MH.Alert(info)
-End Sub
-
-Public Sub Toast (data As List, info As ToastInfo) As String
+Public Sub Toast (data As List, info As Map) As String
 	Return MH.Toast("categories-container", CategoriesTableFilled(data), info)
 End Sub
 
@@ -52,28 +46,20 @@ Public Sub RenderedTable (data As List) As String
 End Sub
 
 Sub CreateOrReadFromCache (CacheName As String) As MiniHtml
-	Select CacheName
-		Case "Categories Page", "Categories Table"
-			If MC.ExistInCache(App.ctx, CacheName) Then
-				Return MC.ReadFromCache(App.ctx, CacheName)
-			End If
-	End Select
+	If CacheName = "Categories Page" Or CacheName = "Categories Table" Then
+		If MC.ExistInCache(App.ctx, CacheName) Then
+			Return MC.ReadFromCache(App.ctx, CacheName)
+		End If
+	End If
 	Dim Segment As MiniHtml
 	Select CacheName
-		Case "Categories Page"
-			Segment = CategoriesPage
-		Case "Categories Table"
-			Segment = CategoriesTable
-		Case "Categories Table Row"
-			Segment = CategoriesTableRow
-		Case "Categories Add Modal"
-			Segment = ModalAdd
-		Case "Categories Edit Modal"
-			Segment = ModalEdit
-		Case "Categories Delete Modal"
-			Segment = ModalDelete
-		Case Else
-			Segment.Initialize("")
+		Case "Categories Page" : Segment = CategoriesPage
+		Case "Categories Table" : Segment = CategoriesTable
+		Case "Categories Table Row" : Segment = CategoriesTableRow
+		Case "Categories Add Modal" : Segment = ModalAdd
+		Case "Categories Edit Modal" : Segment = ModalEdit
+		Case "Categories Delete Modal" : Segment = ModalDelete
+		Case Else :	Segment.Initialize("")
 	End Select
 	MC.WriteToCache(App.ctx, CacheName, Segment.ConvertToBytes)
 	Return Segment
@@ -109,7 +95,6 @@ End Sub
 Public Sub CategoriesTableFilled (data As List) As MiniHtml
 	Dim table1 As MiniHtml = CreateOrReadFromCache("Categories Table")
 	Dim tbody1 As MiniHtml = table1.ChildByName("tbody")
-	tbody1.Children.Clear
 	For Each row As Map In data
 		Dim tr1 As MiniHtml = CreateOrReadFromCache("Categories Table Row")
 		tr1.child(0).replace(row.Get("id"))
@@ -143,7 +128,7 @@ Public Sub CategoriesTableRow As MiniHtml
 End Sub
 
 Sub ModalAdd As MiniHtml	
-	Dim form1 As MiniHtml = MH.FormHxPost("/hx/categories", "#modal-messages")
+	Dim form1 As MiniHtml = MH.FormHx("post", "/hx/categories", "#modal-messages")
 	MH.ModalHeader("Add Category").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
@@ -153,7 +138,7 @@ Sub ModalAdd As MiniHtml
 End Sub
 
 Sub ModalEdit As MiniHtml	
-	Dim form1 As MiniHtml = MH.FormHxPut("/hx/categories", "#modal-messages")
+	Dim form1 As MiniHtml = MH.FormHx("put", "/hx/categories", "#modal-messages")
 	MH.ModalHeader("Edit Category").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
@@ -164,7 +149,7 @@ Sub ModalEdit As MiniHtml
 End Sub
 
 Sub ModalDelete As MiniHtml	
-	Dim form1 As MiniHtml = MH.FormHxDelete("/hx/categories", "#modal-messages")
+	Dim form1 As MiniHtml = MH.FormHx("delete", "/hx/categories", "#modal-messages")
 	MH.ModalHeader("Delete Category").up(form1)
 	Dim mb1 As MiniHtml = MH.ModalBody.up(form1)
 	MH.ModalMessage.up(mb1)
