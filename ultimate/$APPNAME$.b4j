@@ -1,5 +1,7 @@
 ﻿AppType=StandardJava
-Build1=Default,b4j.pakai.server.ultimate
+Build1=Default,b4j.pakai
+Build2=MariaDB,b4j.pakai,MariaDB
+Build3=MySQL,b4j.pakai,MySQL
 File1=config.example
 File2=sqlite.example
 FileGroup1=config
@@ -12,19 +14,18 @@ Library4=minihtml
 Library5=minijs
 Library6=miniormutils
 Module1=CategoriesHandler
-Module10=ProductsModel
-Module11=ProductsView
+Module10=ProductsView
 Module2=CategoriesModel
 Module3=CategoriesView
 Module4=MainView
 Module5=MC
 Module6=MH
-Module7=|absolute|C:\Projects\MiniHTML4\source\MiniHtml
-Module8=ORM
-Module9=ProductsHandler
+Module7=ORM
+Module8=ProductsHandler
+Module9=ProductsModel
 NumberOfFiles=2
 NumberOfLibraries=6
-NumberOfModules=11
+NumberOfModules=10
 Version=10.7
 @EndOfDesignText@
 #Region  Project Attributes
@@ -43,7 +44,13 @@ Version=10.7
 '================================================
 #CommandLineArgs:
 #MergeLibraries: True
-#AdditionalJar: sqlite-jdbc-3.53.2.0
+#If MariaDB
+#AdditionalJar: mariadb-java-client-3.5.9
+#Else If MySQL
+#AdditionalJar: mysql-connector-j-9.7.0
+#Else
+#AdditionalJar: sqlite-jdbc
+#End If
 #End Region
 #Region  Macros
 '#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\..\B4X\libget.jar&Args=%PROJECT%&librariesrefresh=True
@@ -64,14 +71,14 @@ End Sub
 Sub AppStart (Args() As String)
 	App.Initialize
 	App.LoadConfig
-	App.LogEnabled = True
+	'App.LoadDotEnv
 	' Frontend using HTMX and AlpineJS
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
 	App.Rest("/hx/categories/*", "CategoriesHandler")
 	App.Start
-	App.LogStartupMessage
+	Log(App.StartupMessage)
 	App.ctx.Put("VERSION", APP_VERSION)
 	Log($"App version: ${APP_VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
