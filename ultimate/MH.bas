@@ -2,21 +2,17 @@
 Group=App
 ModulesStructureVersion=1
 Type=StaticCode
-Version=10.5
+Version=10.7
 @EndOfDesignText@
-'MiniHtml Helper
-'Version: 3.30
 Sub Process_Globals
-	Type AlertInfo (Message As String, Status As String)
-	Type ToastInfo (Entity As String, Action As String, Message As String, Status As String)
+
 End Sub
 
-'Create MiniHTML object by name
-Sub CMH (Name As String = "", multiline As Boolean = False) As MiniHtml
+Sub CMH (Name As String = "", wrap As Boolean = False) As MiniHtml
 	Dim tn As MiniHtml
 	tn.Initialize(Name)
 	If tn.Mode = "uniline" Or tn.Mode = "multiline" Then
-		tn.multilineIf(multiline)
+		tn.multilineIf(wrap)
 	End If
 	Return tn
 End Sub
@@ -27,35 +23,35 @@ Sub CreateMiniJs As MiniJs
 	Return s
 End Sub
 
-Sub Anchor (multiline As Boolean = True) As MiniHtml
-	Return CMH("a", multiline)
+Sub Anchor (wrap As Boolean = True) As MiniHtml
+	Return CMH("a", wrap)
 End Sub
 
-Sub Button (multiline As Boolean = True) As MiniHtml
-	Return CMH("button", multiline)
+Sub Button As MiniHtml
+	Return CMH("button", True)
 End Sub
 
-Sub Div (multiline As Boolean = True) As MiniHtml
-	Return CMH("div", multiline)
+Sub Div As MiniHtml
+	Return CMH("div", True)
 End Sub
 
-Sub Span (multiline As Boolean = False, LineFeed As Boolean = True, Indentation As Boolean = True) As MiniHtml
-	Dim ic As MiniHtml = CMH("span", multiline)
+Sub Span (wrap As Boolean = False, LineFeed As Boolean = True, Indent As Boolean = True) As MiniHtml
+	Dim ic As MiniHtml = CMH("span", wrap)
 	ic.LineFeed = LineFeed
-	ic.Indentation = Indentation
+	ic.Indentation = Indent
 	Return ic
 End Sub
 
 Sub Br As MiniHtml
-	Return CMH("br", False)
+	Return CMH("br")
 End Sub
 
-Sub Nav (multiline As Boolean = True) As MiniHtml
-	Return CMH("nav", multiline)
+Sub Nav As MiniHtml
+	Return CMH("nav", True)
 End Sub
 
-Sub Form (multiline As Boolean = True) As MiniHtml
-	Return CMH("form", multiline)
+Sub Form As MiniHtml
+	Return CMH("form", True)
 End Sub
 
 Sub H3 As MiniHtml
@@ -74,8 +70,8 @@ Sub Html As MiniHtml
 	Return CMH("html").lang("en")
 End Sub
 
-Sub Head (multiline As Boolean = True) As MiniHtml
-	Return CMH("head", multiline)
+Sub Head As MiniHtml
+	Return CMH("head", True)
 End Sub
 
 Sub Title As MiniHtml
@@ -98,10 +94,10 @@ Sub Body As MiniHtml
 	Return CMH("body")
 End Sub
 
-Sub Icon (multiline As Boolean = False, LineFeed As Boolean = True, Indentation As Boolean = True) As MiniHtml
-	Dim ic As MiniHtml = CMH("i", multiline)
+Sub Icon (wrap As Boolean = False, LineFeed As Boolean = True, Indent As Boolean = True) As MiniHtml
+	Dim ic As MiniHtml = CMH("i", wrap)
 	ic.LineFeed = LineFeed
-	ic.Indentation = Indentation
+	ic.Indentation = Indent
 	Return ic
 End Sub
 
@@ -113,21 +109,20 @@ Sub Label As MiniHtml
 	Return CMH("label")
 End Sub
 
-Sub Caption (multiline As Boolean = False) As MiniHtml
-	Return CMH("caption", multiline)
+Sub Caption As MiniHtml
+	Return CMH("caption", True)
 End Sub
 
-
-Sub Footer (multiline As Boolean = True) As MiniHtml
-	Return CMH("footer", multiline)
+Sub Footer As MiniHtml
+	Return CMH("footer", True)
 End Sub
 
-Sub Table (multiline As Boolean = True) As MiniHtml
-	Return CMH("table", multiline)
+Sub Table As MiniHtml
+	Return CMH("table", True)
 End Sub
 
-Sub Tbody (multiline As Boolean = True) As MiniHtml
-	Return CMH("tbody", multiline)
+Sub Tbody As MiniHtml
+	Return CMH("tbody", True)
 End Sub
 
 Sub Td As MiniHtml
@@ -146,25 +141,21 @@ Sub Tr As MiniHtml
 	Return CMH("tr")
 End Sub
 
-Sub Ul (multiline As Boolean = True) As MiniHtml
-	Return CMH("ul", multiline)
+Sub Ul As MiniHtml
+	Return CMH("ul", True)
 End Sub
 
-Sub Li (multiline As Boolean = True) As MiniHtml
-	Return CMH("li", multiline)
+Sub Li As MiniHtml
+	Return CMH("li", True)
 End Sub
 
-Sub SelectTag (multiline As Boolean = True) As MiniHtml
-	Return CMH("select", multiline)
+Sub SelectTag As MiniHtml
+	Return CMH("select", True)
 End Sub
 
 Sub Option As MiniHtml
 	Return CMH("option")
 End Sub
-
-' ============================
-'  Bootstrap Layout Helpers
-' ============================
 
 Sub ContainerFluid As MiniHtml
 	Return Div.cls("container-fluid")
@@ -202,10 +193,6 @@ Sub DropdownGroup (id As String, name As String, label_text As String) As MiniHt
 	Return FormGroup.add(RequiredLabel(label_text, id)).add(RequiredDropdown(id, name))
 End Sub
 
-' ============================
-'  HTMX Helpers
-' ============================
-
 Sub HxGet (href As String, target As String, swap As String, trigger As String) As MiniHtml
 	Return Anchor.attr("hx-get", href).attrsIfValues(CreateMap("hx-target": target, "hx-swap": swap, "hx-trigger": trigger))
 End Sub
@@ -214,27 +201,10 @@ Sub ContainerHxGet (id As String, href As String, trigger As String, text As Str
 	Return Div.attr("id", id).attr("hx-get", href).attr("hx-trigger", trigger).text(text)
 End Sub
 
-Sub FormHxPost (href As String, target As String) As MiniHtml
-	Return FormHx("post", href, target)
-End Sub
-
-Sub FormHxPut (href As String, target As String) As MiniHtml
-	Return FormHx("put", href, target)
-End Sub
-
-Sub FormHxDelete (href As String, target As String) As MiniHtml
-	Return FormHx("delete", href, target)
-End Sub
-
 Sub FormHx (verb As String, href As String, target As String) As MiniHtml
 	Return Form.attr("hx-"& verb, href).attr("hx-target", target).attr("hx-swap", "innerHTML")
 End Sub
 
-' ============================
-'  Navigation Helpers
-' ============================
-
-'Navbar with "container-fluid" class div, 2 "navbar-brand" class anchors and an icon class
 Sub NavbarExpand (cls As String, expand As String, brand_icon_cls As String, brand_text As String) As MiniHtml
 	Return Nav.cls("navbar navbar-expand-" & expand).clsIf(cls <> "", cls).down(ContainerFluid).down(Anchor).cls("navbar-brand").attr("href", "#").down(Icon).cls(brand_icon_cls).Parent.Parent.down(Anchor(False)).cls("navbar-brand").attr("href", "$SERVER_URL$").text(brand_text).Parent.Parent
 End Sub
@@ -293,7 +263,7 @@ Sub InputGroup As MiniHtml
 End Sub
 
 Sub ContainerModal As MiniHtml
-	Return Div.attr("id", "modal-container").cls("modal fade").attr("tabindex", "-1").attr("aria-hidden", "true").down(Div).cls("modal-dialog modal-dialog-centered").down(Div(False)).cls("modal-content").attr("id", "modal-content").Parent.Parent
+	Return Div.attr("id", "modal-container").cls("modal fade").attr("tabindex", "-1").attr("aria-hidden", "true").down(Div).cls("modal-dialog modal-dialog-centered").down(CMH("div", False)).cls("modal-content").attr("id", "modal-content").Parent.Parent
 End Sub
 
 Sub ContainerToast As MiniHtml
@@ -312,10 +282,10 @@ Sub ModalMessage As MiniHtml
 	Return Div.attr("id", "modal-messages")
 End Sub
 
-Sub ModalFooter (Submit_text As String, Cancel_text As String, Submit_class As String, Cancel_class As String) As MiniHtml
+Sub ModalFooter (SText As String, CText As String, SClass As String, CClass As String) As MiniHtml
 	Dim div1 As MiniHtml = Div.cls("modal-footer")
-	ButtonSubmit(Submit_text, "btn btn-" & Submit_class & " px-3").up(div1)
-	ButtonCancel(Cancel_text, "btn btn-" & Cancel_class & " px-3").up(div1)
+	ButtonSubmit(SText, "btn btn-" & SClass & " px-3").up(div1)
+	ButtonCancel(CText, "btn btn-" & CClass & " px-3").up(div1)
 	Return div1
 End Sub
 
@@ -333,43 +303,21 @@ End Sub
 
 Sub CopyrightFooter As MiniHtml
 	Return Footer.cls("footer mt-auto py-3 bg-body-tertiary border-top").down _
-	(Div).cls("footer small text-center d-md-block").sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif").wrapAttributes.down _
-	(Caption(True)).text("$APP_COPYRIGHT$").down(Br).Parent.text("Made with ").down _
-	(Span(True)).sty("color: red").down(Icon).cls("bi bi-heart").Parent.Parent.text(" in B4X").Parent.Parent
+	(Div).cls("footer small text-center d-md-block").sty("font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif").down _
+	(Caption).text("$APP_COPYRIGHT$").down(Br).Parent.text("Made with").down _
+	(Span(True)).sty("color: red").down(Icon).cls("bi bi-heart m-1").Parent.Parent.text("in B4X").Parent.Parent
 End Sub
 
-' ============================
-' Custom Components
-' ============================
-
-Sub Alert (info As AlertInfo) As String
-	Return Div.cls("alert alert-" & info.Status).text(info.Message).build
+Sub Alert (Message As String, Status As String) As String
+	Return Div.cls("alert alert-" & Status).text(Message).build
 End Sub
 
-Sub Toast (id As String, table1 As MiniHtml, info As ToastInfo) As String
+Sub Toast (id As String, table1 As MiniHtml, info As Map) As String
 	Return Div.attr("id", id).attr("hx-swap-oob", "true").add(table1).build & CRLF & CreateCustomEventScript(info).Generate
 End Sub
 
-Sub CreateCustomEventScript (info As ToastInfo) As MiniJs
+Sub CreateCustomEventScript (info As Map) As MiniJs
 	Dim s As MiniJs = CreateMiniJs
-	s.AddCustomEventDispatch("entity:changed", CreateMap("entity": info.Entity, "action": info.Action, "message": info.Message, "status": info.Status))
+	s.AddCustomEventDispatch("entity:changed", info)
 	Return s
-End Sub
-
-Sub CreateAlertInfo (Message As String, Status As String) As AlertInfo
-	Dim t1 As AlertInfo
-	t1.Initialize
-	t1.Message = Message
-	t1.Status = Status
-	Return t1
-End Sub
-
-Sub CreateToastInfo (Entity As String, Action As String, Message As String, Status As String) As ToastInfo
-	Dim t1 As ToastInfo
-	t1.Initialize
-	t1.Entity = Entity
-	t1.Action = Action
-	t1.Message = Message
-	t1.Status = Status
-	Return t1
 End Sub
