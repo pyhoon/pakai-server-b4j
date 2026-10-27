@@ -3,9 +3,13 @@ Build1=Default,b4j.pakai
 Build2=MariaDB,b4j.pakai,MariaDB
 Build3=MySQL,b4j.pakai,MySQL
 File1=config.example
-File2=sqlite.example
+File2=mariadb.example
+File3=mysql.example
+File4=sqlite.example
 FileGroup1=config
 FileGroup2=config
+FileGroup3=config
+FileGroup4=config
 Group=App
 Library1=endsmeet
 Library2=jcore
@@ -23,7 +27,7 @@ Module6=MH
 Module7=ORM
 Module8=ProductsHandler
 Module9=ProductsModel
-NumberOfFiles=2
+NumberOfFiles=4
 NumberOfLibraries=6
 NumberOfModules=10
 Version=10.7
@@ -35,13 +39,6 @@ Version=10.7
 'License   : MIT License
 'Developer : Poon Yip Hoon (Aeric)
 '================================================
-'================================================
-'Product   : Your Web Server
-'Version   : 1.00
-'Developer : Your Name
-'License   : Your License
-'Copyright : Your Company 2026
-'================================================
 #CommandLineArgs:
 #MergeLibraries: True
 #If MariaDB
@@ -52,14 +49,6 @@ Version=10.7
 #AdditionalJar: sqlite-jdbc
 #End If
 #End Region
-#Region  Macros
-'#Macro: Title, GetLibraries, ide://run?File=%ADDITIONAL%\..\B4X\libget.jar&Args=%PROJECT%&librariesrefresh=True
-'#Macro: Title, ModelGenerator, ide://run?File=%ADDITIONAL%\modgen.jar&Args=ide_state.json&codesync=True
-'#Macro: Title, Objects, ide://run?File=%WINDIR%\SysWOW64\explorer.exe&Args=%PROJECT%\Objects
-#End Region
-'Download tools:
-'<link>libget.jar|https://github.com/pyhoon/libget-b4j/releases/download/v2.60/libget.jar</link>
-'<link>modgen.jar|https://github.com/pyhoon/modgen-b4j/releases/download/v0.60/modgen.jar</link>
 Sub Process_Globals
 	Public DB	As MiniORM
 	Public App	As EndsMeet
