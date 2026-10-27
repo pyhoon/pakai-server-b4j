@@ -110,8 +110,6 @@ SMTP_USERNAME=your-account@example.com
 SMTP_PASSWORD=your-smtp-password
 ```
 
-The `REDIRECT_TO_HTTPS` setting is not available in `config.ini`. Explicit settings in code (such as `App.ssl.Enabled = True`) override values loaded from `.env`.
-
 ### Programmatic API
 
 ```b4x
