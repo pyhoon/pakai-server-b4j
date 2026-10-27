@@ -4,8 +4,6 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.5
 @EndOfDesignText@
-' Products Model
-' Version 6.99
 Sub Class_Globals
 	Private DB As MiniORM
 End Sub
@@ -89,11 +87,11 @@ Public Sub Error As Exception
 	Return DB.Error
 End Sub
 
-Public Sub Create (Category As Int, Code As String, Name As String, Price As Double, Created_Date As String)
+Public Sub Create (Category As Int, Code As String, Name As String, Price As Double)
 	DB.Open
 	DB.Table = "tbl_products"
-	DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "created_date")
-	DB.Parameters = Array(Category, Code, Name, Price, Created_Date)
+	DB.Columns = Array("category_id", "product_code", "product_name", "product_price")
+	DB.Parameters = Array(Category, Code, Name, Price)
 	DB.ReturnRow = True
 	DB.Save
 End Sub
@@ -107,13 +105,14 @@ Public Sub Read As List
 	Return DB.Results
 End Sub
 
-Public Sub Update (Id As Int, Category As Int, Code As String, Name As String, Price As Double, Modified_Date As String)
+Public Sub Update (Id As Int, Category As Int, Code As String, Name As String, Price As Double)
 	DB.Open
 	DB.Table = "tbl_products"
-	DB.Columns = Array("category_id", "product_code", "product_name", "product_price", "modified_date")
-	DB.Parameters = Array(Category, Code, Name, Price, Modified_Date)
+	DB.Columns = Array("category_id", "product_code", "product_name", "product_price")
+	DB.Parameters = Array(Category, Code, Name, Price)
 	DB.Condition = "id = ?"
 	DB.Parameter = Id
+	DB.UpdateModifiedDate = True
 	DB.ReturnRow = True
 	DB.Save
 End Sub
