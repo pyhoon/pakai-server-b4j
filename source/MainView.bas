@@ -5,7 +5,7 @@ Type=Class
 Version=10.5
 @EndOfDesignText@
 ' Main View
-' Version 6.99 rev3
+' Version 6.99 rev4
 Sub Class_Globals
 	Private mModal As MiniHtml
 	Private mToast As MiniHtml
@@ -45,13 +45,13 @@ Public Sub Render As MiniHtml
 	Dim body1 As MiniHtml = page1.ChildByName("body")
 	MH.CopyrightFooter.up(body1)
 	'Local assets
-	'body1.cdn("script", "$SERVER_URL$/assets/js/bootstrap.min.js")
-	'body1.cdn("script", "$SERVER_URL$/assets/js/htmx.min.js")
-	MH.Script.up(body1).attr("src", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js") _
+	'MH.Script.up(body1).src("$SERVER_URL$/assets/js/bootstrap.min.js")
+	'MH.Script.up(body1).src("$SERVER_URL$/assets/js/htmx.min.js")
+	MH.Script.up(body1).src("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js") _
 	.integrity("sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y").crossorigin("anonymous")
-	MH.Script.up(body1).attr("src", "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js") _
+	MH.Script.up(body1).src("https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js") _
 	.integrity("sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz").crossorigin("anonymous")
-	MH.Script.up(body1).attr("src", "$SERVER_URL$/assets/js/app.js")
+	MH.Script.up(body1).src("$SERVER_URL$/assets/js/app.js")
 	Return page1
 End Sub
 
@@ -65,12 +65,12 @@ Private Sub PageHeader As MiniHtml
 	MH.Title.up(head1).text("$APP_TITLE$")
 	MH.FavoriteIcon("image/png", "$SERVER_URL$/assets/img/favicon.png").up(head1)
 	'Local assets
-	'head1.cdn("style", "$SERVER_URL$/assets/css/bootstrap.min.css")
-	'head1.cdn("style", "$SERVER_URL$/assets/css/bootstrap-icons.min.css")
-	MH.Link.up(head1).attr("rel", "stylesheet").attr("href", "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css") _
+	'MH.Link.up(head1).rel.href("$SERVER_URL$/assets/css/bootstrap.min.css")
+	'MH.Link.up(head1).rel.href("$SERVER_URL$/assets/css/bootstrap-icons.min.css")
+	MH.Link.up(head1).rel.href("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css") _
 	.integrity("sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB").crossorigin("anonymous")
-	MH.Link.up(head1).attr("rel", "stylesheet").attr("href", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")	
-	MH.Link.up(head1).attr("rel", "stylesheet").attr("href", "$SERVER_URL$/assets/css/main.css?v=$VERSION$")
+	MH.Link.up(head1).rel.href("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css")	
+	MH.Link.up(head1).rel.href("$SERVER_URL$/assets/css/main.css?v=$VERSION$")
 	Return head1
 End Sub
 
