@@ -4,8 +4,6 @@ ModulesStructureVersion=1
 Type=StaticCode
 Version=10.5
 @EndOfDesignText@
-' ORM Module
-' Version 6.99
 Sub Process_Globals
 	Private DB As MiniORM
 	Private DBS As MiniORMSettings
@@ -16,12 +14,11 @@ End Sub
 Public Sub InitDatabase
 	Try
 		LogColor("Configuring database...", COLOR_BLUE)
-		#If MariaDB
-		Dim dbvar As String = "mariadb"
-		#Else If MySQL
-		Dim dbvar As String = "mysql"
-		#Else
 		Dim dbvar As String = "sqlite"
+		#If MariaDB
+		dbvar = "mariadb"
+		#Else If MySQL
+		dbvar = "mysql"
 		#End If		
 		If File.Exists(File.DirApp, $"${dbvar}.ini"$) = False Then
 			File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)
@@ -97,7 +94,6 @@ Sub CheckDatabase
 			DB.InitPool
 		End If		
 		Main.DB = DB
-		' Create new tables after database has already created
 	Catch
 		LogError(LastException.Message)
 		LogColor("Error checking database!", COLOR_RED)
@@ -106,7 +102,6 @@ Sub CheckDatabase
 	End Try
 End Sub
 
-' Create Database Tables and Populate Data
 Sub CreateDatabase
 	LogColor("Creating database...", COLOR_BLUE)
 	If UsePool(DB.DbType) Then
@@ -158,13 +153,4 @@ Sub CreateDatabase
 	DB.Close
 	DB.QueryExecute = True
 	Main.DB = DB
-End Sub
-
-Public Sub CurrentDateTime As String
-	Dim CurrentDateFormat As String = DateTime.DateFormat
-	DateTime.DateFormat = "yyyy-MM-dd HH:mm:ss"
-	DateTime.SetTimeZone(0)
-	Dim Now As String = DateTime.Date(DateTime.Now)
-	DateTime.DateFormat = CurrentDateFormat
-	Return Now
 End Sub
