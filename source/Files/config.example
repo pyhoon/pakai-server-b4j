@@ -29,23 +29,3 @@ ROOT_PATH=
 
 # Server port
 PORT=8080
-REDIRECT_TO_HTTPS=False
-
-# SSL Settings
-# Generate a keystore from Windows CMD
-# C:\Java\jdk-19.0.2\bin\keytool -keystore keystore.jks -alias jetty -genkey -keyalg RSA
-# Copy keystore file to Objects folder of the B4J project
-SSL_PORT=8888
-SSL_KEYSTORE_DIR=
-SSL_KEYSTORE_FILE=keystore.jks
-SSL_KEYSTORE_PASSWORD=xxxxxxxx
-SSL_ENABLED=False
-
-# Email Settings
-ADMIN_EMAIL=xxxxxxxxx
-SMTP_SERVER=xxxxxxxxx
-SMTP_USERNAME=xxxxxxxxx
-SMTP_PASSWORD=xxxxxxxxx
-SMTP_PORT=465
-SMTP_USESSL=True
-HTML_BODY=True
