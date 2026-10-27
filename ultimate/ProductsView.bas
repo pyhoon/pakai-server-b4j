@@ -106,17 +106,6 @@ Sub ProductsPage As MiniHtml
 		MH.NavLinkItem("API", "/help", "bi bi-gear me-2", "API").up(nav1)
 	End If
 	MH.NavLinkItem("Categories", "/categories", "bi bi-tag me-2", "Categories").up(nav1)
-'	Dim navbar As MiniHtml = nav1.childById("navbarCollapse")
-'	Dim i1 As MiniHtml = navbar.childByClass("bi-infinity ")
-'	If Initialized(i1) Then
-'		i1.LineFeed = True
-'		i1.Indentation = True
-'	End If
-'	Dim i2 As MiniHtml = navbar.childByClass("bi-tag ")
-'	If Initialized(i2) Then
-'		i2.LineFeed = True
-'		i2.Indentation = True
-'	End If
 	Return page1
 End Sub
 
