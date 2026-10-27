@@ -1,5 +1,7 @@
 ﻿AppType=StandardJava
-Build1=Default,b4j.pakai.server.ultimate
+Build1=Default,b4j.pakai
+Build2=MariaDB,b4j.pakai,MariaDB
+Build3=MySQL,b4j.pakai,MySQL
 File1=config.example
 File2=sqlite.example
 FileGroup1=config
@@ -42,7 +44,13 @@ Version=10.7
 '================================================
 #CommandLineArgs:
 #MergeLibraries: True
-#AdditionalJar: sqlite-jdbc-3.53.2.0
+#If MariaDB
+#AdditionalJar: mariadb-java-client-3.5.9
+#Else If MySQL
+#AdditionalJar: mysql-connector-j-9.7.0
+#Else
+#AdditionalJar: sqlite-jdbc
+#End If
 #End Region
 #Region  Macros
 '1 - Create $APPNAME$.b4j
@@ -75,14 +83,14 @@ End Sub
 Sub AppStart (Args() As String)
 	App.Initialize
 	App.LoadConfig
-	App.LogEnabled = True
+	'App.LoadDotEnv
 	' Frontend using HTMX and AlpineJS
 	App.Get("", "ProductsHandler")
 	App.Get("/categories", "CategoriesHandler")
 	App.Rest("/hx/products/*", "ProductsHandler")
 	App.Rest("/hx/categories/*", "CategoriesHandler")
 	App.Start
-	App.LogStartupMessage
+	Log(App.StartupMessage)
 	App.ctx.Put("VERSION", APP_VERSION)
 	Log($"App version: ${APP_VERSION}"$)
 	Log($"Open the following URL from your web browser"$)
