@@ -7,7 +7,7 @@ Pakai Server is a full-stack B4J project template for building modern web applic
 > **Forum thread:** [https://www.b4x.com/android/forum/threads/web-project-template-pakai-server-v6.169224/](https://www.b4x.com/android/forum/threads/web-project-template-pakai-server-v6.169224/)  
 > **GitHub:** [https://github.com/pyhoon/pakai-server-b4j](https://github.com/pyhoon/pakai-server-b4j)
 > **Tutorial:** [Pakai Framework v6.99 Tutorial](TUTORIAL.md)  
-> **Libraries Guide:** [Dependency Libraries Guide](LIBRARIES-TUTORIAL.md)
+> **Libraries Guide:** [Dependency Libraries Guide](TUTORIAL-LIBRARIES.md)
 
 ![Index](pakai-index.png)
 
@@ -15,7 +15,7 @@ Pakai Server is a full-stack B4J project template for building modern web applic
 
 ## Features
 
-- **Three deployment variants** — Full Stack (Web + API), API-only, Web-only
+- **Four project templates** — Full Stack, API-only, Web-only, and Ultimate (lean Web UI starter)
 - **HTMX 2.0.8** frontend — no custom JavaScript for CRUD; server returns HTML fragments
 - **Bootstrap 5.3.8** responsive UI with modal dialogs and toast notifications
 - **AlpineJS 3.15.8** interactive API console on the documentation page
@@ -36,11 +36,12 @@ Pakai Server is a full-stack B4J project template for building modern web applic
 
 ## Project Variants (Templates)
 
-| Template | Modules | Description |
-|----------|:---:|-------------|
-| `Pakai Server (6.99).b4xtemplate` | 15 | Full stack: Web UI + REST API + Documentation |
-| `Pakai Server Api (6.99).b4xtemplate` | 9 | API only: REST endpoints + HelpHandler as landing page |
-| `Pakai Server Web (6.99).b4xtemplate` | 11 | Web only: HTMX frontend without REST API |
+| Template | Description |
+|----------|-------------|
+| `Pakai Server (6.99).b4xtemplate` | Full stack: Web UI + REST API + API documentation |
+| `Pakai Server Api (6.99).b4xtemplate` | REST API and API documentation, without the CRUD Web UI |
+| `Pakai Server Web (6.99).b4xtemplate` | Web UI with HTMX, without REST API endpoints |
+| `Pakai Server Ultimate (6.99).b4xtemplate` | Lean Web UI starter with Products/Categories CRUD; no REST API or API documentation modules |
 
 ### Build Configurations
 
@@ -50,13 +51,15 @@ Pakai Server is a full-stack B4J project template for building modern web applic
 | MariaDB | `MariaDB,hu2_acceptall` | MariaDB |
 | MySQL | `MySQL,hu2_acceptall` | MySQL |
 
+The Ultimate project provides the same Default, MariaDB, and MySQL build choices. Select a template variant based on the features you need, then choose the database build configuration in B4J.
+
 ---
 
 ## Quick Start
 
 ### Prerequisites
 
-- B4J IDE (version 10.5 or later)
+- B4J IDE v10.7 or later (all four templates target B4J v10.7)
 - Java JDK 19+ (or compatible)
 
 ### Setup & Run
@@ -67,11 +70,12 @@ Pakai Server is a full-stack B4J project template for building modern web applic
    - `source/Pakai-Server.b4j` — Full stack
    - `source/Pakai-Server-Api.b4j` — API only
    - `source/Pakai-Server-Web.b4j` — Web only
+   - `ultimate/Pakai-Server-Ultimate.b4j` — Ultimate Web UI starter
 4. **Select build configuration** — Default (SQLite), MariaDB, or MySQL
 5. **Press F5** (Run) — the server starts
 6. **Open a browser** to `http://127.0.0.1:8080`
 
-On first run, the application auto-creates the database file (`pakai.db` for SQLite), creates the `tbl_categories` and `tbl_products` tables, and populates them with seed data (2 categories, 3 products).
+On first run, the application auto-creates the database and tables, then adds sample categories and products. The standard templates use `pakai.db` for SQLite; the Ultimate starter defaults to `data.db`.
 
 ### Database Configuration
 
@@ -86,18 +90,19 @@ DbFile=pakai.db
 ```ini
 DbType=MariaDB
 DbHost=localhost
-DbPort=
+DbPort=3306
 DbName=pakai
-User=root
-Password=password
+User=your_user
+Password=your_password
 DriverClass=org.mariadb.jdbc.Driver
 JdbcUrl=jdbc:mariadb://{DbHost}:{DbPort}/{DbName}?characterEncoding=utf8&useSSL=false
 MaxPoolSize=0
 ```
 
-**MySQL** — create `Objects/mysql.ini` following the same pattern as `mariadb.ini`.
+**MySQL** (`Objects/mysql.ini`) uses the same settings pattern, with `DbType=MySQL`, `DriverClass=com.mysql.cj.jdbc.Driver`, and a URL such as `jdbc:mysql://{DbHost}:{DbPort}/{DbName}?characterEncoding=utf8&useSSL=false`.
 
 > When the database is configured for MariaDB or MySQL, the application auto-creates the schema (database) if it does not exist.
+> Replace sample credentials with your own and do not commit real database passwords.
 
 ---
 
@@ -106,18 +111,13 @@ MaxPoolSize=0
 ```ini
 APP_TITLE=Pakai
 APP_TRADEMARK=PAKAI
-HOME_TITLE=PAKAI FRAMEWORK
-APP_COPYRIGHT=Copyright Computerise System Solutions 2026
+HOME_TITLE=PAKAI SERVER
+APP_COPYRIGHT=Copyright MyCompany 2026
 
 ROOT_URL=http://127.0.0.1
 ROOT_PATH=
+#API_NAME=api
 PORT=8080
-REDIRECT_TO_HTTPS=False
-
-SSL_PORT=8888
-SSL_KEYSTORE_FILE=keystore.jks
-SSL_KEYSTORE_PASSWORD=password
-SSL_ENABLED=False
 ```
 
 | Key | Default | Description |
@@ -128,14 +128,53 @@ SSL_ENABLED=False
 | `APP_COPYRIGHT` | *(see file)* | Footer copyright text |
 | `ROOT_URL` | http://127.0.0.1 | Public server URL (use domain in production) |
 | `ROOT_PATH` | *(empty)* | URL sub-path prefix |
+| `API_NAME` | `api` (optional) | API path prefix; uncomment and set to customize it |
 | `PORT` | 8080 | HTTP listen port |
-| `REDIRECT_TO_HTTPS` | False | Auto-redirect HTTP to HTTPS |
-| `SSL_PORT` | 8888 | HTTPS listen port |
-| `SSL_KEYSTORE_FILE` | keystore.jks | JKS keystore filename |
-| `SSL_KEYSTORE_PASSWORD` | password | Keystore password |
-| `SSL_ENABLED` | False | Enable HTTPS |
 
-SMTP email settings are also available for notification features.
+The standard `config.example` does not include SSL or SMTP settings. Add the relevant configuration in your application if you need those features. The standard sample leaves `API_NAME` commented out, so the framework default is used unless you set it. The Ultimate project's startup code has a commented `App.LoadDotEnv` call; dotenv loading is not enabled by default.
+
+The Ultimate starter uses a smaller `config.ini` with the app branding and HTTP server settings:
+
+```ini
+APP_TITLE=Pakai
+APP_TRADEMARK=PAKAI
+HOME_TITLE=PAKAI SERVER ULTIMATE
+APP_COPYRIGHT=Copyright MyCompany 2026
+ROOT_URL=http://127.0.0.1
+ROOT_PATH=
+PORT=8080
+```
+
+### Optional HTTPS and SMTP Configuration
+
+SSL/HTTPS and SMTP keys are not copied into `config.ini` by the current standard `config.example`. Those optional settings are loaded separately from a `.env` file by EndsMeet' `App.LoadDotEnv` method. The standard Full Stack, API, and Web templates include `Files/.env.example`. Copy or rename it to `Files/.env`, set the values, and call `App.LoadDotEnv` after `App.LoadConfig` and before `App.Start`:
+
+```b4x
+App.Initialize
+App.LoadConfig
+App.LoadDotEnv
+' Register routes here
+App.Start
+```
+
+Example `.env` settings (choose either SMTP port 465 or 587):
+
+```ini
+SSL_PORT=8888
+SSL_ENABLED=False
+SSL_KEYSTORE_DIR=
+SSL_KEYSTORE_FILE=keystore.p12
+SSL_KEYSTORE_PASSWORD=replace-with-your-keystore-password
+
+SMTP_PORT=465
+SMTP_ENABLED=False
+SMTP_USESSL=True
+SMTP_SERVER=smtp.example.com
+SMTP_USERNAME=your-account@example.com
+SMTP_PASSWORD=replace-with-your-smtp-password
+```
+
+`App.LoadDotEnv` applies only the keys it finds in `.env`. For HTTPS, provide a `.p12` (PKCS#12) keystore; create one with Java `keytool` or export an existing certificate and private key with OpenSSL. Keep `.env`, keystores, private keys, and passwords out of source control. `App.LoadDotEnv` is commented out in the provided startup code, so uncomment it to use these settings. The Ultimate project also has the call commented out; its project file does not currently list `.env.example` among its assets, so add the file to that project's `Files` folder if you use this configuration there.
 
 ---
 
@@ -436,12 +475,14 @@ GET /api/find/products-by-category_id/1
 
 | Library | Version | Purpose |
 |---------|---------|---------|
-| [EndsMeet](https://github.com/pyhoon/EndsMeet) | 2.20 | Web framework (routing, HTTP server, sessions, SSL) |
-| [MiniCSS](https://github.com/pyhoon/MiniCSS-B4X) | 0.30 | CSS generation from B4X code |
-| [MiniHtml](https://github.com/pyhoon/MiniHtml2-B4X) | 3.00 | HTML generation (DSL-like builder) |
+| [EndsMeet](https://github.com/pyhoon/EndsMeet) | 4.03 | Web framework (routing, HTTP server, sessions, SSL) |
+| [MiniCSS](https://github.com/pyhoon/MiniCSS-B4X) | 0.40 | CSS generation from B4X code |
+| [MiniHTML4](https://github.com/pyhoon/MiniHTML4) | 4.02 | HTML generation (DSL-like builder) |
 | [MiniJS](https://github.com/pyhoon/MiniJS-B4X) | 0.60 | JavaScript generation from B4X code |
-| [MiniORMUtils](https://github.com/pyhoon/MiniORMUtils-B4X) | 6.00 | ORM database abstraction layer |
-| [WebApiUtils](https://github.com/pyhoon/WebApiUtils-B4J) | 6.99 | REST API utilities (response formatting, XML/JSON) |
+| [MiniORMUtils](https://github.com/pyhoon/MiniORMUtils-B4X) | 6.04 | ORM database abstraction layer |
+| [WebApiUtils](https://github.com/pyhoon/WebApiUtils-B4J) | 7.00 | REST API utilities (response formatting, XML/JSON) |
+
+All four templates use these current B4X library versions. Their `libs.json` files are the authoritative dependency manifests; run `libget.jar` from the selected project to install the declared libraries.
 
 ### Optional Tools
 
@@ -454,9 +495,9 @@ GET /api/find/products-by-category_id/1
 
 | Driver | Version | Database |
 |--------|---------|----------|
-| sqlite-jdbc-3.7.2.jar | 3.7.2 | SQLite |
-| mysql-connector-j-9.3.0.jar | 9.3.0 | MySQL |
-| mariadb-java-client-3.5.6.jar | 3.5.6 | MariaDB |
+| SQLite JDBC | `sqlite-jdbc` (version not pinned in the project file) | SQLite |
+| MySQL Connector/J | 9.7.0 | MySQL |
+| MariaDB Java Client | 3.5.9 | MariaDB |
 
 ### Frontend (CDN-loaded)
 
@@ -482,60 +523,63 @@ pakai-server-b4j/
 │   ├── Pakai Server (6.99).b4xtemplate
 │   ├── Pakai Server Api (6.99).b4xtemplate
 │   ├── Pakai Server Web (6.99).b4xtemplate
+│   ├── Pakai Server Ultimate (6.99).b4xtemplate
 │   └── swagger.zip              # Minimal Swagger UI asset files
-└── source/
-    ├── Pakai-Server.b4j         # Full stack project file
-    ├── Pakai-Server-Api.b4j     # API-only project file
-    ├── Pakai-Server-Web.b4j     # Web-only project file
-    ├── $APPNAME$.b4j            # Template placeholder
-    ├── libs.json                # Library dependency definitions
-    ├── res.json                 # External resource URLs
-    ├── ORM.bas                  # Database initialization
-    ├── MainView.bas             # Main page layout
-    ├── MC.bas                   # HTML caching utility
-    ├── MH.bas                   # MiniHtml helper
-    ├── CategoriesModel.bas      # Categories CRUD
-    ├── CategoriesView.bas       # Categories HTML views
-    ├── CategoriesHandler.bas    # Categories Web handler
-    ├── CategoriesApiHandler.bas # Categories API handler
-    ├── ProductsModel.bas        # Products CRUD
-    ├── ProductsView.bas         # Products HTML views
-    ├── ProductsHandler.bas      # Products Web handler
-    ├── ProductsApiHandler.bas   # Products API handler
-    ├── FindApiHandler.bas       # Search/filter API
-    ├── HelpHandler.bas          # API documentation
-    ├── HttpsFilter.bas          # SSL redirect
-    ├── Files/
-    │   ├── config.example       # Server configuration example
-    │   ├── sqlite.example       # SQLite settings example
-    │   ├── mariadb.example      # MariaDB settings example
-    │   └── mysql.example        # MySQL settings example
-    └── Objects/
-        ├── config.ini           # Server configuration (auto-generated)
-        ├── sqlite.ini           # SQLite settings (auto-generated)
-        ├── mariadb.ini          # MariaDB settings (auto-generated via Conditional Compile)
-        ├── pakai.db             # SQLite database (auto-generated)
-        ├── help.html            # Generated API documentation page
-        ├── keystore.jks         # SSL keystore (generated via JDK keytool)
-        └── www/                 # Static assets
-            ├── assets/css/      # Bootstrap 5.3.8, main.css
-            ├── assets/js/       # Bootstrap, HTMX 2.0.8, AlpineJS 3.15.8, app.js
-            ├── assets/img/      # favicon, sponsor images
-            └── swagger/         # Swagger UI files
-
-**Note:** Config example files (`config.example`, `sqlite.example`, `mariadb.example`, `mysql.example`) are auto-copied to `Objects/` on first run if the `.ini` file doesn't exist.
+├── source/
+│   ├── Pakai-Server.b4j         # Full stack project file
+│   ├── Pakai-Server-Api.b4j     # API-only project file
+│   ├── Pakai-Server-Web.b4j     # Web-only project file
+│   ├── $APPNAME$.b4j            # Template placeholder
+│   ├── libs.json                # Library dependency definitions
+│   ├── res.json                 # External resource URLs
+│   ├── ORM.bas                  # Database initialization
+│   ├── MainView.bas             # Main page layout
+│   ├── MC.bas                   # HTML caching utility
+│   ├── MH.bas                   # MiniHtml helper
+│   ├── CategoriesModel.bas      # Categories CRUD
+│   ├── CategoriesView.bas       # Categories HTML views
+│   ├── CategoriesHandler.bas    # Categories Web handler
+│   ├── CategoriesApiHandler.bas # Categories API handler
+│   ├── ProductsModel.bas        # Products CRUD
+│   ├── ProductsView.bas         # Products HTML views
+│   ├── ProductsHandler.bas      # Products Web handler
+│   ├── ProductsApiHandler.bas   # Products API handler
+│   ├── FindApiHandler.bas       # Search/filter API
+│   ├── HelpHandler.bas          # API documentation
+│   └── Objects/                 # Runtime configuration, database and static assets
+└── ultimate/                    # Source project for the Ultimate template
 ```
+
+The separate `ultimate/` directory contains the source project for the **Pakai Server Ultimate** template. It is a compact Web UI starter with Products and Categories CRUD, database initialization, and shared HTML helpers. It does not include REST API handlers or `HelpHandler`.
+
+```text
+ultimate/
+├── Pakai-Server-Ultimate.b4j
+├── CategoriesHandler.bas
+├── CategoriesModel.bas
+├── CategoriesView.bas
+├── ProductsHandler.bas
+├── ProductsModel.bas
+├── ProductsView.bas
+├── MainView.bas
+├── ORM.bas
+├── MC.bas
+├── MH.bas
+└── Objects/                     # Runtime configuration and static assets
+```
+
+The B4J project files reference configuration example assets that are copied to `Objects/` on first run when a corresponding `.ini` file is missing. Runtime contents of `Objects/` depend on the selected template and build configuration.
 
 ---
 
 ## Creating a New Project from Template
 
-1. Copy the desired `.b4xtemplate` from the `release/` folder to your B4J **Additional Libraries** folder
-2. In B4J IDE: **File → New → Pakai Server (6.99)**
-3. Set the project name and click OK
-4. Use the **IDE macros** (clickable links in the project code header) to:
-   - **GetLibraries** — auto-download all B4X library dependencies via `libget.jar`
-   - **ModelGenerator** — scaffold new models from your database schema via `modgen.jar`
+1. Copy the desired `.b4xtemplate` from the `release/` folder to your B4J **Additional Libraries** folder.
+2. In B4J IDE, select **File → New** and choose the Pakai template variant.
+3. Set the project name and click **OK**.
+4. Open the generated project and use its **GetLibraries** IDE macro to download required B4X libraries.
+
+The Step 1–5 macros in the repository project files are for maintaining and packaging the distributable templates. `modgen.jar` is an optional tool for generating MiniORM-related code; usage depends on the target project.
 
 > See the [Pakai Framework v6.99 Tutorial](TUTORIAL.md) for a complete step-by-step guide.
 
