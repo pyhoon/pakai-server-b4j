@@ -16,14 +16,30 @@ End Sub
 Public Sub InitDatabase
 	Try
 		LogColor("Configuring database...", COLOR_BLUE)
-		If File.Exists(File.DirApp, "sqlite.ini") = False Then
-			File.Copy(File.DirAssets, "sqlite.example", File.DirApp, "sqlite.ini")
+		#If MariaDB
+		Dim dbvar As String = "mariadb"
+		#Else If MySQL
+		Dim dbvar As String = "mysql"
+		#Else
+		Dim dbvar As String = "sqlite"
+		#End If		
+		If File.Exists(File.DirApp, $"${dbvar}.ini"$) = False Then
+			File.Copy(File.DirAssets, $"${dbvar}.example"$, File.DirApp, $"${dbvar}.ini"$)
 		End If
-		Dim ctx As Map = File.ReadMap(File.DirApp, "sqlite.ini")
+		Dim ctx As Map = File.ReadMap(File.DirApp, $"${dbvar}.ini"$)
 		DB.Initialize
 		DBS.Initialize
 		DBS.DBType = ctx.GetDefault("DbType", "")
 		Select DBS.DBType
+			Case DB.MARIADB, DB.MYSQL
+				DBS.DBHost = ctx.GetDefault("DbHost", "")
+				DBS.DBPort = ctx.GetDefault("DbPort", "")
+				DBS.DBName = ctx.GetDefault("DbName", "")
+				DBS.Driver = ctx.GetDefault("DriverClass", "")
+				DBS.JdbcUrl = ctx.GetDefault("JdbcUrl", "")
+				DBS.User = ctx.GetDefault("User", "")
+				DBS.Password = ctx.GetDefault("Password", "")
+				DBS.MaxPoolSize = ctx.GetDefault("MaxPoolSize", 0)
 			Case DB.SQLITE
 				DBS.DBDir = ctx.GetDefault("DbDir", File.DirApp)
 				DBS.DBFile = ctx.GetDefault("DbFile", "data.db")
@@ -43,12 +59,30 @@ Public Sub InitDatabase
 	End Try
 End Sub
 
+Private Sub UsePool (Name As String) As Boolean
+	Dim DbArray() As String = Array As String(DB.MARIADB, DB.MYSQL)
+	Return DbArray.As(List).IndexOf(Name) > -1
+End Sub
+
 Sub CheckDatabase
 	Try
 		LogColor("Checking database...", COLOR_BLUE)
 		Select DB.DbType
 			Case DB.SQLITE
 				Dim DBExist As Boolean = DB.Exist
+			Case DB.MARIADB, DB.MYSQL
+				Wait For (DB.InitSchemaAsync) Complete (Success As Boolean)
+				If Success = False Then
+					LogColor("Database initilialization failed!", COLOR_RED)
+					Log("Application is terminated.")
+					ExitApplication
+				End If
+				If DB.Test = False Then
+					LogColor("Database connection test failed!", COLOR_RED)
+					Log("Application is terminated.")
+					ExitApplication
+				End If
+				Wait For (DB.ExistAsync) Complete (DBExist As Boolean)
 			Case Else
 				LogColor("Database type is unknown!", COLOR_RED)
 				ExitApplication
@@ -59,6 +93,9 @@ Sub CheckDatabase
 			Return
 		End If
 		LogColor($"${DB.DbType} database existed!"$, COLOR_BLUE)
+		If UsePool(DB.DbType) Then
+			DB.InitPool
+		End If		
 		Main.DB = DB
 		' Create new tables after database has already created
 	Catch
@@ -72,13 +109,19 @@ End Sub
 ' Create Database Tables and Populate Data
 Sub CreateDatabase
 	LogColor("Creating database...", COLOR_BLUE)
-	Dim Success As Boolean = DB.CreateSQLite
+	If UsePool(DB.DbType) Then
+		Wait For (DB.CreateDatabaseAsync) Complete (Success As Boolean)
+	Else
+		Dim Success As Boolean = DB.CreateSQLite
+	End If
 	If Not(Success) Then
 		LogColor("Database creation failed!", COLOR_RED)
 		Return
 	End If
-	
 	LogColor("Creating tables...", COLOR_BLUE)
+	If UsePool(DB.DbType) Then
+		DB.InitPool
+	End If
 	DB.UseTimestamps = True
 	DB.QueryExecute = False
 	DB.QueryAddToBatch = True
